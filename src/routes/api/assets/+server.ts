@@ -3,8 +3,7 @@ import type { RequestHandler } from "./$types";
 
 async function sha1(buffer: ArrayBuffer) {
   const digest = await crypto.subtle.digest('SHA-1', buffer)
-  const digestArray = Array.from(new Uint8Array(digest))
-  return digestArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return Buffer.from(digest).toString('base64').replace(/\//g, '-').replace(/\+/g, '_').replace(/=/g, '')
 }
 
 export const POST: RequestHandler = async ({ platform, request }) => {
