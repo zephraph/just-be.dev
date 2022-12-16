@@ -171,3 +171,5 @@ dist
 .dev.vars
 
 .svelte-kit
+.local-data
+.env

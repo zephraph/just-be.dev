@@ -9,7 +9,10 @@ declare namespace App {
 
 	interface Platform {
 		env: {
-			COUNTER: DurableObjectNamespace;
+			KV_IDs: KVNamespace;
+			KV_URLs: KVNamespace;
+			R2_NOTES: R2Bucket;
+			R2_ASSETS: R2Bucket;
 		}
 		context: {
 			waitUntil(promise: Promise<any>): void;

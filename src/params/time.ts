@@ -1,6 +1,7 @@
 import type { ParamMatcher } from "@sveltejs/kit";
-import { ulid } from '$lib/validators'
+import { time } from '$lib/validators'
 
 export const match: ParamMatcher = (param) => {
-  return ulid.safeParse(param).success
+  return time.safeParse(parseInt(param, 10)).success
 }
+

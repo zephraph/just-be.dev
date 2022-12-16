@@ -1,8 +1,12 @@
-name = "just-be.dev"
-main = "src/index.ts"
+name = "just-be-dev"
 compatibility_date = "2022-11-27"
+compatibility_flags = [ "formdata_parser_supports_files" ]
 
 kv_namespaces = [
   { binding = "KV_IDs", id = "9b50bb86675242f493b168d0feb3ecfc" },
   { binding = "KV_URLs", id = "8e76f1a51eb94a918b04bb2c0816a84a" },
+]
+
+r2_buckets = [
+  { binding = "R2_ASSETS", bucket_name = "assets" },
 ]
