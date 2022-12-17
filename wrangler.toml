@@ -8,5 +8,5 @@ kv_namespaces = [
 ]
 
 r2_buckets = [
-  { binding = "R2_ASSETS", bucket_name = "assets" },
+  { binding = "R2_ATTACHMENTS", bucket_name = "attachments" },
 ]

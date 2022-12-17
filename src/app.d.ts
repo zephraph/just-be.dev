@@ -11,12 +11,11 @@ declare namespace App {
 		env: {
 			KV_IDs: KVNamespace;
 			KV_URLs: KVNamespace;
-			R2_NOTES: R2Bucket;
-			R2_ASSETS: R2Bucket;
-		}
+			R2_ATTACHMENTS: R2Bucket;
+		};
 		context: {
 			waitUntil(promise: Promise<any>): void;
-		}
+		};
 		caches: CacheStorage & { default: Cache };
 	}
 }

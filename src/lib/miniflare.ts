@@ -1,21 +1,21 @@
-import { Miniflare, Log, LogLevel } from 'miniflare'
-import { dev } from '$app/environment'
+import { Miniflare, Log, LogLevel } from 'miniflare';
+import { dev } from '$app/environment';
 
 export const miniflare = async (platform: App.Platform) => {
-  if (!dev) return platform;
+	if (!dev) return platform;
 
-  if (platform) return platform;
-  const mf = new Miniflare({
-    log: new Log(LogLevel.INFO),
-    compatibilityFlags: ["formdata_parser_supports_files"],
-    kvPersist: './.local-data/kv',
-    kvNamespaces: ['KV_IDs', 'KV_Urls'],
-    r2Persist: './.local-data/r2',
-    r2Buckets: ['R2_NOTES', 'R2_ASSETS'],
-    globalAsyncIO: true,
-    globalTimers: true,
-    globalRandom: true,
-    script: `
+	if (platform) return platform;
+	const mf = new Miniflare({
+		log: new Log(LogLevel.INFO),
+		compatibilityFlags: ['formdata_parser_supports_files'],
+		kvPersist: './.local-data/kv',
+		kvNamespaces: ['KV_IDs', 'KV_Urls'],
+		r2Persist: './.local-data/r2',
+		r2Buckets: ['R2_ATTACHMENTS'],
+		globalAsyncIO: true,
+		globalTimers: true,
+		globalRandom: true,
+		script: `
       addEventListener("fetch", (event) => {
         event.waitUntil(Promise.resolve(event.request.url));
         event.respondWith(new Response(event.request.headers.get("X-Message")));
@@ -24,7 +24,7 @@ export const miniflare = async (platform: App.Platform) => {
         event.waitUntil(Promise.resolve(event.scheduledTime));
       });
     `
-  });
+	});
 
-  return { env: await mf.getBindings() }
-}
+	return { env: await mf.getBindings() };
+};
