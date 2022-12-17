@@ -5,7 +5,7 @@
 
 <main class="lg-:container mx-auto px-6 py-2 max-w-screen-lg">
 	<Header />
-	<section>
+	<article class="prose lg:prose-xl">
 		<slot />
-	</section>
+	</article>
 </main>
