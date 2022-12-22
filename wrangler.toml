@@ -4,6 +4,7 @@ compatibility_flags = [ "formdata_parser_supports_files" ]
 
 kv_namespaces = [
   { binding = "KV_IDs", id = "9b50bb86675242f493b168d0feb3ecfc" },
+  { binding = "KV_FILENAMEs", id = "d5a9d75ba4214c4eb50dfb8292df5fcb" },
   { binding = "KV_URLs", id = "8e76f1a51eb94a918b04bb2c0816a84a" },
 ]
 

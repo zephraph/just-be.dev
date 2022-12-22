@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ platform, request }) => {
 	const bucket = platform.env.R2_ATTACHMENTS;
 
 	if (!(await bucket.head(hash))) {
-		await bucket.put(hash, await file.arrayBuffer());
+		await bucket.put(hash, file.stream());
 	}
 
 	return json({

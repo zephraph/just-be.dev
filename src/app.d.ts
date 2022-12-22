@@ -10,6 +10,7 @@ declare namespace App {
 	interface Platform {
 		env: {
 			KV_IDs: KVNamespace;
+			KV_FILENAMEs: KVNamespace;
 			KV_URLs: KVNamespace;
 			R2_ATTACHMENTS: R2Bucket;
 		};
