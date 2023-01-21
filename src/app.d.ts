@@ -5,13 +5,12 @@ declare namespace App {
 	// interface Error {}
 	// interface Locals {}
 	// interface PageData {}
-	// interface Platform {}
-
 	interface Platform {
 		env: {
 			KV_IDs: KVNamespace;
 			KV_FILENAMEs: KVNamespace;
 			KV_URLs: KVNamespace;
+			KV_NOTEs: KVNamespace;
 			R2_ATTACHMENTS: R2Bucket;
 		};
 		context: {

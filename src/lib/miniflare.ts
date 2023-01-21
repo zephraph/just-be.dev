@@ -9,7 +9,7 @@ export const miniflare = async (platform: App.Platform) => {
 		log: new Log(LogLevel.INFO),
 		compatibilityFlags: ['formdata_parser_supports_files'],
 		kvPersist: './.local-data/kv',
-		kvNamespaces: ['KV_IDs', 'KV_FILENAMEs', 'KV_URLs'],
+		kvNamespaces: ['KV_IDs', 'KV_FILENAMEs', 'KV_URLs', 'KV_NOTEs'],
 		r2Persist: './.local-data/r2',
 		r2Buckets: ['R2_ATTACHMENTS'],
 		globalAsyncIO: true,
