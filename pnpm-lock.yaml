@@ -28,9 +28,6 @@ specifiers:
   xregexp: ^5.1.1
   zod: ^3.20.2
 
-dependencies:
-  marked: 4.2.12
-
 devDependencies:
   '@cloudflare/workers-types': 4.20221111.1
   '@sveltejs/adapter-cloudflare': 1.1.0_@sveltejs+kit@1.2.2
@@ -40,6 +37,7 @@ devDependencies:
   autoprefixer: 10.4.13_postcss@8.4.21
   chevrotain: 10.4.2
   gray-matter: 4.0.3
+  marked: 4.2.12
   mdsvex: 0.10.6_svelte@3.55.1
   miniflare: 2.11.0
   postcss: 8.4.21
@@ -48,7 +46,7 @@ devDependencies:
   svelte: 3.55.1
   svelte-check: 3.0.2_pehl75e5jsy22vp33udjja4soi
   svelte-preprocess: 5.0.1_oifjsu5oar4lzyaoppb2hxramu
-  tailwindcss: 3.2.4_postcss@8.4.21
+  tailwindcss: 3.2.4
   ts-dedent: 2.2.0
   tslib: 2.4.1
   typescript: 4.9.4
@@ -600,7 +598,7 @@ packages:
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       postcss-selector-parser: 6.0.10
-      tailwindcss: 3.2.4_postcss@8.4.21
+      tailwindcss: 3.2.4
     dev: true
 
   /@types/better-sqlite3/7.6.3:
@@ -1493,7 +1491,7 @@ packages:
     resolution: {integrity: sha512-yr8hSKa3Fv4D3jdZmtMMPghgVt6TWbk86WQaWhDloQjRSQhMMYCAro7jP7VDJrjjdV8pxVxMssXS8B8Y5DZ5aw==}
     engines: {node: '>= 12'}
     hasBin: true
-    dev: false
+    dev: true
 
   /mdsvex/0.10.6_svelte@3.55.1:
     resolution: {integrity: sha512-aGRDY0r5jx9+OOgFdyB9Xm3EBr9OUmcrTDPWLB7a7g8VPRxzPy4MOBmcVYgz7ErhAJ7bZ/coUoj6aHio3x/2mA==}
@@ -2206,12 +2204,10 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
-  /tailwindcss/3.2.4_postcss@8.4.21:
+  /tailwindcss/3.2.4:
     resolution: {integrity: sha512-AhwtHCKMtR71JgeYDaswmZXhPcW9iuI9Sp2LvZPo9upDZ7231ZJ7eA9RaURbhpXGVlrjX4cFNlB4ieTetEb7hQ==}
     engines: {node: '>=12.13.0'}
     hasBin: true
-    peerDependencies:
-      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
