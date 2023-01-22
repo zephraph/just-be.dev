@@ -7,7 +7,7 @@
 
 <nav class="flex justify-between items-center pt-3 pb-16 md:pt-4 text-gray-400 ">
 	<a
-		class="animated-header bastia whitespace-nowrap text-3xl items-center mr-2 hover:text-gray-800 ease-out duration-300 cursor-pointer"
+		class="animated-header bastia whitespace-nowrap text-3xl items-center mr-2 hover:text-orange-500 ease-out duration-300 cursor-pointer"
 		href="/"
 	>
 		<span>just</span><span class="fade-in">in</span>
@@ -29,7 +29,7 @@
 		transition: 0.15s all ease-in-out;
 	}
 	.social-icons > *:hover {
-		transform: scale(1.2);
+		transform: scale(1.1);
 	}
 
 	.fade-in {
