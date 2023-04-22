@@ -11,6 +11,9 @@ async function sha1(buffer: ArrayBuffer) {
 }
 
 export const POST: RequestHandler = async ({ platform, request }) => {
+	if (!platform) {
+		throw error(500, "Welp, that's not supposed to happen. I'll look into it.");
+	}
 	const formData = await request.formData();
 	const file = formData.get('file') as File;
 
