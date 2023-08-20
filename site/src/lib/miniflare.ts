@@ -1,4 +1,4 @@
-import { Miniflare, Log, LogLevel } from 'miniflare';
+import { Miniflare, Log, LogLevel } from '.pnpm/miniflare@2.11.0/node_modules/miniflare';
 import { dev } from '$app/environment';
 
 export const miniflare = async (platform: App.Platform) => {
