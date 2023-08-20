@@ -1,43 +1,13 @@
 {
-	"name": "just-be.dev",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest",
-		"lint": "prettier --plugin-search-dir . --check .",
-		"format": "prettier --plugin-search-dir . --write ."
-	},
-	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20230404.0",
-		"@sveltejs/adapter-cloudflare": "^2.2.0",
-		"@sveltejs/kit": "1.15.7",
-		"@tailwindcss/typography": "^0.5.9",
-		"@types/marked": "^4.0.8",
-		"autoprefixer": "^10.4.14",
-		"gray-matter": "^4.0.3",
-		"marked": "^4.3.0",
-		"mdsvex": "^0.10.6",
-		"miniflare": "^2.13.0",
-		"postcss": "^8.4.23",
-		"prettier": "^2.8.7",
-		"prettier-plugin-svelte": "^2.10.0",
-		"svelte": "^3.58.0",
-		"svelte-check": "^3.2.0",
-		"svelte-preprocess": "^5.0.3",
-		"tailwindcss": "^3.3.1",
-		"ts-dedent": "^2.2.0",
-		"tslib": "^2.5.0",
-		"typescript": "^5.0.4",
-		"vite": "^4.3.1",
-		"vitest": "^0.30.1",
-		"wrangler": "2.16.0",
-		"xregexp": "^5.1.1",
-		"zod": "^3.21.4"
-	},
-	"type": "module"
+  "scripts": {
+    "dev": "wrangler pages dev --compatibility-date=2023-01-01 ./pages",
+    "deploy": "wrangler pages deploy ./pages"
+  },
+  "dependencies": {
+    "hono": "^3.4.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230628.0",
+    "wrangler": "^3.1.2"
+  }
 }
