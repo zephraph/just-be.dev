@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "dev": "wrangler pages dev --compatibility-date=2023-01-01 ./pages",
-    "deploy": "wrangler pages deploy ./pages"
+    "dev": "wrangler dev --compatibility-date=2023-01-01 functions/[[route]].ts"
   },
   "dependencies": {
     "hono": "^3.4.1"
