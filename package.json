@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "wrangler dev --compatibility-date=2023-01-01 functions/[[route]].ts"
+    "dev": "wrangler dev --compatibility-date=2023-01-01 functions/index.ts"
   },
   "dependencies": {
     "hono": "^3.4.1"
