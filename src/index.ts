@@ -12,11 +12,7 @@ app.get('/_obsidian/:prefix/*', async (c) => {
 })
 
 app.get('/*', async (c) => {
-  return fetch(`https://notes.just-be.dev/${c.req.url}`, {
-    headers: {
-      'Host': 'notes.just-be.dev'
-    }
-  }).then((res) => {
+  return fetch(`https://notes.just-be.dev/${c.req.url}`).then((res) => {
     const { origin } = new URL(c.req.url)
     return new HTMLRewriter()
       .on('script', rewriteContent(content => {
