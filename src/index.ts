@@ -47,17 +47,14 @@ app.get("/*", async (c) => {
       )
       .on(
         "script",
-        rewriteContent((content) => {
-          return content
+        rewriteContent((content) =>
+          content
             .replace(
               /https:\/\/publish-(\d+)\.obsidian\.md/g,
               `${origin}/_obsidian/$1`
             )
-            .replace(
-              encodeURI(origin).replace(/:/g, "%3A") + "/",
-              `About%20me`
-            );
-        })
+            .replace(encodeURI(origin).replace(/:/g, "%3A") + "/", `About%20me`)
+        )
       )
       .transform(res);
   });
