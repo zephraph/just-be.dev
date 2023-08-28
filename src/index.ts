@@ -2,10 +2,6 @@ import { Hono } from "hono";
 import { appendContent, rewriteAttribute, rewriteContent } from "./rewriters";
 const app = new Hono();
 
-app.get("/api/hello", (c) => {
-  return c.html("<h1>Hello world</h1>");
-});
-
 app.get("/_obsidian/assets/*", async (c) => {
   const path = c.req.path.replace(/\/_obsidian\/assets\//, "");
   if (path.includes("app.js")) {
