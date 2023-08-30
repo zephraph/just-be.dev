@@ -47,8 +47,9 @@ app.get("/posts/:slug", async (c) => {
 });
 
 app.get("/*", async (c) => {
-  return fetch(`https://notes.just-be.dev/${c.req.url}`).then((res) => {
-    const { origin } = new URL(c.req.url);
+  const { origin, pathname } = new URL(c.req.url);
+  return fetch(`https://notes.just-be.dev${pathname}`).then((res) => {
+    const encodedURI = encodeURI(origin).replace(/:/g, "%3A") + '/';
     return new HTMLRewriter()
       .on(
         "script",
@@ -62,11 +63,11 @@ app.get("/*", async (c) => {
         "script",
         rewriteContent((content) =>
           content
+            .replace(encodedURI, '')
             .replace(
               /https:\/\/publish-(\d+)\.obsidian\.md/g,
               `${origin}/_obsidian/$1`
             )
-            .replace(encodeURI(origin).replace(/:/g, "%3A") + "/", `About%20me`)
         )
       )
       .transform(res);
