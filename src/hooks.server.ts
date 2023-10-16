@@ -21,7 +21,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Temporarily redirect all existing posts to homepage
 	if (event.url.pathname.startsWith('/posts')) {
-		throw redirect(307, '/');
+		throw redirect(307, `https://notes.just-be.dev${event.url.pathname}`);
 	}
 	return resolve(event);
 };
