@@ -14,6 +14,9 @@ importers:
       astro:
         specifier: ^4.13.1
         version: 4.13.1(typescript@5.5.4)
+      remark-obsidian:
+        specifier: ^1.8.0
+        version: 1.8.0
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -1409,6 +1412,9 @@ packages:
 
   remark-gfm@4.0.0:
     resolution: {integrity: sha512-U92vJgBPkbw4Zfu/IiW2oTZLSL3Zpv+uI7My2eq8JxKgqraFdU8YUGicEJCEgSbeaG+QDFqIcwwfMTOEelPxuA==}
+
+  remark-obsidian@1.8.0:
+    resolution: {integrity: sha512-nzL47ykZubW/ELAetSE8+73BFX8kGO+64//7pYnsEuEUrEz5x4AHP9wYhsceFkfK6oftAyugy1FkPcThhdyD2g==}
 
   remark-parse@11.0.0:
     resolution: {integrity: sha512-FCxlKLNGknS5ba/1lmpYijMUzX2esxW5xQqjWxw2eHFfS2MSdaHVINFmhjo+qN1WhZhNimq0dZATN9pH0IDrpA==}
@@ -3458,6 +3464,8 @@ snapshots:
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
+
+  remark-obsidian@1.8.0: {}
 
   remark-parse@11.0.0:
     dependencies:
