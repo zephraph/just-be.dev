@@ -7,12 +7,19 @@ import type { APIContext, APIRoute } from "astro";
 
 export const prerender = false;
 
-const app = new Hono<{ Bindings: APIContext }>()
+// Dump cf env in top level of context
+type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
+
+const app = new Hono<{ Bindings: AstroContext }>()
   .basePath("/api/")
-  .post("/publish", async (context) => {
-    console.log("env", context.env);
+  .post("/publish", async (c) => {
+    c.text("Published!");
   });
 
 export const ALL: APIRoute = (astroContext) => {
-  return app.fetch(astroContext.request, astroContext);
+  return app.fetch(
+    astroContext.request,
+    Object.assign(astroContext, astroContext.locals.runtime.env),
+    astroContext.locals.runtime.ctx
+  );
 };
