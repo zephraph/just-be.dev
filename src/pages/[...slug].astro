@@ -1,16 +1,19 @@
 ---
 import { getEntry } from "astro:content";
-// 1. Get the slug from the incoming server request
 const { slug } = Astro.params;
 
+// If there's no slug, we're on the index page
 if (slug === undefined) {
-  throw new Error("Slug is required");
+  // TODO: Should render index page
+  return Astro.rewrite("/404");
 }
-// 2. Query for the entry directly using the request slug
+// First, try to get the entry from the "notes" collection if it exists
+// This is mostly for the sake of local development.
 const entry = await getEntry("notes", slug);
+
 // 3. Redirect if the entry does not exist
 if (entry === undefined) {
-  return Astro.redirect("/404");
+  return Astro.rewrite("/404");
 }
 
 // 4. (Optional) Render the entry to HTML in the template
