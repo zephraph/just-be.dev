@@ -25,5 +25,12 @@ export const normalizeFrontmatter: RemarkPlugin = () => {
       ) as Heading | undefined;
       fm.title = title?.children.find((node) => node.type === "text")?.value;
     }
+
+    /**
+     * Treat the homepage as a special case.
+     */
+    if (fm.homepage) {
+      fm.layout = "@layouts/homepage.astro";
+    }
   };
 };
