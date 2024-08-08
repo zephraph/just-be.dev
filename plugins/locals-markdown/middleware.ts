@@ -1,9 +1,12 @@
+/// <reference types="./middleware.d.ts" />
+
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
-import { markdown } from "../astro.config";
 import { defineMiddleware } from "astro:middleware";
 import matter from "gray-matter";
 
-const processor = await createMarkdownProcessor(markdown);
+const processor = await createMarkdownProcessor(
+  await import(__ASTRO_CONFIG_PATH__).then((m) => m.markdown)
+);
 
 export const onRequest = defineMiddleware((context, next) => {
   context.locals.render = (content, frontmatter) => {
