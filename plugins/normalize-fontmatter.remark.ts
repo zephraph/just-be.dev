@@ -4,14 +4,14 @@ import type { Heading } from "mdast";
 export const normalizeFrontmatter: RemarkPlugin = () => {
   return (root, file) => {
     const fm = (file.data.astro as MarkdownAstroData).frontmatter;
+
     /**
-     * If the frontmatter has a layout key, we'll assume it's a layout file
-     * and normalize it to the correct path.
+     * Treat the homepage as a special case for layouts and fallback to default.
      */
-    if (fm.layout) {
-      fm.layout = `@layouts/${fm.layout}.astro`;
-    } else {
-      fm.layout = "@layouts/default.astro";
+    if (fm.homepage) {
+      fm.layout = "homepage";
+    } else if (!fm.layout) {
+      fm.layout = "default";
     }
 
     /**
@@ -24,13 +24,6 @@ export const normalizeFrontmatter: RemarkPlugin = () => {
         (node) => node.type === "heading" && node.depth === 1
       ) as Heading | undefined;
       fm.title = title?.children.find((node) => node.type === "text")?.value;
-    }
-
-    /**
-     * Treat the homepage as a special case.
-     */
-    if (fm.homepage) {
-      fm.layout = "@layouts/homepage.astro";
     }
   };
 };

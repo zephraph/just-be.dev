@@ -14,7 +14,12 @@ type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
 
 const app = new Hono<{ Bindings: AstroContext }>()
   .basePath("/api/")
-  .use("*", (c, next) => bearerAuth({ token: c.env.PUBLISH_KEY })(c, next))
+  .use("*", (c, next) => {
+    if (process.env.NODE_ENV === "development") {
+      return next();
+    }
+    return bearerAuth({ token: c.env.PUBLISH_KEY })(c, next);
+  })
   .use("/publish/*", etag())
   .post("/publish/:id", async (c) => {
     const result = await c.env.R2_BUCKET.put(

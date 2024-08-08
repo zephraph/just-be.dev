@@ -8,6 +8,7 @@ const notesCollection = defineCollection({
     title: z.string().optional(),
     published: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
+    layout: z.string().optional(),
   }),
 });
 // Export a single `collections` object to register your collection(s)

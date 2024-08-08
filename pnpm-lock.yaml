@@ -14,6 +14,9 @@ importers:
       '@astrojs/cloudflare':
         specifier: ^11.0.4
         version: 11.0.4(astro@4.13.1(@types/node@22.1.0)(typescript@5.5.4))
+      '@astrojs/markdown-remark':
+        specifier: ^5.2.0
+        version: 5.2.0
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.13.1(@types/node@22.1.0)(typescript@5.5.4))(tailwindcss@3.4.7)
@@ -23,6 +26,9 @@ importers:
       astro:
         specifier: ^4.13.1
         version: 4.13.1(@types/node@22.1.0)(typescript@5.5.4)
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
       hono:
         specifier: ^4.5.4
         version: 4.5.4
@@ -36,9 +42,6 @@ importers:
         specifier: ^5.5.4
         version: 5.5.4
     devDependencies:
-      '@astrojs/markdown-remark':
-        specifier: ^5.2.0
-        version: 5.2.0
       '@cloudflare/workers-types':
         specifier: ^4.20240729.0
         version: 4.20240729.0

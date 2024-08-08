@@ -1,25 +1,50 @@
 ---
 import { getEntry } from "astro:content";
-const { slug } = Astro.params;
-
-// If there's no slug, we're on the index page
-if (slug === undefined) {
-  // TODO: Should render index page
-  return Astro.rewrite("/404");
-}
-// First, try to get the entry from the "notes" collection if it exists
-// This is mostly for the sake of local development.
-const entry = await getEntry("notes", slug);
-
-// 3. Redirect if the entry does not exist
-if (entry === undefined) {
-  return Astro.rewrite("/404");
-}
-
-// 4. (Optional) Render the entry to HTML in the template
-const { Content } = await entry.render();
 
 export const prerender = false;
+
+const HOME_SLUG = "01J4CPMJ91NF1DNQPE3TZ50HH0";
+
+const ulidRegex = /^[0-9A-HJ-NP-TV-Z]{26}$/i;
+
+function isULID(ulid: string) {
+  return ulidRegex.test(ulid);
+}
+
+let { slug } = Astro.params;
+// default to homepage slug
+slug ??= HOME_SLUG;
+
+let html = "";
+let layout = "default";
+
+const entry = await getEntry("notes", slug.toLowerCase());
+if (entry) {
+  const { code } = await Astro.locals.render(entry.body);
+  html = code;
+  layout =
+    entry.slug === HOME_SLUG.toLocaleLowerCase()
+      ? "homepage"
+      : (entry.data.layout ?? "default");
+}
+
+if (!html && isULID(slug)) {
+  const content = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
+  if (!content) return rewrite("/404");
+  const { code, metadata } = await Astro.locals.render(await content.text());
+  html = code;
+  // The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
+  // so that the import below works correctly
+  layout = metadata.frontmatter.layout;
+}
+
+if (!html) {
+  return Astro.rewrite("/404");
+}
+
+const Layout = (await import(`../layouts/${layout}.astro`)).default;
 ---
 
-<Content />
+<Layout>
+  <Fragment set:html={html} />
+</Layout>
