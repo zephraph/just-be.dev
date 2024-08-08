@@ -5,9 +5,10 @@ import { z, defineCollection } from "astro:content";
 const notesCollection = defineCollection({
   type: "content",
   schema: z.object({
-    title: z.string(),
-    published: z.boolean(),
-    tags: z.array(z.string()),
+    title: z.string().optional(),
+    published: z.boolean().default(false),
+    tags: z.array(z.string()).default([]),
+    layout: z.string().optional(),
   }),
 });
 // Export a single `collections` object to register your collection(s)
