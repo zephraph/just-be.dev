@@ -1,5 +1,6 @@
 name = "just-be-dev"
 compatibility_date = "2024-08-06"
+compatibility_flags = ["nodejs_compat"]
 
 kv_namespaces = [
   { binding = "KV_MAPPINGS", id = "36e4319084c4498fa08e5bf00f36331a" },

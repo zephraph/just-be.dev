@@ -4,9 +4,8 @@ import { defineConfig, type AstroUserConfig } from "astro/config";
 import remarkObsidian from "remark-obsidian";
 import { normalizeFrontmatter } from "./plugins/normalize-fontmatter.remark";
 import localsMarkdown from "./plugins/locals-markdown";
-
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 import tailwind from "@astrojs/tailwind";
-
 import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
@@ -21,4 +20,14 @@ export default defineConfig({
       enabled: true,
     },
   }),
+  vite: {
+    ssr: {
+      external: ["node:path", "path"],
+    },
+    plugins: [
+      nodePolyfills({
+        include: ["url", "module"],
+      }),
+    ],
+  },
 });
