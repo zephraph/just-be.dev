@@ -1,13 +1,12 @@
 /// <reference types="./astro.config.d.ts" />
 
-import { defineConfig, type AstroUserConfig } from "astro/config";
-import remarkObsidian from "remark-obsidian";
-import { normalizeFrontmatter } from "./plugins/normalize-fontmatter.remark";
-import localsMarkdown from "./plugins/locals-markdown";
-
+import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
-
 import cloudflare from "@astrojs/cloudflare";
+
+import { normalizeFrontmatter } from "./packages/my-remark";
+import { remarkObsidian } from "./packages/remark-obsidian";
+import mdRenderer from "./packages/astro-md";
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,8 +14,9 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [normalizeFrontmatter, remarkObsidian],
   },
-  integrations: [localsMarkdown({ configUrl: import.meta.url }), tailwind()],
+  integrations: [mdRenderer(), tailwind()],
   adapter: cloudflare({
+    imageService: "cloudflare",
     platformProxy: {
       enabled: true,
     },

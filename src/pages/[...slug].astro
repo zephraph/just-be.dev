@@ -1,5 +1,5 @@
 ---
-import { getEntry } from "astro:content";
+// import { getEntry } from "astro:content";
 
 export const prerender = false;
 
@@ -18,24 +18,14 @@ slug ??= HOME_SLUG;
 let html = "";
 let layout = "default";
 
-const entry = await getEntry("notes", slug.toLowerCase());
-if (entry) {
-  const { code } = await Astro.locals.render(entry.body);
-  html = code;
-  layout =
-    entry.slug === HOME_SLUG.toLocaleLowerCase()
-      ? "homepage"
-      : (entry.data.layout ?? "default");
-}
-
 if (!html && isULID(slug)) {
   const content = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
-  if (!content) return rewrite("/404");
+  if (!content) return Astro.rewrite("/404");
   const { code, metadata } = await Astro.locals.render(await content.text());
   html = code;
   // The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
   // so that the import below works correctly
-  layout = metadata.frontmatter.layout;
+  layout = metadata.frontmatter.layout.slice(9, -6);
 }
 
 if (!html) {

@@ -1,0 +1,16 @@
+{
+  "name": "@just-be/astro-md",
+  "version": "1.0.0",
+  "description": "Programmatic Markdown renderer for Astro",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Justin Bennett <oss@just-be.dev>",
+  "license": "MIT",
+  "dependencies": {
+    "@astrojs/markdown-remark": "catalog:",
+    "gray-matter": "^4.0.3"
+  }
+}

@@ -6,7 +6,8 @@
         "~/*": ["./*"],
         "@components/*": ["src/components/*"],
         "@layouts/*": ["src/layouts/*"],
-        "@plugins/*": ["plugins/*"],
+        "@just-be/*": ["packages/*"],
       }
-    }
+    },
+    "exclude": ["node_modules", "dist"]
 }
