@@ -14,6 +14,10 @@ export const normalizeFrontmatter: RemarkPlugin = () => {
       fm.layout = "default";
     }
 
+    if (fm.layout) {
+      fm.layout = `@layouts/${fm.layout}.astro`;
+    }
+
     /**
      * If the title isn't listed in the frontmatter, we'll try to infer it from
      * the first heading in the markdown file. This works well with the `obsidian-front-matter-title`
@@ -27,3 +31,5 @@ export const normalizeFrontmatter: RemarkPlugin = () => {
     }
   };
 };
+
+export default normalizeFrontmatter;

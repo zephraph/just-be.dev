@@ -1,7 +1,6 @@
 /// <reference types="./astro.config.d.ts" />
 
 import { defineConfig } from "astro/config";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
 import tailwind from "@astrojs/tailwind";
 import cloudflare from "@astrojs/cloudflare";
 
@@ -15,20 +14,11 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [normalizeFrontmatter, remarkObsidian],
   },
-  integrations: [mdRenderer({ configUrl: import.meta.url }), tailwind()],
+  integrations: [mdRenderer(), tailwind()],
   adapter: cloudflare({
+    imageService: "cloudflare",
     platformProxy: {
       enabled: true,
     },
   }),
-  vite: {
-    ssr: {
-      external: ["node:path", "path"],
-    },
-    plugins: [
-      nodePolyfills({
-        include: ["url", "module"],
-      }),
-    ],
-  },
 });

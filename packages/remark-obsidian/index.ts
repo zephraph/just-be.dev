@@ -11,3 +11,5 @@ export const remarkObsidian: RemarkPlugin = function () {
     // });
   };
 };
+
+export default remarkObsidian;

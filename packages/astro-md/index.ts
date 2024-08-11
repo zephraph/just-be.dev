@@ -8,27 +8,11 @@ export interface Renderer {
   ) => Promise<MarkdownProcessorRenderResult>;
 }
 
-interface LocalsMarkdownOptions {
-  /**
-   * Pass `import.meta.url` to this option
-   */
-  configUrl: string;
-}
-
-export default function renderIntegration({
-  configUrl,
-}: LocalsMarkdownOptions): AstroIntegration {
+export default function renderIntegration(): AstroIntegration {
   const integration: AstroIntegration = {
     name: "astro:md",
     hooks: {
-      "astro:config:setup"({ addMiddleware, updateConfig }) {
-        updateConfig({
-          vite: {
-            define: {
-              __ASTRO_CONFIG_PATH__: JSON.stringify(configUrl),
-            },
-          },
-        });
+      async "astro:config:setup"({ addMiddleware }) {
         addMiddleware({
           entrypoint: "@just-be/astro-md/middleware.ts",
           order: "pre",

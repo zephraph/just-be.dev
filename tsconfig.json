@@ -8,5 +8,6 @@
         "@layouts/*": ["src/layouts/*"],
         "@just-be/*": ["packages/*"],
       }
-    }
+    },
+    "exclude": ["node_modules", "dist"]
 }
