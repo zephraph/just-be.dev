@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@astrojs/markdown-remark':
+      specifier: ^5.2.0
+      version: 5.2.0
+
 importers:
 
   .:
@@ -61,15 +67,6 @@ importers:
       '@types/mdast':
         specifier: ^4.0.4
         version: 4.0.4
-
-  packages/obsidian-remark:
-    dependencies:
-      '@astrojs/markdown-remark':
-        specifier: 'catalog:'
-        version: 5.2.0
-      unist-util-visit:
-        specifier: ^5.0.0
-        version: 5.0.0
 
   packages/remark-obsidian:
     dependencies:

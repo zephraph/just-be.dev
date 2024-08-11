@@ -6,6 +6,7 @@ import matter from "gray-matter";
 import { normalizeFrontmatter } from "../my-remark";
 import { remarkObsidian } from "../remark-obsidian";
 
+// TODO: Figure out how to pass in plugins from astro's config
 const processor = await createMarkdownProcessor({
   remarkPlugins: [normalizeFrontmatter, remarkObsidian],
 });

@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-remark",
+  "name": "@just-be/remark-obsidian",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
