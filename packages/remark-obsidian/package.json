@@ -11,6 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "@astrojs/markdown-remark": "catalog:",
+    "mdast-util-from-markdown": "^2.0.1",
+    "mdast-util-to-markdown": "^2.1.0",
     "micromark-extension-wiki-link": "^0.0.4",
     "micromark-util-character": "^2.1.0",
     "micromark-util-symbol": "^2.0.0",

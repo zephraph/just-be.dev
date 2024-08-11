@@ -1,14 +1,15 @@
 /// <reference path="./types.d.ts" />
 import type { CompileData, Handle, HtmlExtension } from "micromark-util-types";
-
-const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "_");
+import { displayName, href, slugify } from "./utils";
 
 export function html(): HtmlExtension {
   const enterWikiLink: Handle = function () {
     let stack = this.getData("wikiLinkStack");
     if (!stack) this.setData("wikiLinkStack", (stack = []));
 
-    stack.push({});
+    stack.push({
+      type: "wikiLink",
+    });
   };
 
   function top(stack: CompileData["wikiLinkStack"]) {
@@ -36,7 +37,7 @@ export function html(): HtmlExtension {
   const exitWikiLinkTarget: Handle = function (token) {
     const target = this.sliceSerialize(token);
     const current = top(this.getData("wikiLinkStack"));
-    current.target = target;
+    current.value = target;
   };
 
   const exitWikiLink: Handle = function () {
@@ -45,34 +46,8 @@ export function html(): HtmlExtension {
     if (!wikiLink) return;
     if (Object.values(wikiLink).every((v) => !v)) return;
 
-    console.log(wikiLink);
-
-    let displayName = wikiLink.alias ?? wikiLink.target ?? "";
-    if (!wikiLink.alias && wikiLink.block) {
-      displayName = displayName.length
-        ? `${displayName} > ^${wikiLink.block}`
-        : `^${wikiLink.block}`;
-    }
-    if (!wikiLink.alias && wikiLink.headings) {
-      displayName = [displayName, ...wikiLink.headings]
-        .filter((n) => n)
-        .join(" > ");
-    }
-
-    const blockOrHeadings = wikiLink.block
-      ? "#^" + wikiLink.block
-      : wikiLink.headings
-      ? "#" + wikiLink.headings.join("#")
-      : "";
-
-    const href = slugify(
-      wikiLink.target
-        ? `/${wikiLink.target}${blockOrHeadings}`
-        : `/${blockOrHeadings}`
-    );
-
-    this.tag(`<a href="${href}">`);
-    this.raw(displayName);
+    this.tag(`<a href="${href(wikiLink)}">`);
+    this.raw(displayName(wikiLink));
     this.tag("</a>");
   };
 

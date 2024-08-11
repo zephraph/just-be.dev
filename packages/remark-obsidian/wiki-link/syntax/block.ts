@@ -22,7 +22,6 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
 
   let hasBlockContent = false;
   const consumeBlock = (code: Code) => {
-    console.log("consumeBlock", code ? String.fromCharCode(code) : null);
     if (code === codes.eof || markdownLineEnding(code)) {
       return nok(code);
     }
