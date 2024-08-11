@@ -1,0 +1,18 @@
+{
+  "name": "my-remark",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Justin Bennett <oss@just-be.dev>",
+  "license": "MIT",
+  "dependencies": {
+    "@astrojs/markdown-remark": "catalog:"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4"
+  }
+}

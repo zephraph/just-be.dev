@@ -30,7 +30,7 @@ export default function renderIntegration({
           },
         });
         addMiddleware({
-          entrypoint: "@plugins/locals-markdown/middleware.ts",
+          entrypoint: "@just-be/astro-md/middleware.ts",
           order: "pre",
         });
       },

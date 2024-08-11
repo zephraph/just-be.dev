@@ -6,7 +6,7 @@
         "~/*": ["./*"],
         "@components/*": ["src/components/*"],
         "@layouts/*": ["src/layouts/*"],
-        "@plugins/*": ["plugins/*"],
+        "@just-be/*": ["packages/*"],
       }
     }
 }
