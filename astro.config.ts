@@ -6,6 +6,7 @@ import cloudflare from "@astrojs/cloudflare";
 import { normalizeFrontmatter } from "./packages/my-remark";
 import { remarkObsidian } from "./packages/remark-obsidian";
 import mdRenderer from "./packages/astro-md";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 /**
  * This is a little hack to be able to progrmmatically detect
@@ -27,8 +28,18 @@ export default defineConfig({
     },
   }),
   vite: {
+    build: {
+      sourcemap: true,
+    },
     ssr: {
       external: ["node:async_hooks"],
     },
+    plugins: [
+      sentryVitePlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: "just-be",
+        project: "just-be-dev",
+      }),
+    ],
   },
 });

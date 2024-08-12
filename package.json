@@ -9,13 +9,15 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "logs": "wrangler pages deployment tail --project-name just-be-dev"
+    "logs": "wrangler pages deployment tail --project-name just-be-dev",
+    "logs:preview": "pnpm run logs --environment preview"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.1",
     "@astrojs/cloudflare": "^11.0.4",
     "@astrojs/tailwind": "^5.1.0",
     "@sentry/cloudflare": "^8.25.0",
+    "@sentry/vite-plugin": "^2.22.0",
     "astro": "^4.13.1",
     "hono": "^4.5.4",
     "tailwindcss": "^3.4.7",
