@@ -13,13 +13,23 @@ import sentry from "@sentry/astro";
 export default defineConfig({
   output: "hybrid",
   markdown: {
-    remarkPlugins: [normalizeFrontmatter, remarkObsidian]
+    remarkPlugins: [normalizeFrontmatter, remarkObsidian],
   },
-  integrations: [mdRenderer(), tailwind(), sentry()],
+  integrations: [
+    mdRenderer(),
+    tailwind(),
+    sentry({
+      dsn: "https://a8f7d774bf99fbbbbcc44b10905afb2f@o275713.ingest.us.sentry.io/4507761751621632",
+      sourceMapsUploadOptions: {
+        project: "just-be-dev",
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      },
+    }),
+  ],
   adapter: cloudflare({
     imageService: "cloudflare",
     platformProxy: {
-      enabled: true
-    }
-  })
+      enabled: true,
+    },
+  }),
 });
