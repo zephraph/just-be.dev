@@ -1,6 +1,6 @@
 /// <reference types="../types.d.ts" />
 
-import type { Code, Construct, Tokenizer } from "micromark-util-types";
+import type { Code, Construct } from "micromark-util-types";
 import { codes } from "micromark-util-symbol";
 import {
   markdownLineEndingOrSpace,

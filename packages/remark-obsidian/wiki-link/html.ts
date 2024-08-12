@@ -1,6 +1,6 @@
 /// <reference path="./types.d.ts" />
 import type { CompileData, Handle, HtmlExtension } from "micromark-util-types";
-import { displayName, href, slugify } from "./utils";
+import { displayName, href } from "./utils";
 
 export function html(): HtmlExtension {
   const enterWikiLink: Handle = function () {

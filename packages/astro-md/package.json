@@ -11,6 +11,6 @@
   "license": "MIT",
   "dependencies": {
     "@astrojs/markdown-remark": "catalog:",
-    "gray-matter": "^4.0.3"
+    "remark-frontmatter": "^5.0.0"
   }
 }
