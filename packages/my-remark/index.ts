@@ -4,6 +4,7 @@ import type { Heading } from "mdast";
 export const normalizeFrontmatter: RemarkPlugin = () => {
   return (root, file) => {
     const fm = (file.data.astro as MarkdownAstroData).frontmatter;
+    file.data.frontmatter = fm;
 
     /**
      * Treat the homepage as a special case for layouts and fallback to default.

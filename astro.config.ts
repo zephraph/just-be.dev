@@ -7,7 +7,11 @@ import { normalizeFrontmatter } from "./packages/my-remark";
 import { remarkObsidian } from "./packages/remark-obsidian";
 import mdRenderer from "./packages/astro-md";
 
-import sentry from "@sentry/astro";
+/**
+ * This is a little hack to be able to progrmmatically detect
+ * if we're pre-rendering or in SSR mode.
+ */
+process.env.IS_BUILD = "true";
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,21 +19,16 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [normalizeFrontmatter, remarkObsidian],
   },
-  integrations: [
-    mdRenderer(),
-    tailwind(),
-    sentry({
-      dsn: "https://a8f7d774bf99fbbbbcc44b10905afb2f@o275713.ingest.us.sentry.io/4507761751621632",
-      sourceMapsUploadOptions: {
-        project: "just-be-dev",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      },
-    }),
-  ],
+  integrations: [mdRenderer(), tailwind()],
   adapter: cloudflare({
     imageService: "cloudflare",
     platformProxy: {
       enabled: true,
     },
   }),
+  vite: {
+    ssr: {
+      external: ["node:async_hooks"],
+    },
+  },
 });

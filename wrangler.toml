@@ -1,14 +1,16 @@
 name = "just-be-dev"
 pages_build_output_dir = "./dist"
 compatibility_date = "2024-08-06"
-node_compat = true
+compatibility_flags = ["nodejs_als"]
 
 [vars]
 NODE_VERSION = "v20.16.0"
 PNPM_VERSION = "v9.7.0"
 
-kv_namespaces = [
-  { binding = "KV_MAPPINGS", id = "36e4319084c4498fa08e5bf00f36331a" },
-]
+[[kv_namespaces]]
+binding = "KV_MAPPINGS"
+id = "36e4319084c4498fa08e5bf00f36331a"
 
-r2_buckets = [{ binding = "R2_BUCKET", bucket_name = "just-be-dev" }]
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "just-be-dev"

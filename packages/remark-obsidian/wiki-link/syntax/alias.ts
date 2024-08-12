@@ -1,4 +1,4 @@
-import type { Code, Construct, Tokenizer } from "micromark-util-types";
+import type { Code, Construct } from "micromark-util-types";
 import { wikiCode } from "./utils";
 import { codes } from "micromark-util-symbol";
 import {
