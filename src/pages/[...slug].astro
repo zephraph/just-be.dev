@@ -32,9 +32,9 @@ if (!html) {
   return Astro.rewrite("/404");
 }
 
-// const Layout = (await import(`../layouts/${layout}.astro`)).default;
+const Layout = (await import(`../layouts/${layout}.astro`)).default;
 ---
 
-<!-- <Layout> -->
-<Fragment set:html={html} />
-<!-- </Layout> -->
+<Layout>
+  <Fragment set:html={html} />
+</Layout>

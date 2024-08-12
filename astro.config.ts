@@ -16,7 +16,7 @@ process.env.IS_BUILD = "true";
 
 // https://astro.build/config
 export default defineConfig({
-  output: "hybrid",
+  output: "server",
   markdown: {
     remarkPlugins: [normalizeFrontmatter, remarkObsidian],
   },
