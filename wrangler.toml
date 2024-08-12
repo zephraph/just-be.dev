@@ -2,6 +2,10 @@ name = "just-be-dev"
 pages_build_output_dir = "./dist"
 compatibility_date = "2024-08-06"
 
+[vars]
+NODE_VERSION = "v20.16.0"
+PNPM_VERSION = "v9.7.0"
+
 kv_namespaces = [
   { binding = "KV_MAPPINGS", id = "36e4319084c4498fa08e5bf00f36331a" },
 ]
