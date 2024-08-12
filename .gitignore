@@ -28,6 +28,3 @@ pnpm-debug.log*
 .dev.vars
 
 notes
-
-# Sentry Config File
-.env.sentry-build-plugin
