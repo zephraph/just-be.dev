@@ -26,3 +26,5 @@ pnpm-debug.log*
 # Cloudflare artifacts
 .wrangler
 .dev.vars
+
+notes
