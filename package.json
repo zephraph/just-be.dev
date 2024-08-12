@@ -24,5 +24,10 @@
     "@tailwindcss/typography": "^0.5.14",
     "vitest": "^2.0.5",
     "wrangler": "3.68.0"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "@astrojs/markdown-remark": "patches/@astrojs__markdown-remark.patch"
+    }
   }
 }
