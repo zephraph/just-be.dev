@@ -1,4 +1,4 @@
-/// <reference types="./env.d.ts" />
+/// <reference types="../../src/env.d.ts" />
 
 import * as Sentry from "@sentry/cloudflare";
 import { defineMiddleware } from "astro:middleware";

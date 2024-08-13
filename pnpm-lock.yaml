@@ -4,12 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    '@astrojs/markdown-remark':
-      specifier: ^5.2.0
-      version: 5.2.0
-
 patchedDependencies:
   '@astrojs/markdown-remark':
     hash: v5kacvnx7x7h7wln5itqdcnhza
@@ -28,12 +22,6 @@ importers:
       '@astrojs/tailwind':
         specifier: ^5.1.0
         version: 5.1.0(astro@4.13.1(@types/node@22.1.0)(typescript@5.5.4))(tailwindcss@3.4.7)
-      '@sentry/cloudflare':
-        specifier: ^8.25.0
-        version: 8.25.0
-      '@sentry/vite-plugin':
-        specifier: ^2.22.0
-        version: 2.22.0
       astro:
         specifier: ^4.13.1
         version: 4.13.1(@types/node@22.1.0)(typescript@5.5.4)
@@ -59,6 +47,15 @@ importers:
       wrangler:
         specifier: 3.70.0
         version: 3.70.0(@cloudflare/workers-types@4.20240729.0)
+
+  packages/astro-cf-sentry:
+    dependencies:
+      '@sentry/cloudflare':
+        specifier: ^8.25.0
+        version: 8.25.0
+      '@sentry/vite-plugin':
+        specifier: ^2.22.0
+        version: 2.22.0
 
   packages/astro-md:
     dependencies:
