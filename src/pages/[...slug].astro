@@ -1,8 +1,10 @@
 ---
-// import { getEntry } from "astro:content";
-
 export const prerender = false;
 
+// This matches to the note in my obsidian setup
+// that's homepage. I probably could avoid hard coding this
+// by having a mapping in the KV store, but this is
+// simpler for now. 
 const HOME_SLUG = "01J4CPMJ91NF1DNQPE3TZ50HH0";
 
 const ulidRegex = /^[0-9A-HJ-NP-TV-Z]{26}$/i;
@@ -12,11 +14,10 @@ function isULID(ulid: string) {
 }
 
 let { slug } = Astro.params;
+
 // default to homepage slug
 slug ??= HOME_SLUG;
 
-
-console.log('slug?', slug)
 
 let html = "";
 let layout = "default";
@@ -36,11 +37,11 @@ if (isULID(slug)) {
   layout = metadata.frontmatter.layout.slice(9, -6);
 } 
 
-console.log('slug', slug) 
-console.log('html', html)
-
 if (!html) return Astro.rewrite("/404");
 
+// The slug is used to determine the canonical URL. For every page that _isn't_ the hope page I want that
+// to the the ULID. For the home page, I just want the root URL to be canonical. 
+slug = slug === HOME_SLUG ? "" : slug;
 
 const Layout = (await import(`../layouts/${layout}.astro`)).default;
 ---
