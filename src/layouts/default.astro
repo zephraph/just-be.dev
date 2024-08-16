@@ -3,13 +3,14 @@ import BaseLayout from "./base.astro";
 import Header from "@components/Header.astro";
 
 interface Props {
+  id: string;
   title: string;
 }
 
-const { title } = Astro.props;
+const { id, title } = Astro.props;
 ---
 
-<BaseLayout title={title}>
+<BaseLayout id={id} title={title}>
   <main class="lg-:container mx-auto px-6 py-2 max-w-screen-lg">
     <Header />
     <article class="prose lg:prose-xl">

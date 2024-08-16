@@ -1,6 +1,6 @@
 import type { WikiLinkNode } from "./types";
 
-export const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "_");
+export const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
 
 export const displayName = (wikiLink: WikiLinkNode) => {
   let displayName = wikiLink.alias ?? wikiLink.value ?? "";

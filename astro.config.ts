@@ -10,6 +10,10 @@ import astroCloudflareSentry from "./packages/astro-cf-sentry";
 
 // https://astro.build/config
 export default defineConfig({
+  site:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:4321"
+      : "https://just-be.dev",
   /**
    * Note: I'd like this to be hybrid, but when that's enabled cf deployments give me a 500 error
    * @see https://just-be.sentry.io/share/issue/ab09f9239b3f45d1b27a222743afd6aa/

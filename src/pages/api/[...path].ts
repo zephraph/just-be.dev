@@ -7,7 +7,7 @@ import type { APIContext, APIRoute } from "astro";
 import { bearerAuth } from "hono/bearer-auth";
 import { etag } from "hono/etag";
 
-export const prerender = false;
+const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
 
 // Dump cf env in top level of context
 type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
@@ -22,10 +22,32 @@ const app = new Hono<{ Bindings: AstroContext }>()
   })
   .use("/publish/*", etag())
   .post("/publish/:id", async (c) => {
-    const result = await c.env.R2_BUCKET.put(
-      c.req.param("id"),
-      await c.req.blob()
-    );
+    const id = c.req.param("id");
+    const props: Record<string, any> = c.req.query();
+    // Alises (as stored in obsidian) are treated as slugs for navigation
+    if (props.aliases) {
+      const slugs: string[] = props.aliases
+        .split(",")
+        .filter(Boolean)
+        .map(slugify);
+      await Promise.all(
+        slugs.map((slug) =>
+          c.env.KV_MAPPINGS.get(slug).then((currentId) => {
+            if (currentId) {
+              // Mappings are immutable. If a slug is already mapped to a different id, throw an error.
+              if (currentId !== id) {
+                throw new Error(`Slug ${slug} is mapped to ${currentId}`);
+              }
+              return;
+            }
+            return c.env.KV_MAPPINGS.put(slug, id);
+          })
+        )
+      );
+    }
+    const result = await c.env.R2_BUCKET.put(id, await c.req.blob(), {
+      onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
+    });
     if (!result) return c.json({ error: "Failed to upload" }, 500);
     const { size, version, httpEtag: etag } = result;
     return c.json({ ok: true, size, version }, 200, { etag });
