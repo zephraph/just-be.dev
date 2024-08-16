@@ -22,10 +22,27 @@ const app = new Hono<{ Bindings: AstroContext }>()
   })
   .use("/publish/*", etag())
   .post("/publish/:id", async (c) => {
-    const result = await c.env.R2_BUCKET.put(
-      c.req.param("id"),
-      await c.req.blob()
-    );
+    const id = c.req.param("id");
+    const props: Record<string, any> = c.req.query();
+    if (props.slugs) {
+      const slugs = props.slugs.split(/[\s,]+/).filter(Boolean);
+      await Promise.all(
+        slugs.map((slug: string) =>
+          c.env.KV_MAPPINGS.get(slug).then((currentId) => {
+            if (currentId) {
+              if (currentId !== id) {
+                throw new Error(`Slug ${slug} is mapped to ${currentId}`);
+              }
+              return;
+            }
+            return c.env.KV_MAPPINGS.put(slug, id);
+          })
+        )
+      );
+    }
+    const result = await c.env.R2_BUCKET.put(id, await c.req.blob(), {
+      onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
+    });
     if (!result) return c.json({ error: "Failed to upload" }, 500);
     const { size, version, httpEtag: etag } = result;
     return c.json({ ok: true, size, version }, 200, { etag });
