@@ -20,3 +20,7 @@
 .bastia-outline {
   font-family: "Bastia-outline";
 }
+
+h2:has(+ p > sup) {
+  margin-bottom: 0rem !important;
+}

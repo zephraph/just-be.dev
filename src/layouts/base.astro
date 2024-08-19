@@ -1,9 +1,10 @@
 ---
 import "../style.css";
+import { ViewTransitions } from "astro:transitions";
 
 interface Props {
   title: string;
-  id: string
+  id: string;
 }
 
 const { id, title } = Astro.props;
@@ -16,9 +17,10 @@ const { id, title } = Astro.props;
     <meta name="description" content="Astro description" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <link rel="canonical" href=`${Astro.site}${id}`/>
+    <link rel="canonical" href=`${Astro.site}${id}` />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ViewTransitions />
   </head>
   <body class="m-auto">
     <slot />
