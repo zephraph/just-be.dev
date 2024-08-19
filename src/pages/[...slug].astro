@@ -29,9 +29,13 @@ if (!isULID(slug)) {
 
 if (isULID(slug)) {
   let content = "";
+
+  // In dev read note from symlinked directory
   if (process.env.NODE_ENV === "development") {
     const fs = await import("node:fs/promises");
     content = await fs.readFile(`./notes/${slug}.md`, "utf-8")
+
+  // In prod pull from R2
   } else {
     const result = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
     if (!result) return Astro.rewrite("/404");
