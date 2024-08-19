@@ -10,7 +10,8 @@
   "author": "Justin Bennett <oss@just-be.dev>",
   "license": "MIT",
   "dependencies": {
-    "@astrojs/markdown-remark": "catalog:"
+    "@astrojs/markdown-remark": "catalog:",
+    "vfile-matter": "^5.0.0"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4"
