@@ -27,10 +27,10 @@ const rename = new Command()
   .action(async (_, path) => {
     const file = basename(path, ".md");
     const dir = dirname(path);
-    const targetDir = "Daily Notes";
-    if (/\d{4}-\d{2}-\d{2}/.test(file)) {
+    const targetDir = "logs";
+    if (/\d{4}/.test(file)) {
       if (dir.endsWith(targetDir)) return;
-      const targetFile = join(dir, targetDir, `${ulid()}.md`);
+      const targetFile = join(dir, targetDir, `${file}.md`);
       await move(path, targetFile, {
         overwrite: false,
       });
