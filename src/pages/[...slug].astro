@@ -1,4 +1,6 @@
 ---
+import { a } from "vitest/dist/chunks/suite.CcK46U-P.js";
+
 export const prerender = false;
 
 // This matches to the note in my obsidian setup
@@ -28,9 +30,17 @@ if (!isULID(slug)) {
 }
 
 if (isULID(slug)) {
-  const content = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
+  let content = "";
+  if (process.env.NODE_ENV === "development") {
+    const fs = await import("node:fs/promises");
+    content = await fs.readFile(`./notes/${slug}.md`, "utf-8")
+  } else {
+    const result = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
+    if (!result) return Astro.rewrite("/404");
+    content = await result.text();
+  }
   if (!content) return Astro.rewrite("/404");
-  const { code, metadata } = await Astro.locals.render(await content.text());
+  const { code, metadata } = await Astro.locals.render(content);
   html = code;
   // The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
   // so that the import below works correctly

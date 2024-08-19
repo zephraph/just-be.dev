@@ -7,6 +7,7 @@ import { normalizeFrontmatter } from "./packages/my-remark";
 import { remarkObsidian } from "./packages/remark-obsidian";
 import mdRenderer from "./packages/astro-md";
 import astroCloudflareSentry from "./packages/astro-cf-sentry";
+import fullReload from "vite-plugin-full-reload";
 
 // https://astro.build/config
 export default defineConfig({
@@ -37,4 +38,7 @@ export default defineConfig({
       enabled: true,
     },
   }),
+  vite: {
+    plugins: [fullReload(["notes/**/*.md"])],
+  },
 });
