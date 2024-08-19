@@ -1,9 +1,14 @@
 import type { MarkdownAstroData, RemarkPlugin } from "@astrojs/markdown-remark";
 import type { Heading } from "mdast";
+import { matter } from "vfile-matter";
 
 export const normalizeFrontmatter: RemarkPlugin = () => {
   return (root, file) => {
-    const fm = (file.data.astro as MarkdownAstroData).frontmatter;
+    // Populate frontmatter
+    matter(file);
+    const fm = ((file.data.astro as MarkdownAstroData).frontmatter = file.data
+      .matter as Record<string, unknown>);
+
     /**
      * Treat the homepage as a special case for layouts and fallback to default.
      */

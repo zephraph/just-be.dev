@@ -4,12 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    '@astrojs/markdown-remark':
-      specifier: ^5.2.0
-      version: 5.2.0
-
 patchedDependencies:
   '@astrojs/markdown-remark':
     hash: v5kacvnx7x7h7wln5itqdcnhza
@@ -80,6 +74,9 @@ importers:
       '@astrojs/markdown-remark':
         specifier: 'catalog:'
         version: 5.2.0(patch_hash=v5kacvnx7x7h7wln5itqdcnhza)
+      vfile-matter:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@types/mdast':
         specifier: ^4.0.4
@@ -2804,6 +2801,9 @@ packages:
 
   vfile-location@5.0.3:
     resolution: {integrity: sha512-5yXvWDEgqeiYiBe1lbxYF7UMAIm/IcopxMHrMQDq3nvKcjPKIhZklUKL+AE7J7uApI4kwe2snsK+eI6UTj9EHg==}
+
+  vfile-matter@5.0.0:
+    resolution: {integrity: sha512-jhPSqlj8hTSkTXOqyxbUeZAFFVq/iwu/jukcApEqc/7DOidaAth6rDc0Zgg0vWpzUnWkwFP7aK28l6nBmxMqdQ==}
 
   vfile-message@4.0.2:
     resolution: {integrity: sha512-jRDZ1IMLttGj41KcZvlrYAaI3CfqpLpfpf+Mfig13viT6NKvRzWZ+lXz0Y5D60w6uJIBAOGq9mSHf0gktF0duw==}
@@ -6032,6 +6032,11 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.2
       vfile: 6.0.2
+
+  vfile-matter@5.0.0:
+    dependencies:
+      vfile: 6.0.2
+      yaml: 2.5.0
 
   vfile-message@4.0.2:
     dependencies:
