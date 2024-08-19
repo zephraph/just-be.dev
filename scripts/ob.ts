@@ -54,7 +54,7 @@ const publish = new Command()
       fm = extractYaml(content).attrs;
     }
     return fetch(
-      `http://${Deno.env.get("SITE")}/api/publish/${file}${
+      `${Deno.env.get("SITE")}/api/publish/${file}${
         fm ? "?" + new URLSearchParams(fm).toString() : ""
       }`,
       {
