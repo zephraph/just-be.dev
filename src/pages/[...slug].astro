@@ -4,7 +4,7 @@ export const prerender = false;
 // This matches to the note in my obsidian setup
 // that's homepage. I probably could avoid hard coding this
 // by having a mapping in the KV store, but this is
-// simpler for now. 
+// simpler for now.
 const HOME_SLUG = "01J4CPMJ91NF1DNQPE3TZ50HH0";
 
 const ulidRegex = /^[0-9A-HJ-NP-TV-Z]{26}$/i;
@@ -18,12 +18,11 @@ let { slug } = Astro.params;
 // default to homepage slug
 slug ??= HOME_SLUG;
 
-
 let html = "";
 let layout = "default";
 
 if (!isULID(slug)) {
-  slug = await Astro.locals.runtime.env.KV_MAPPINGS.get(slug) as string;
+  slug = (await Astro.locals.runtime.env.KV_MAPPINGS.get(slug)) as string;
   if (!slug) return Astro.rewrite("/404");
 }
 
@@ -33,11 +32,13 @@ if (isULID(slug)) {
   // In dev read note from symlinked directory
   if (process.env.NODE_ENV === "development") {
     const fs = await import("node:fs/promises");
-    content = await fs.readFile(`./notes/${slug}.md`, "utf-8")
+    content = await fs.readFile(`./notes/${slug}.md`, "utf-8");
 
-  // In prod pull from R2
+    // In prod pull from R2
   } else {
-    const result = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
+    const result = await Astro.locals.runtime.env.R2_BUCKET.get(
+      slug.toUpperCase()
+    );
     if (!result) return Astro.rewrite("/404");
     content = await result.text();
   }
@@ -47,12 +48,12 @@ if (isULID(slug)) {
   // The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
   // so that the import below works correctly
   layout = metadata.frontmatter.layout.slice(9, -6);
-} 
+}
 
 if (!html) return Astro.rewrite("/404");
 
 // The slug is used to determine the canonical URL. For every page that _isn't_ the hope page I want that
-// to the the ULID. For the home page, I just want the root URL to be canonical. 
+// to the the ULID. For the home page, I just want the root URL to be canonical.
 slug = slug === HOME_SLUG ? "" : slug;
 
 const Layout = (await import(`../layouts/${layout}.astro`)).default;
