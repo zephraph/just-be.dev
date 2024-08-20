@@ -21,6 +21,15 @@
   font-family: "Bastia-outline";
 }
 
+h1:has(+ p > sup),
 h2:has(+ p > sup) {
   margin-bottom: 0rem !important;
+}
+
+h1 + p:has(> sup) {
+  margin-top: 0rem !important;
+}
+h1 + p > sup,
+h2 + p > sup {
+  @apply text-gray-400;
 }
