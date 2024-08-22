@@ -14,3 +14,7 @@ id = "36e4319084c4498fa08e5bf00f36331a"
 [[r2_buckets]]
 binding = "R2_BUCKET"
 bucket_name = "just-be-dev"
+
+[[r2_buckets]]
+binding = "R2_ASSETS"
+bucket_name = "just-be-dev-assets"
