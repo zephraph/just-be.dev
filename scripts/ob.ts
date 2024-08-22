@@ -3,7 +3,7 @@
  */
 import { ulid } from "jsr:@std/ulid";
 import { Command } from "jsr:@cliffy/command@1.0.0-rc.5";
-import { basename, dirname, join } from "jsr:@std/path";
+import { basename, dirname, join, extname } from "jsr:@std/path";
 import { move } from "jsr:@std/fs";
 import { extractYaml } from "jsr:@std/front-matter";
 import { contentType } from "jsr:@std/media-types";
@@ -55,7 +55,7 @@ async function publishNote(path: string) {
     fm = extractYaml(content).attrs;
   }
   return fetch(
-    `${Deno.env.get("SITE")}/api/publish/${file}${
+    `${Deno.env.get("SITE")}/api/notes/${file}${
       fm ? "?" + new URLSearchParams(fm).toString() : ""
     }`,
     {
@@ -73,13 +73,18 @@ async function publishNote(path: string) {
   );
 }
 async function publishAsset(path: string) {
-  return fetch(`${Deno.env.get("SITE")}/api/publish/${basename(path)}`, {
+  const hash = crypto.subtle.digest("SHA-256", await Deno.readFile(path));
+  return fetch(`${Deno.env.get("SITE")}/api/assets/${hash}${extname(path)}`, {
     method: "POST",
     headers: {
       "Content-Type": contentType(path) || "application/octet-stream",
     },
     body: await Deno.readFile(path),
-  });
+  }).then(async (res) =>
+    res.status < 400
+      ? console.log("Published!")
+      : console.error("Error publishing", res.status + " " + (await res.text()))
+  );
 }
 
 const publish = new Command()
