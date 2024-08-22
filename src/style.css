@@ -35,7 +35,7 @@ h2 + p > sup {
 }
 
 blockquote {
-  @apply !border-slate-400 bg-gradient-to-r from-slate-300 to-slate-50 !px-6 py-0.5;
+  @apply !border-slate-400 bg-gradient-to-r from-slate-300 to-gray-50 !px-6 py-0.5;
 }
 
 blockquote ul {
