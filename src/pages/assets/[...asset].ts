@@ -31,21 +31,25 @@ function readStreamToReadableStream(stream: ReadStream) {
  * For development only, stream static files from the file system
  */
 async function staticFileResponse(filePath: string) {
-  const fs = await import("fs");
-  if (!fs.existsSync(filePath)) {
-    return null;
+  // This is wrapped in this if block so that it's removed from the production build
+  if (process.env.NODE_ENV === "development") {
+    const fs = await import("node:fs");
+    if (!fs.existsSync(filePath)) {
+      return null;
+    }
+    const fileStream = fs.createReadStream(filePath);
+    const readableStream = readStreamToReadableStream(fileStream);
+    return new Response(readableStream, {
+      status: 200,
+      headers: {
+        "X-Location": "static file",
+        // @ts-expect-error
+        "Content-Type": mime.getType(filePath) || "application/octet-stream",
+      },
+    });
   }
-  const fileStream = fs.createReadStream(filePath);
-  const readableStream = readStreamToReadableStream(fileStream);
-  console.log("reading file from fs");
-  return new Response(readableStream, {
-    status: 200,
-    headers: {
-      "X-Location": "static file",
-      // @ts-expect-error
-      "Content-Type": mime.getType(filePath) || "application/octet-stream",
-    },
-  });
+  // This code path should never be reached, but if it does something definitely went wrong
+  return new Response("Something went wrong", { status: 500 });
 }
 
 export const GET: APIRoute = async (ctx) => {
