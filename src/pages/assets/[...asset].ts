@@ -34,6 +34,7 @@ async function staticFileResponse(filePath: string) {
   // This is wrapped in this if block so that it's removed from the production build
   if (process.env.NODE_ENV === "development") {
     const fs = await import("node:fs");
+    const { default: mime } = await import("mime");
     if (!fs.existsSync(filePath)) {
       return null;
     }
@@ -43,7 +44,6 @@ async function staticFileResponse(filePath: string) {
       status: 200,
       headers: {
         "X-Location": "static file",
-        // @ts-expect-error
         "Content-Type": mime.getType(filePath) || "application/octet-stream",
       },
     });

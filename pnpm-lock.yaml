@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@astrojs/markdown-remark':
+      specifier: ^5.2.0
+      version: 5.2.0
+
 patchedDependencies:
   '@astrojs/markdown-remark':
     hash: v5kacvnx7x7h7wln5itqdcnhza
@@ -28,6 +34,9 @@ importers:
       hono:
         specifier: ^4.5.4
         version: 4.5.4
+      mime:
+        specifier: ^4.0.4
+        version: 4.0.4
       tailwindcss:
         specifier: ^3.4.7
         version: 3.4.7
@@ -2143,6 +2152,11 @@ packages:
   mime@3.0.0:
     resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
     engines: {node: '>=10.0.0'}
+    hasBin: true
+
+  mime@4.0.4:
+    resolution: {integrity: sha512-v8yqInVjhXyqP6+Kw4fV3ZzeMRqEW6FotRsKXjRS5VMTNIuXsdRoAvklpoRgSqXm6o9VNH4/C0mgedko9DdLsQ==}
+    engines: {node: '>=16'}
     hasBin: true
 
   mimic-fn@2.1.0:
@@ -5268,6 +5282,8 @@ snapshots:
       picomatch: 2.3.1
 
   mime@3.0.0: {}
+
+  mime@4.0.4: {}
 
   mimic-fn@2.1.0: {}
 
