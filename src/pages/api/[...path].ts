@@ -5,7 +5,7 @@
 import { Hono } from "hono";
 import type { APIContext, APIRoute } from "astro";
 import { bearerAuth } from "hono/bearer-auth";
-import { isValidSha256 } from "~/utils";
+import { isValidSha256, slugify } from "~/utils";
 
 // Dump cf env in top level of context
 type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
