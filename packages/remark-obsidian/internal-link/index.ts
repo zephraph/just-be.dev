@@ -1,17 +1,12 @@
-import { wikiLink } from "./syntax/wiki-link";
-import { wikiCode } from "./syntax/utils";
 import type { RemarkPlugin } from "@astrojs/markdown-remark";
 import { fromMarkdown } from "./mdast";
+import { syntax } from "./syntax";
 
-export function syntax() {
-  return {
-    text: { [wikiCode.start]: wikiLink },
-  };
-}
+export { syntax } from "./syntax";
 export { html } from "./html";
 export { fromMarkdown } from "./mdast";
 
-export const wikiLinkPugin: RemarkPlugin = function () {
+export const internalLinkPlugin: RemarkPlugin = function () {
   // TODO: Fix this type
   const data = this.data() as any;
 
@@ -21,4 +16,4 @@ export const wikiLinkPugin: RemarkPlugin = function () {
   );
 };
 
-export default wikiLinkPugin;
+export default internalLinkPlugin;

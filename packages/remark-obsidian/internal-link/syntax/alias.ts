@@ -1,5 +1,5 @@
 import type { Code, Construct } from "micromark-util-types";
-import { wikiCode } from "./utils";
+import { internalLinkCode } from "./utils";
 import { codes } from "micromark-util-symbol";
 import {
   markdownLineEnding,
@@ -9,13 +9,13 @@ import { createTokenizer } from "../../parser-utils";
 
 const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   const start = (code: Code) => {
-    if (code !== wikiCode.aliasStart) return nok(code);
+    if (code !== internalLinkCode.aliasStart) return nok(code);
 
-    effects.enter("wikiLinkAliasMarker");
+    effects.enter("internalLinkAliasMarker");
 
-    return consumeMarker(code, wikiCode.aliasMarker, (code) => {
-      effects.exit("wikiLinkAliasMarker");
-      effects.enter("wikiLinkAlias");
+    return consumeMarker(code, internalLinkCode.aliasMarker, (code) => {
+      effects.exit("internalLinkAliasMarker");
+      effects.enter("internalLinkAlias");
       return consumeAlias(code);
     });
   };
@@ -26,9 +26,9 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
       return nok(code);
     }
 
-    if (code === wikiCode.end) {
+    if (code === internalLinkCode.end) {
       if (!hasAlias) return nok(code);
-      effects.exit("wikiLinkAlias");
+      effects.exit("internalLinkAlias");
       return ok(code);
     }
 
@@ -43,6 +43,6 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   return start;
 });
 
-export const wikiLinkAlias: Construct = {
+export const internalLinkAlias: Construct = {
   tokenize,
 };

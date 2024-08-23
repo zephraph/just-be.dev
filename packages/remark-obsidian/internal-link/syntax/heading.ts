@@ -1,5 +1,5 @@
 import type { Code, Construct, State } from "micromark-util-types";
-import { wikiCode } from "./utils";
+import { internalLinkCode } from "./utils";
 import { createTokenizer } from "../../parser-utils";
 import {
   markdownLineEnding,
@@ -9,13 +9,13 @@ import { codes } from "micromark-util-symbol";
 
 const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   const start = (code: Code) => {
-    if (code !== wikiCode.headingOrBlockStart) return nok(code);
+    if (code !== internalLinkCode.headingOrBlockStart) return nok(code);
 
-    effects.enter("wikiLinkHeadingMarker");
+    effects.enter("internalLinkHeadingMarker");
 
-    return consumeMarker(code, wikiCode.headingMarker, (code) => {
-      effects.exit("wikiLinkHeadingMarker");
-      effects.enter("wikiLinkHeading");
+    return consumeMarker(code, internalLinkCode.headingMarker, (code) => {
+      effects.exit("internalLinkHeadingMarker");
+      effects.enter("internalLinkHeading");
       return consumeHeading(code);
     });
   };
@@ -26,21 +26,21 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
       return nok(code);
     }
 
-    if (code === wikiCode.aliasStart) {
+    if (code === internalLinkCode.aliasStart) {
       if (!hasHeading) return nok(code);
-      effects.exit("wikiLinkHeading");
+      effects.exit("internalLinkHeading");
       return ok(code);
     }
 
-    if (code === wikiCode.end) {
+    if (code === internalLinkCode.end) {
       if (!hasHeading) return nok(code);
-      effects.exit("wikiLinkHeading");
+      effects.exit("internalLinkHeading");
       return ok(code);
     }
 
-    if (code === wikiCode.headingOrBlockStart) {
+    if (code === internalLinkCode.headingOrBlockStart) {
       if (!hasHeading) return nok(code);
-      effects.exit("wikiLinkHeading");
+      effects.exit("internalLinkHeading");
       // Reset the heading state for the next one
       hasHeading = false;
       return start(code);
@@ -57,6 +57,6 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   return start;
 });
 
-export const wikiLinkHeading: Construct = {
+export const internalLinkHeading: Construct = {
   tokenize,
 };

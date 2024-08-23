@@ -1,6 +1,6 @@
 import { codeOf, codifyString } from "../../parser-utils";
 
-export const wikiCode = {
+export const internalLinkCode = {
   startMarker: codifyString("[["),
   endMarker: codifyString("]]"),
 

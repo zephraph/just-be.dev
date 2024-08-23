@@ -2,91 +2,94 @@ import { test, assert } from "vitest";
 import { micromark } from "micromark";
 import { html, syntax } from ".";
 
-test("[[Wiki Link]]", () => {
-  let serialized = micromark("[[Wiki Link]]", {
+test("[[Internal Link]]", () => {
+  let serialized = micromark("[[Internal Link]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/wiki_link">Wiki Link</a></p>');
+  assert.equal(serialized, '<p><a href="/internal-link">Internal Link</a></p>');
 });
 
-test("[[Wiki Link|Alias]]", () => {
-  let serialized = micromark("[[Wiki Link|Alias]]", {
+test("[[Internal Link|Alias]]", () => {
+  let serialized = micromark("[[Internal Link|Alias]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/wiki_link">Alias</a></p>');
+  assert.equal(serialized, '<p><a href="/internal-link">Alias</a></p>');
 });
 
-test("[[Wiki Link#Main Section]]", () => {
-  let serialized = micromark("[[Wiki Link#Main Section]]", {
+test("[[Internal Link#Main Section]]", () => {
+  let serialized = micromark("[[Internal Link#Main Section]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
   assert.equal(
     serialized,
-    '<p><a href="/wiki_link#main_section">Wiki Link > Main Section</a></p>'
+    '<p><a href="/internal-link#main-section">Internal Link > Main Section</a></p>'
   );
 });
 
-test("[[Wiki Link#Main Section|Alias]]", () => {
-  let serialized = micromark("[[Wiki Link#Main Section|Alias]]", {
+test("[[Internal Link#Main Section|Alias]]", () => {
+  let serialized = micromark("[[Internal Link#Main Section|Alias]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
   assert.equal(
     serialized,
-    '<p><a href="/wiki_link#main_section">Alias</a></p>'
+    '<p><a href="/internal-link#main-section">Alias</a></p>'
   );
 });
 
-test("[[Wiki Link#Main Section#Sub Section]]", () => {
-  let serialized = micromark("[[Wiki Link#Main Section#Sub Section]]", {
+test("[[Internal Link#Main Section#Sub Section]]", () => {
+  let serialized = micromark("[[Internal Link#Main Section#Sub Section]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
   assert.equal(
     serialized,
-    '<p><a href="/wiki_link#main_section#sub_section">Wiki Link > Main Section > Sub Section</a></p>'
+    '<p><a href="/internal-link#main-section#sub-section">Internal Link > Main Section > Sub Section</a></p>'
   );
 });
 
-test("[[Wiki Link#Main Section#Sub Section|Alias]]", () => {
-  let serialized = micromark("[[Wiki Link#Main Section#Sub Section|Alias]]", {
+test("[[Internal Link#Main Section#Sub Section|Alias]]", () => {
+  let serialized = micromark(
+    "[[Internal Link#Main Section#Sub Section|Alias]]",
+    {
+      extensions: [syntax()],
+      htmlExtensions: [html()],
+    }
+  );
+
+  assert.equal(
+    serialized,
+    '<p><a href="/internal-link#main-section#sub-section">Alias</a></p>'
+  );
+});
+
+test("[[Internal Link#^Abc123]]", () => {
+  let serialized = micromark("[[Internal Link#^Abc123]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
   assert.equal(
     serialized,
-    '<p><a href="/wiki_link#main_section#sub_section">Alias</a></p>'
+    '<p><a href="/internal-link#^abc123">Internal Link > ^Abc123</a></p>'
   );
 });
 
-test("[[Wiki Link#^Abc123]]", () => {
-  let serialized = micromark("[[Wiki Link#^Abc123]]", {
+test("[[Internal Link#^Abc123|Alias]]", () => {
+  let serialized = micromark("[[Internal Link#^Abc123|Alias]]", {
     extensions: [syntax()],
     htmlExtensions: [html()],
   });
 
-  assert.equal(
-    serialized,
-    '<p><a href="/wiki_link#^abc123">Wiki Link > ^Abc123</a></p>'
-  );
-});
-
-test("[[Wiki Link#^Abc123|Alias]]", () => {
-  let serialized = micromark("[[Wiki Link#^Abc123|Alias]]", {
-    extensions: [syntax()],
-    htmlExtensions: [html()],
-  });
-
-  assert.equal(serialized, '<p><a href="/wiki_link#^abc123">Alias</a></p>');
+  assert.equal(serialized, '<p><a href="/internal-link#^abc123">Alias</a></p>');
 });
 
 test("[[#Main Section]]", () => {
@@ -95,7 +98,7 @@ test("[[#Main Section]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/#main_section">Main Section</a></p>');
+  assert.equal(serialized, '<p><a href="/#main-section">Main Section</a></p>');
 });
 
 test("[[#Main Section|Alias]]", () => {
@@ -104,7 +107,7 @@ test("[[#Main Section|Alias]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/#main_section">Alias</a></p>');
+  assert.equal(serialized, '<p><a href="/#main-section">Alias</a></p>');
 });
 
 test("[[#Main Section#Sub Section]]", () => {
@@ -115,7 +118,7 @@ test("[[#Main Section#Sub Section]]", () => {
 
   assert.equal(
     serialized,
-    '<p><a href="/#main_section#sub_section">Main Section > Sub Section</a></p>'
+    '<p><a href="/#main-section#sub-section">Main Section > Sub Section</a></p>'
   );
 });
 
@@ -127,7 +130,7 @@ test("[[#Main Section#Sub Section|Alias]]", () => {
 
   assert.equal(
     serialized,
-    '<p><a href="/#main_section#sub_section">Alias</a></p>'
+    '<p><a href="/#main-section#sub-section">Alias</a></p>'
   );
 });
 

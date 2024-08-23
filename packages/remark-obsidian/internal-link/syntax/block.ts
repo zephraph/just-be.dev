@@ -4,18 +4,18 @@ import {
 } from "micromark-util-character";
 import { codes } from "micromark-util-symbol";
 import type { Code, Construct } from "micromark-util-types";
-import { wikiCode } from "./utils";
+import { internalLinkCode } from "./utils";
 import { createTokenizer } from "../../parser-utils";
 
 const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   const start = (code: Code) => {
-    if (code !== wikiCode.headingOrBlockStart) return nok(code);
+    if (code !== internalLinkCode.headingOrBlockStart) return nok(code);
 
-    effects.enter("wikiLinkBlockMarker");
+    effects.enter("internalLinkBlockMarker");
 
-    return consumeMarker(code, wikiCode.blockMarker, (code) => {
-      effects.exit("wikiLinkBlockMarker");
-      effects.enter("wikiLinkBlock");
+    return consumeMarker(code, internalLinkCode.blockMarker, (code) => {
+      effects.exit("internalLinkBlockMarker");
+      effects.enter("internalLinkBlock");
       return consumeBlock(code);
     });
   };
@@ -26,15 +26,15 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
       return nok(code);
     }
 
-    if (code === wikiCode.aliasStart) {
+    if (code === internalLinkCode.aliasStart) {
       if (!hasBlockContent) return nok(code);
-      effects.exit("wikiLinkBlock");
+      effects.exit("internalLinkBlock");
       return ok(code);
     }
 
-    if (code === wikiCode.end) {
+    if (code === internalLinkCode.end) {
       if (!hasBlockContent) return nok(code);
-      effects.exit("wikiLinkBlock");
+      effects.exit("internalLinkBlock");
       return ok(code);
     }
 
@@ -49,6 +49,6 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   return start;
 });
 
-export const wikiLinkBlock: Construct = {
+export const internalLinkBlock: Construct = {
   tokenize,
 };
