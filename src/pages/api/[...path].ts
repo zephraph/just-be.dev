@@ -5,9 +5,7 @@
 import { Hono } from "hono";
 import type { APIContext, APIRoute } from "astro";
 import { bearerAuth } from "hono/bearer-auth";
-import { etag } from "hono/etag";
-
-const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
+import { isValidSha256, slugify } from "~/utils";
 
 // Dump cf env in top level of context
 type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
@@ -20,8 +18,7 @@ const app = new Hono<{ Bindings: AstroContext }>()
     }
     return bearerAuth({ token: c.env.PUBLISH_KEY })(c, next);
   })
-  .use("/publish/*", etag())
-  .post("/publish/:id", async (c) => {
+  .post("/notes/:id", async (c) => {
     const id = c.req.param("id");
     const props: Record<string, any> = c.req.query();
     // Alises (as stored in obsidian) are treated as slugs for navigation
@@ -49,6 +46,35 @@ const app = new Hono<{ Bindings: AstroContext }>()
       onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
     });
     if (!result) return c.json({ error: "Failed to upload" }, 500);
+    const { size, version, httpEtag: etag } = result;
+    return c.json({ ok: true, size, version }, 200, { etag });
+  })
+  .post("/assets/:filePath", async (c) => {
+    const originalPath = c.req.query("path");
+    const filePath = c.req.param("filePath");
+    const fileName = filePath.split(".")[0];
+
+    if (!isValidSha256(fileName)) {
+      return c.json({ error: "Invalid file name: File must be SHA256" }, 400);
+    }
+    const result = await c.env.R2_ASSETS.put(filePath, await c.req.blob(), {
+      onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
+    });
+    if (!result) return c.json({ error: "Failed to upload" }, 500);
+
+    if (originalPath) {
+      c.executionCtx.waitUntil(c.env.KV_MAPPINGS.put(originalPath, filePath));
+    }
+
+    if (!("body" in result)) {
+      // Note to self: 304s MUST have a null body
+      // see https://github.com/honojs/hono/issues/2971#issuecomment-2167437708
+      return new Response(null, {
+        status: 304,
+        headers: { ETag: result.etag },
+      });
+    }
+
     const { size, version, httpEtag: etag } = result;
     return c.json({ ok: true, size, version }, 200, { etag });
   });

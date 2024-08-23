@@ -1,5 +1,7 @@
 import type { APIRoute } from "astro";
 import type { ReadStream } from "node:fs";
+import { isValidSha256 } from "~/utils";
+import mime from "mime";
 
 /**
  * Node's ReadStream is different than the ReadableStream used in the browser.
@@ -34,7 +36,6 @@ async function staticFileResponse(filePath: string) {
   // This is wrapped in this if block so that it's removed from the production build
   if (process.env.NODE_ENV === "development") {
     const fs = await import("node:fs");
-    const { default: mime } = await import("mime");
     if (!fs.existsSync(filePath)) {
       return null;
     }
@@ -64,10 +65,16 @@ export const GET: APIRoute = async (ctx) => {
   const BUCKET = ctx.locals.runtime.env.R2_ASSETS;
   const KV = ctx.locals.runtime.env.KV_MAPPINGS;
 
-  const filename = await KV.get(ctx.url.pathname);
+  let filename = ctx.url.pathname.slice(1).split(/[\./]/).at(-2);
+  if (!filename || !isValidSha256(filename)) {
+    // The slice is to remove the leading slash
+    filename = (await KV.get(ctx.url.pathname.slice(1))) ?? "";
+  }
+
   if (!filename) {
     return new Response("File not found", { status: 404 });
   }
+
   const res = await BUCKET.get(filename, {
     onlyIf: {
       // If the provided ETag matches the current ETag, we don't really want to fetch from the bucket
@@ -81,7 +88,7 @@ export const GET: APIRoute = async (ctx) => {
 
   // ETag hasn't changed so the file is cached for the user
   if (!("body" in res)) {
-    return new Response("Not Modified", { status: 304 });
+    return new Response(null, { status: 304, headers: { ETag: res.etag } });
   }
 
   return new Response(res.body, {
@@ -92,7 +99,9 @@ export const GET: APIRoute = async (ctx) => {
           : "public, max-age=31536000, immutable",
       "Content-Length": res.size.toString(),
       "Content-Type":
-        res.httpMetadata?.contentType || "application/octet-stream",
+        res.httpMetadata?.contentType ||
+        mime.getType(filename) ||
+        "application/octet-stream",
       ETag: res.etag,
     },
   });

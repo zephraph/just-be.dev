@@ -3,9 +3,10 @@
  */
 import { ulid } from "jsr:@std/ulid";
 import { Command } from "jsr:@cliffy/command@1.0.0-rc.5";
-import { basename, dirname, join } from "jsr:@std/path";
+import { basename, dirname, join, extname } from "jsr:@std/path";
 import { move } from "jsr:@std/fs";
 import { extractYaml } from "jsr:@std/front-matter";
+import { contentType } from "jsr:@std/media-types";
 
 // async function write(text: string) {
 //   const encoder = new TextEncoder();
@@ -25,6 +26,9 @@ const rename = new Command()
   .description("Renames a note with a ULID")
   .arguments("<path:string>")
   .action(async (_, path) => {
+    // Ignore non-markdown files
+    if (!path.endsWith(".md")) return;
+
     const file = basename(path, ".md");
     const dir = dirname(path);
     const targetDir = "logs";
@@ -40,39 +44,69 @@ const rename = new Command()
     }
   });
 
+async function publishNote(path: string) {
+  const file = basename(path, ".md");
+  if (!isULID(file)) {
+    throw new Error("File must have a ULID name to be published");
+  }
+  const content = await Deno.readTextFile(path);
+  let fm = {};
+  if (content.startsWith("---")) {
+    fm = extractYaml(content).attrs;
+  }
+  return fetch(
+    `${Deno.env.get("SITE")}/api/notes/${file}${
+      fm ? "?" + new URLSearchParams(fm).toString() : ""
+    }`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${Deno.env.get("PUBLISH_KEY")}`,
+      },
+      body: content,
+    }
+  ).then(async (res) =>
+    res.status < 400
+      ? console.log("Published!")
+      : console.error("Error publishing", res.status + " " + (await res.text()))
+  );
+}
+async function publishAsset(path: string) {
+  // Calculate the SHA256 hash of the file
+  const hash = await crypto.subtle
+    .digest("SHA-256", await Deno.readFile(path))
+    .then((b) => new Uint8Array(b))
+    .then(Array.from)
+    .then((a) => a.map((b: any) => b.toString(16).padStart(2, "0")).join(""));
+
+  // POST /api/assets/:hash?path=:path (where :path is `assets/...`)
+  return fetch(
+    `${Deno.env.get("SITE")}/api/assets/${hash}${extname(
+      path
+    )}?${new URLSearchParams({
+      path: path.substring(path.lastIndexOf("assets")),
+    }).toString()}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": contentType(path) || "application/octet-stream",
+        Authorization: `Bearer ${Deno.env.get("PUBLISH_KEY")}`,
+      },
+      body: await Deno.readFile(path),
+    }
+  ).then(async (res) =>
+    res.status < 400
+      ? console.log("Published!")
+      : console.error("Error publishing", res.status + " " + (await res.text()))
+  );
+}
+
 const publish = new Command()
-  .description("Publishes a note")
+  .description("Publishes notes or assets")
   .arguments("<path:string>")
-  .action(async (_, path) => {
-    const file = basename(path, ".md");
-    if (!isULID(file)) {
-      throw new Error("File must have a ULID name to be published");
-    }
-    const content = await Deno.readTextFile(path);
-    let fm = {};
-    if (content.startsWith("---")) {
-      fm = extractYaml(content).attrs;
-    }
-    return fetch(
-      `${Deno.env.get("SITE")}/api/publish/${file}${
-        fm ? "?" + new URLSearchParams(fm).toString() : ""
-      }`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Bearer ${Deno.env.get("PUBLISH_KEY")}`,
-        },
-        body: content,
-      }
-    ).then(async (res) =>
-      res.status < 400
-        ? console.log("Published!")
-        : console.error(
-            "Error publishing",
-            res.status + " " + (await res.text())
-          )
-    );
+  .action((_, path) => {
+    return path.endsWith(".md") ? publishNote(path) : publishAsset(path);
   });
 
 await new Command()
