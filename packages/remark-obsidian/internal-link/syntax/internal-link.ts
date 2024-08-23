@@ -1,4 +1,4 @@
-/// <reference types="../types.d.ts" />
+/// <reference types="../../types.d.ts" />
 
 import type { Code, Construct } from "micromark-util-types";
 import { codes } from "micromark-util-symbol";
@@ -6,21 +6,21 @@ import {
   markdownLineEndingOrSpace,
   markdownLineEnding,
 } from "micromark-util-character";
-import { wikiCode } from "./utils";
+import { internalLinkCode } from "./utils";
 import { createTokenizer } from "../../parser-utils";
-import { wikiLinkBlock } from "./block";
-import { wikiLinkAlias } from "./alias";
-import { wikiLinkHeading } from "./heading";
+import { internalLinkBlock } from "./block";
+import { internalLinkAlias } from "./alias";
+import { internalLinkHeading } from "./heading";
 
 const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   function start(code: Code) {
-    if (code !== wikiCode.start) return nok(code);
+    if (code !== internalLinkCode.start) return nok(code);
 
-    effects.enter("wikiLink");
-    effects.enter("wikiLinkMarker");
+    effects.enter("internalLink");
+    effects.enter("internalLinkMarker");
 
-    return consumeMarker(code, wikiCode.startMarker, (code) => {
-      effects.exit("wikiLinkMarker");
+    return consumeMarker(code, internalLinkCode.startMarker, (code) => {
+      effects.exit("internalLinkMarker");
       return consumeContents(code);
     });
   }
@@ -30,50 +30,50 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
       return nok(code);
     }
 
-    if (code === wikiCode.headingOrBlockStart) {
+    if (code === internalLinkCode.headingOrBlockStart) {
       return effects.attempt(
-        wikiLinkBlock,
+        internalLinkBlock,
         consumeAliasOrEnd,
         consumeHeadings
       )(code);
     }
 
-    effects.enter("wikiLinkTarget");
+    effects.enter("internalLinkTarget");
     return consumeTarget(code);
   }
 
   function consumeAliasOrEnd(code: Code) {
-    return code === wikiCode.aliasStart
-      ? effects.attempt(wikiLinkAlias, consumeEnd)(code)
+    return code === internalLinkCode.aliasStart
+      ? effects.attempt(internalLinkAlias, consumeEnd)(code)
       : consumeEnd(code);
   }
 
   function consumeHeadings(code: Code) {
-    return effects.attempt(wikiLinkHeading, consumeAliasOrEnd)(code);
+    return effects.attempt(internalLinkHeading, consumeAliasOrEnd)(code);
   }
 
   let hasTarget = false;
   function consumeTarget(code: Code) {
-    if (code === wikiCode.end) {
+    if (code === internalLinkCode.end) {
       if (!hasTarget) return nok(code);
-      effects.exit("wikiLinkTarget");
+      effects.exit("internalLinkTarget");
       return consumeEnd(code);
     }
 
-    if (code === wikiCode.headingOrBlockStart) {
+    if (code === internalLinkCode.headingOrBlockStart) {
       if (!hasTarget) return nok(code);
-      effects.exit("wikiLinkTarget");
+      effects.exit("internalLinkTarget");
       return effects.attempt(
-        wikiLinkBlock,
+        internalLinkBlock,
         consumeAliasOrEnd,
         consumeHeadings
       )(code);
     }
 
-    if (code === wikiCode.aliasStart) {
+    if (code === internalLinkCode.aliasStart) {
       if (!hasTarget) return nok(code);
-      effects.exit("wikiLinkTarget");
-      return effects.attempt(wikiLinkAlias, consumeEnd)(code);
+      effects.exit("internalLinkTarget");
+      return effects.attempt(internalLinkAlias, consumeEnd)(code);
     }
 
     if (code === codes.eof || markdownLineEnding(code)) {
@@ -90,10 +90,10 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   }
 
   function consumeEnd(code: Code) {
-    effects.enter("wikiLinkMarker");
-    return consumeMarker(code, wikiCode.endMarker, (code) => {
-      effects.exit("wikiLinkMarker");
-      effects.exit("wikiLink");
+    effects.enter("internalLinkMarker");
+    return consumeMarker(code, internalLinkCode.endMarker, (code) => {
+      effects.exit("internalLinkMarker");
+      effects.exit("internalLink");
       return ok(code);
     });
   }
@@ -101,6 +101,6 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   return start;
 });
 
-export const wikiLink: Construct = {
+export const internalLink: Construct = {
   tokenize,
 };

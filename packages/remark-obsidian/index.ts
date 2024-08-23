@@ -1,9 +1,9 @@
 import type { MarkdownAstroData, RemarkPlugin } from "@astrojs/markdown-remark";
 import { visit } from "unist-util-visit";
-import wikiLinkPlugin from "./wiki-link";
+import internalLinkPlugin from "./internal-link";
 
 export const remarkObsidian: RemarkPlugin = function () {
-  this.use(wikiLinkPlugin, {});
+  this.use(internalLinkPlugin, {});
 
   return (root, file) => {
     // const fm = (file.data.astro as MarkdownAstroData).frontmatter;
