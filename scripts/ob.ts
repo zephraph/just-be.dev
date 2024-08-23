@@ -91,6 +91,7 @@ async function publishAsset(path: string) {
       method: "POST",
       headers: {
         "Content-Type": contentType(path) || "application/octet-stream",
+        Authorization: `Bearer ${Deno.env.get("PUBLISH_KEY")}`,
       },
       body: await Deno.readFile(path),
     }
