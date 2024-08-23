@@ -5,12 +5,7 @@
 import { Hono } from "hono";
 import type { APIContext, APIRoute } from "astro";
 import { bearerAuth } from "hono/bearer-auth";
-import { etag } from "hono/etag";
-
-const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
-
-const isValidSha256 = (hashString: string) =>
-  /^[a-fA-F0-9]{64}$/.test(hashString);
+import { isValidSha256 } from "~/utils";
 
 // Dump cf env in top level of context
 type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
@@ -23,7 +18,6 @@ const app = new Hono<{ Bindings: AstroContext }>()
     }
     return bearerAuth({ token: c.env.PUBLISH_KEY })(c, next);
   })
-  .use(etag())
   .post("/notes/:id", async (c) => {
     const id = c.req.param("id");
     const props: Record<string, any> = c.req.query();
@@ -56,8 +50,10 @@ const app = new Hono<{ Bindings: AstroContext }>()
     return c.json({ ok: true, size, version }, 200, { etag });
   })
   .post("/assets/:filePath", async (c) => {
+    const originalPath = c.req.query("path");
     const filePath = c.req.param("filePath");
     const fileName = filePath.split(".")[0];
+
     if (!isValidSha256(fileName)) {
       return c.json({ error: "Invalid file name: File must be SHA256" }, 400);
     }
@@ -66,8 +62,17 @@ const app = new Hono<{ Bindings: AstroContext }>()
     });
     if (!result) return c.json({ error: "Failed to upload" }, 500);
 
+    if (originalPath) {
+      c.executionCtx.waitUntil(c.env.KV_MAPPINGS.put(originalPath, filePath));
+    }
+
     if (!("body" in result)) {
-      return c.status(304);
+      // Note to self: 304s MUST have a null body
+      // see https://github.com/honojs/hono/issues/2971#issuecomment-2167437708
+      return new Response(null, {
+        status: 304,
+        headers: { ETag: result.etag },
+      });
     }
 
     const { size, version, httpEtag: etag } = result;

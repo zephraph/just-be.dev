@@ -73,14 +73,28 @@ async function publishNote(path: string) {
   );
 }
 async function publishAsset(path: string) {
-  const hash = crypto.subtle.digest("SHA-256", await Deno.readFile(path));
-  return fetch(`${Deno.env.get("SITE")}/api/assets/${hash}${extname(path)}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": contentType(path) || "application/octet-stream",
-    },
-    body: await Deno.readFile(path),
-  }).then(async (res) =>
+  // Calculate the SHA256 hash of the file
+  const hash = await crypto.subtle
+    .digest("SHA-256", await Deno.readFile(path))
+    .then((b) => new Uint8Array(b))
+    .then(Array.from)
+    .then((a) => a.map((b: any) => b.toString(16).padStart(2, "0")).join(""));
+
+  // POST /api/assets/:hash?path=:path (where :path is `assets/...`)
+  return fetch(
+    `${Deno.env.get("SITE")}/api/assets/${hash}${extname(
+      path
+    )}?${new URLSearchParams({
+      path: path.substring(path.lastIndexOf("assets")),
+    }).toString()}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": contentType(path) || "application/octet-stream",
+      },
+      body: await Deno.readFile(path),
+    }
+  ).then(async (res) =>
     res.status < 400
       ? console.log("Published!")
       : console.error("Error publishing", res.status + " " + (await res.text()))
