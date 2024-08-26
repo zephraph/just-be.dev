@@ -6,70 +6,72 @@ const md = await createMarkdownProcessor({
   remarkPlugins: [remarkObsidian],
 });
 
-test("[[Wiki Links]]", async () => {
-  const { code } = await md.render("[[Wiki Links]]");
-  expect(code).toContain('<a href="/wiki_links">Wiki Links</a>');
+test("[[Internal Links]]", async () => {
+  const { code } = await md.render("[[Internal Links]]");
+  expect(code).toContain('<a href="/internal-links">Internal Links</a>');
 });
 
-test("[[Wiki Links|Alias]]", async () => {
-  const { code } = await md.render("[[Wiki Links|Alias]]");
-  expect(code).toContain('<a href="/wiki_links">Alias</a>');
+test("[[Internal Links|Alias]]", async () => {
+  const { code } = await md.render("[[Internal Links|Alias]]");
+  expect(code).toContain('<a href="/internal-links">Alias</a>');
 });
 
-test("[[Wiki Links#Main Section]]", async () => {
-  const { code } = await md.render("[[Wiki Links#Main Section]]");
+test("[[Internal Links#Main Section]]", async () => {
+  const { code } = await md.render("[[Internal Links#Main Section]]");
   expect(code).toContain(
-    '<a href="/wiki_links#main_section">Wiki Links > Main Section</a>'
+    '<a href="/internal-links#main-section">Internal Links > Main Section</a>'
   );
 });
 
-test("[[Wiki Links#Main Section|Alias]]", async () => {
-  const { code } = await md.render("[[Wiki Links#Main Section|Alias]]");
-  expect(code).toContain('<a href="/wiki_links#main_section">Alias</a>');
+test("[[Internal Links#Main Section|Alias]]", async () => {
+  const { code } = await md.render("[[Internal Links#Main Section|Alias]]");
+  expect(code).toContain('<a href="/internal-links#main-section">Alias</a>');
 });
 
-test("[[Wiki Links#Main Section#Sub Section]]", async () => {
-  const { code } = await md.render("[[Wiki Links#Main Section#Sub Section]]");
-  expect(code).toContain(
-    '<a href="/wiki_links#main_section#sub_section">Wiki Links > Main Section > Sub Section</a>'
-  );
-});
-
-test("[[Wiki Links#Main Section#Sub Section|Alias]]", async () => {
+test("[[Internal Links#Main Section#Sub Section]]", async () => {
   const { code } = await md.render(
-    "[[Wiki Links#Main Section#Sub Section|Alias]]"
+    "[[Internal Links#Main Section#Sub Section]]"
   );
   expect(code).toContain(
-    '<a href="/wiki_links#main_section#sub_section">Alias</a>'
+    '<a href="/internal-links#main-section#sub-section">Internal Links > Main Section > Sub Section</a>'
   );
 });
 
-test("[[Wiki Links#^Abc-123]]", async () => {
-  const { code } = await md.render("[[Wiki Links#^Abc-123]]");
+test("[[Internal Links#Main Section#Sub Section|Alias]]", async () => {
+  const { code } = await md.render(
+    "[[Internal Links#Main Section#Sub Section|Alias]]"
+  );
   expect(code).toContain(
-    '<a href="/wiki_links#^abc-123">Wiki Links > ^Abc-123</a>'
+    '<a href="/internal-links#main-section#sub-section">Alias</a>'
   );
 });
 
-test("[[Wiki Links#^Abc-123|Alias]]", async () => {
-  const { code } = await md.render("[[Wiki Links#^Abc-123|Alias]]");
-  expect(code).toContain('<a href="/wiki_links#^abc-123">Alias</a>');
+test("[[Internal Links#^Abc-123]]", async () => {
+  const { code } = await md.render("[[Internal Links#^Abc-123]]");
+  expect(code).toContain(
+    '<a href="/internal-links#^abc-123">Internal Links > ^Abc-123</a>'
+  );
+});
+
+test("[[Internal Links#^Abc-123|Alias]]", async () => {
+  const { code } = await md.render("[[Internal Links#^Abc-123|Alias]]");
+  expect(code).toContain('<a href="/internal-links#^abc-123">Alias</a>');
 });
 
 test("[[#Main Section]]", async () => {
   const { code } = await md.render("[[#Main Section]]");
-  expect(code).toContain('<a href="/#main_section">Main Section</a>');
+  expect(code).toContain('<a href="/#main-section">Main Section</a>');
 });
 
 test("[[#Main Section|Alias]]", async () => {
   const { code } = await md.render("[[#Main Section|Alias]]");
-  expect(code).toContain('<a href="/#main_section">Alias</a>');
+  expect(code).toContain('<a href="/#main-section">Alias</a>');
 });
 
 test("[[#Main Section#Sub Section]]", async () => {
   const { code } = await md.render("[[#Main Section#Sub Section]]");
   expect(code).toContain(
-    '<a href="/#main_section#sub_section">Main Section > Sub Section</a>'
+    '<a href="/#main-section#sub-section">Main Section > Sub Section</a>'
   );
 });
 

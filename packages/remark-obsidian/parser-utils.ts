@@ -1,4 +1,4 @@
-import type { Code, Effects, State } from "micromark-util-types";
+import type { Code, Effects, State, TokenTypeMap } from "micromark-util-types";
 
 export const codeOf = (char: string) => char.charCodeAt(0);
 export const codifyString = (str: string) => str.split("").map(codeOf);
@@ -40,6 +40,28 @@ export function createTokenizer(
   tokenizer: (arg: CustomTokenizerArgs) => State
 ) {
   return function (effects: Effects, ok: State, nok: State) {
+    if (!(effects.enter as any)._isPatched) {
+      let stackDepth = 0;
+      const oldEnter = effects.enter;
+      const oldExit = effects.exit;
+      const oldConsume = effects.consume;
+      effects.enter = (name: keyof TokenTypeMap) => {
+        console.log(`${" ".repeat(stackDepth)}enter`, name);
+        stackDepth++;
+        return oldEnter(name);
+      };
+      // @ts-ignore
+      effects.enter._isPatched = true;
+      effects.exit = (name: keyof TokenTypeMap) => {
+        stackDepth--;
+        console.log(`${" ".repeat(stackDepth)}exit`, name);
+        return oldExit(name);
+      };
+      effects.consume = (code: Code) => {
+        process.stdout.write(String.fromCharCode(code ?? -1));
+        return oldConsume(code);
+      };
+    }
     return tokenizer({
       effects,
       ok,
@@ -47,4 +69,25 @@ export function createTokenizer(
       consumeMarker: consumeMarker({ effects, nok, ok }),
     });
   };
+}
+
+/**
+ * Safely interpolates values into a template string.
+ * If any of the values are null or undefined, it returns an empty string.
+ * Otherwise, it combines the strings and values, replacing undefined values with empty strings.
+ *
+ * @param {TemplateStringsArray} strings - The array of string literals in the template
+ * @param {...any} values - The expressions to be interpolated
+ * @returns {string} The resulting interpolated string, or an empty string if any value is null or undefined
+ */
+export function safeTpl(
+  strings: TemplateStringsArray,
+  ...values: any[]
+): string {
+  if (values.some((value) => value === null || value === undefined)) {
+    return "";
+  }
+  return strings.reduce((result, string, i) => {
+    return result + string + (values[i] || "");
+  }, "");
 }

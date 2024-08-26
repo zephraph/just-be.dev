@@ -17,10 +17,10 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
     if (code !== internalLinkCode.start) return nok(code);
 
     effects.enter("internalLink");
-    effects.enter("internalLinkMarker");
+    effects.enter("internalLinkStartMarker");
 
     return consumeMarker(code, internalLinkCode.startMarker, (code) => {
-      effects.exit("internalLinkMarker");
+      effects.exit("internalLinkStartMarker");
       return consumeContents(code);
     });
   }
@@ -90,9 +90,9 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
   }
 
   function consumeEnd(code: Code) {
-    effects.enter("internalLinkMarker");
+    effects.enter("internalLinkEndMarker");
     return consumeMarker(code, internalLinkCode.endMarker, (code) => {
-      effects.exit("internalLinkMarker");
+      effects.exit("internalLinkEndMarker");
       effects.exit("internalLink");
       return ok(code);
     });
