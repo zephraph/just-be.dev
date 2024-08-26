@@ -40,7 +40,11 @@ export function createTokenizer(
   tokenizer: (arg: CustomTokenizerArgs) => State
 ) {
   return function (effects: Effects, ok: State, nok: State) {
-    if (!(effects.enter as any)._isPatched) {
+    if (
+      process.env.NODE_ENV === "test" &&
+      process.env.DEBUG_PARSER &&
+      !(effects.enter as any)._isPatched
+    ) {
       let stackDepth = 0;
       const oldEnter = effects.enter;
       const oldExit = effects.exit;
