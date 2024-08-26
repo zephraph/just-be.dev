@@ -1,8 +1,8 @@
 /// <reference path="../types.d.ts" />
 
 import type { CompileData, Handle, HtmlExtension } from "micromark-util-types";
-import { safeTpl } from "../parser-utils";
 import mime from "mime";
+import { safeTpl } from "../parser-utils";
 
 export function html(): HtmlExtension {
   const enterEmbed: Handle = function () {
@@ -86,8 +86,13 @@ export function html(): HtmlExtension {
       return;
     }
 
+    const width = safeTpl`width="${embed.dimensions?.[0]}" `;
+    const height = safeTpl`height="${embed.dimensions?.[1]}" `;
+
     this.tag(
-      `<embed src="${embed.value}" type="${mime.getType(embed.extension)}" />`
+      `<embed src="${embed.value}" type="${mime.getType(
+        embed.extension
+      )}" ${width}${height}/>`
     );
   };
 
