@@ -49,8 +49,17 @@ export function fromMarkdown() {
   };
 
   const exitEmbedHeading: FromMarkdownHandle = function (token) {
+    const heading = this.sliceSerialize(token);
     const current = top(this.stack);
-    current.headings!.push(this.sliceSerialize(token));
+    current.headings ??= [];
+    current.headings.push(heading);
+  };
+
+  const exitEmbedPdfParam: FromMarkdownHandle = function (token) {
+    const [key, value] = this.sliceSerialize(token).split("=");
+    const current = top(this.stack);
+    current.pdfParams ??= {};
+    current.pdfParams[key] = value;
   };
 
   const exitEmbedExtension: FromMarkdownHandle = function (token) {
@@ -62,15 +71,23 @@ export function fromMarkdown() {
     const embed = top(this.stack);
     this.exit(token);
 
+    const width = embed.dimensions?.[0];
+    const height = embed.dimensions?.[1];
+
     embed.data ??= {};
     embed.data.hName = "embed";
     embed.data.hProperties = {
       src: embed.value,
       type: embed.extension,
-      width: embed.dimensions?.[0],
-      height: embed.dimensions?.[1],
       ...embed.pdfParams,
     };
+
+    if (width) {
+      embed.data.hProperties.width = width;
+    }
+    if (height) {
+      embed.data.hProperties.height = height;
+    }
   };
 
   return {
@@ -81,6 +98,7 @@ export function fromMarkdown() {
       embed: exitEmbed,
       embedTarget: exitEmbedTarget,
       embedExtension: exitEmbedExtension,
+      embedPdfParam: exitEmbedPdfParam,
       embedDimensionValue: exitEmbedDimensionValue,
       internalLinkHeading: exitEmbedHeading,
       internalLinkBlock: exitEmbedBlock,
