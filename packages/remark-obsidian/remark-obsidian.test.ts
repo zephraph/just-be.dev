@@ -1,6 +1,6 @@
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import { remarkObsidian } from ".";
-import { expect, test, vi } from "vitest";
+import { expect, test } from "vitest";
 
 const md = await createMarkdownProcessor({
   remarkPlugins: [remarkObsidian()],

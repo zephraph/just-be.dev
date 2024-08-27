@@ -2,7 +2,6 @@
 
 import type { Data } from "mdast";
 import type {
-  Extension as FromMarkdownExtension,
   Handle as FromMarkdownHandle,
   CompileContext,
 } from "mdast-util-from-markdown";

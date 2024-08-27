@@ -1,9 +1,4 @@
-import type {
-  Code,
-  Construct,
-  State,
-  TokenTypeMap,
-} from "micromark-util-types";
+import type { Code, Construct, State } from "micromark-util-types";
 import { codeOf, codifyString, createTokenizer } from "../../parser-utils";
 import { embedCode } from "./utils";
 import { codes } from "micromark-util-symbol";

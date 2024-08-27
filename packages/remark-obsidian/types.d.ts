@@ -11,6 +11,7 @@ export interface InternalLinkNode {
   alias?: string | null;
   block?: string | null;
   headings?: string[] | null;
+  data?: Record<string, any>;
 }
 
 export interface EmbedNode {
@@ -21,6 +22,7 @@ export interface EmbedNode {
   extension?: string | null;
   pdfParams?: Record<string, string>;
   dimensions?: number[] | null;
+  data?: Record<string, any>;
 }
 
 declare module "micromark-util-types" {

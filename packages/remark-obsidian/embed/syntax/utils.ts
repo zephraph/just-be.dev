@@ -1,4 +1,4 @@
-import { codifyString, codeOf } from "../../parser-utils";
+import { codifyString } from "../../parser-utils";
 
 import { internalLinkCode } from "../../internal-link/syntax/utils";
 

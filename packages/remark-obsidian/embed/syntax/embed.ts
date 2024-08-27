@@ -1,7 +1,7 @@
 /// <reference types="../../types.d.ts" />
 
-import type { Code, Construct, TokenTypeMap } from "micromark-util-types";
-import { codifyString, createTokenizer } from "../../parser-utils";
+import type { Code, Construct } from "micromark-util-types";
+import { createTokenizer } from "../../parser-utils";
 import { embedCode } from "./utils";
 import { codes } from "micromark-util-symbol";
 import { markdownLineEnding } from "micromark-util-character";
