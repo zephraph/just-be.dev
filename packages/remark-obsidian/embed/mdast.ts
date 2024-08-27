@@ -7,12 +7,18 @@ import type {
   CompileContext,
 } from "mdast-util-from-markdown";
 import type { EmbedNode as Node } from "micromark-util-types";
+import mime from "mime";
+import { href } from "../internal-link/utils";
 
 interface EmbedNode extends Node {
   data?: Data;
 }
 
-export function fromMarkdown() {
+interface FromMarkdownOptions {
+  unresolvedLinks?: Set<string>;
+}
+
+export function fromMarkdown(options: FromMarkdownOptions = {}) {
   const enterEmbed: FromMarkdownHandle = function (token) {
     let embed: EmbedNode = {
       type: "embed",
@@ -71,16 +77,77 @@ export function fromMarkdown() {
     const embed = top(this.stack);
     this.exit(token);
 
+    if (embed.value) {
+      options.unresolvedLinks?.add(embed.value);
+    }
+
     const width = embed.dimensions?.[0];
     const height = embed.dimensions?.[1];
 
     embed.data ??= {};
-    embed.data.hName = "embed";
-    embed.data.hProperties = {
-      src: embed.value,
-      type: embed.extension,
-      ...embed.pdfParams,
-    };
+    const type = embed.extension
+      ? mime.getType(`.${embed.extension}`) ?? ""
+      : "";
+    switch (true) {
+      case type.startsWith("audio/"):
+        embed.data.hName = "audio";
+        embed.data.hProperties = {
+          controls: true,
+        };
+        embed.data.hChildren = [
+          {
+            type: "element",
+            tagName: "source",
+            properties: {
+              src: embed.value,
+              type,
+            },
+            children: [],
+          },
+        ];
+        break;
+      case type.startsWith("video/"):
+        embed.data.hName = "video";
+        embed.data.hProperties = {
+          controls: true,
+        };
+        embed.data.hChildren = [
+          {
+            type: "element",
+            tagName: "source",
+            properties: {
+              src: embed.value,
+              type,
+            },
+            children: [],
+          },
+        ];
+        break;
+      case type.startsWith("image/"):
+        embed.data.hName = "img";
+        embed.data.hProperties = {
+          src: embed.value,
+          type,
+        };
+        break;
+      case type.startsWith("application/pdf"):
+        embed.data.hName = "object";
+        embed.data.hProperties = {
+          data: embed.value,
+          type,
+          ...embed.pdfParams,
+        };
+        break;
+      default:
+        embed.data.hName = "object";
+        embed.data.hProperties = {
+          data: href(embed),
+          ...embed.pdfParams,
+        };
+        break;
+    }
+
+    embed.data.hProperties ??= {};
 
     if (width) {
       embed.data.hProperties.width = width;

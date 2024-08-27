@@ -1,9 +1,9 @@
 import { createMarkdownProcessor } from "@astrojs/markdown-remark";
 import { remarkObsidian } from ".";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 
 const md = await createMarkdownProcessor({
-  remarkPlugins: [remarkObsidian],
+  remarkPlugins: [remarkObsidian()],
 });
 
 test("[[Internal Links]]", async () => {
@@ -83,4 +83,75 @@ test("[[#^Abc-123]]", async () => {
 test("[[#^Abc-123|Alias]]", async () => {
   const { code } = await md.render("[[#^Abc-123|Alias]]");
   expect(code).toContain('<a href="/#^abc-123">Alias</a>');
+});
+
+// New embed tests
+test("![[Internal Link]]", async () => {
+  const { code } = await md.render("![[Internal Link]]");
+  expect(code).toContain('<p><object data="/internal-link"></object></p>');
+});
+
+test("![[Internal Link.pdf]]", async () => {
+  const { code } = await md.render("![[Internal Link.pdf]]");
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf"></object></p>'
+  );
+});
+
+test("![[Internal Link.pdf#width=100&height=200]]", async () => {
+  const { code } = await md.render(
+    "![[Internal Link.pdf#width=100&height=200]]"
+  );
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" width="100" height="200"></object></p>'
+  );
+});
+
+test("![[Internal Link.pdf#page=5]]", async () => {
+  const { code } = await md.render("![[Internal Link.pdf#page=5]]");
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" page="5"></object></p>'
+  );
+});
+
+test("![[Internal Link.pdf#page=5&zoom=2]]", async () => {
+  const { code } = await md.render("![[Internal Link.pdf#page=5&zoom=2]]");
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" page="5" zoom="2"></object></p>'
+  );
+});
+
+test("![[Internal Link.jpg]]", async () => {
+  const { code } = await md.render("![[Internal Link.jpg]]");
+  expect(code).toContain(
+    '<p><img src="Internal Link.jpg" type="image/jpeg"></p>'
+  );
+});
+
+test("![[Internal Link.mp3]]", async () => {
+  const { code } = await md.render("![[Internal Link.mp3]]");
+  expect(code).toContain(
+    '<p><audio controls><source src="Internal Link.mp3" type="audio/mpeg"></audio></p>'
+  );
+});
+
+test("![[Internal Link.mp4]]", async () => {
+  const { code } = await md.render("![[Internal Link.mp4]]");
+  expect(code).toContain(
+    '<p><video controls><source src="Internal Link.mp4" type="video/mp4"></video></p>'
+  );
+});
+
+test("![[Internal Link#Section]]", async () => {
+  const { code } = await md.render("![[Internal Link#Section]]");
+  expect(code).toContain(
+    '<p><object data="/internal-link#section"></object></p>'
+  );
+});
+
+test("![[Internal Link#^block-id]]", async () => {
+  const { code } = await md.render("![[Internal Link#^block-id]]");
+  expect(code).toContain(
+    '<p><object data="/internal-link#^block-id"></object></p>'
+  );
 });

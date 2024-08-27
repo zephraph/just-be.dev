@@ -19,10 +19,9 @@ test("![[Internal Link]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hName": "object",
                 "hProperties": {
-                  "src": "Internal Link",
-                  "type": null,
+                  "data": "/internal-link",
                 },
               },
               "dimensions": [],
@@ -86,10 +85,10 @@ test("![[Internal Link.pdf]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hName": "object",
                 "hProperties": {
-                  "src": "Internal Link.pdf",
-                  "type": "pdf",
+                  "data": "Internal Link.pdf",
+                  "type": "application/pdf",
                 },
               },
               "dimensions": [],
@@ -145,77 +144,76 @@ test("![[Internal Link.pdf]]", () => {
 });
 
 test("![[Internal Link.pdf#width=100&height=200]]", () => {
-  expect(
-    parse("![[Internal Link.pdf#width=100&height=200]]")
-  ).toMatchInlineSnapshot(`
-    {
-      "children": [
-        {
-          "children": [
-            {
-              "block": null,
-              "data": {
-                "hName": "embed",
-                "hProperties": {
+  expect(parse("![[Internal Link.pdf#width=100&height=200]]"))
+    .toMatchInlineSnapshot(`
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "block": null,
+                "data": {
+                  "hName": "object",
+                  "hProperties": {
+                    "data": "Internal Link.pdf",
+                    "height": "200",
+                    "type": "application/pdf",
+                    "width": "100",
+                  },
+                },
+                "dimensions": [],
+                "extension": "pdf",
+                "headings": [],
+                "pdfParams": {
                   "height": "200",
-                  "src": "Internal Link.pdf",
-                  "type": "pdf",
                   "width": "100",
                 },
-              },
-              "dimensions": [],
-              "extension": "pdf",
-              "headings": [],
-              "pdfParams": {
-                "height": "200",
-                "width": "100",
-              },
-              "position": {
-                "end": {
-                  "column": 44,
-                  "line": 1,
-                  "offset": 43,
+                "position": {
+                  "end": {
+                    "column": 44,
+                    "line": 1,
+                    "offset": 43,
+                  },
+                  "start": {
+                    "column": 1,
+                    "line": 1,
+                    "offset": 0,
+                  },
                 },
-                "start": {
-                  "column": 1,
-                  "line": 1,
-                  "offset": 0,
-                },
+                "type": "embed",
+                "value": "Internal Link.pdf",
               },
-              "type": "embed",
-              "value": "Internal Link.pdf",
+            ],
+            "position": {
+              "end": {
+                "column": 44,
+                "line": 1,
+                "offset": 43,
+              },
+              "start": {
+                "column": 1,
+                "line": 1,
+                "offset": 0,
+              },
             },
-          ],
-          "position": {
-            "end": {
-              "column": 44,
-              "line": 1,
-              "offset": 43,
-            },
-            "start": {
-              "column": 1,
-              "line": 1,
-              "offset": 0,
-            },
+            "type": "paragraph",
           },
-          "type": "paragraph",
+        ],
+        "position": {
+          "end": {
+            "column": 44,
+            "line": 1,
+            "offset": 43,
+          },
+          "start": {
+            "column": 1,
+            "line": 1,
+            "offset": 0,
+          },
         },
-      ],
-      "position": {
-        "end": {
-          "column": 44,
-          "line": 1,
-          "offset": 43,
-        },
-        "start": {
-          "column": 1,
-          "line": 1,
-          "offset": 0,
-        },
-      },
-      "type": "root",
-    }
-  `);
+        "type": "root",
+      }
+    `);
 });
 
 test("![[Internal Link.pdf#page=5]]", () => {
@@ -227,11 +225,11 @@ test("![[Internal Link.pdf#page=5]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hName": "object",
                 "hProperties": {
+                  "data": "Internal Link.pdf",
                   "page": "5",
-                  "src": "Internal Link.pdf",
-                  "type": "pdf",
+                  "type": "application/pdf",
                 },
               },
               "dimensions": [],
@@ -297,11 +295,11 @@ test("![[Internal Link.pdf#page=5&zoom=2]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hName": "object",
                 "hProperties": {
+                  "data": "Internal Link.pdf",
                   "page": "5",
-                  "src": "Internal Link.pdf",
-                  "type": "pdf",
+                  "type": "application/pdf",
                   "zoom": "2",
                 },
               },
@@ -369,10 +367,10 @@ test("![[Internal Link.jpg]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hName": "img",
                 "hProperties": {
                   "src": "Internal Link.jpg",
-                  "type": "jpg",
+                  "type": "image/jpeg",
                 },
               },
               "dimensions": [],
@@ -436,10 +434,20 @@ test("![[Internal Link.mp3]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hChildren": [
+                  {
+                    "children": [],
+                    "properties": {
+                      "src": "Internal Link.mp3",
+                      "type": "audio/mpeg",
+                    },
+                    "tagName": "source",
+                    "type": "element",
+                  },
+                ],
+                "hName": "audio",
                 "hProperties": {
-                  "src": "Internal Link.mp3",
-                  "type": "mp3",
+                  "controls": true,
                 },
               },
               "dimensions": [],
@@ -503,10 +511,20 @@ test("![[Internal Link.mp4]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hChildren": [
+                  {
+                    "children": [],
+                    "properties": {
+                      "src": "Internal Link.mp4",
+                      "type": "video/mp4",
+                    },
+                    "tagName": "source",
+                    "type": "element",
+                  },
+                ],
+                "hName": "video",
                 "hProperties": {
-                  "src": "Internal Link.mp4",
-                  "type": "mp4",
+                  "controls": true,
                 },
               },
               "dimensions": [],
@@ -570,10 +588,9 @@ test("![[Internal Link#Section]]", () => {
             {
               "block": null,
               "data": {
-                "hName": "embed",
+                "hName": "object",
                 "hProperties": {
-                  "src": "Internal Link",
-                  "type": null,
+                  "data": "/internal-link#section",
                 },
               },
               "dimensions": [],
@@ -639,10 +656,9 @@ test("![[Internal Link#^block-id]]", () => {
             {
               "block": "block-id",
               "data": {
-                "hName": "embed",
+                "hName": "object",
                 "hProperties": {
-                  "src": "Internal Link",
-                  "type": null,
+                  "data": "/internal-link#^block-id",
                 },
               },
               "dimensions": [],

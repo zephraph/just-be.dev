@@ -2,15 +2,53 @@ import type { MarkdownAstroData, RemarkPlugin } from "@astrojs/markdown-remark";
 import { visit } from "unist-util-visit";
 import internalLinkPlugin from "./internal-link";
 import embedPlugin from "./embed";
+import { href } from "./internal-link/utils";
 
-export const remarkObsidian: RemarkPlugin = function () {
-  this.use(internalLinkPlugin, embedPlugin);
+interface RemarkObsidianOptions {
+  fileResolver?: (path: string) => Promise<string>;
+}
 
-  return (root, file) => {
-    // const fm = (file.data.astro as MarkdownAstroData).frontmatter;
-    // visit(root, "paragraph", (node, index, parent) => {
-    // });
+export const remarkObsidian = (
+  options: RemarkObsidianOptions = {}
+): RemarkPlugin =>
+  function () {
+    let unresolvedLinks: Set<string> = new Set();
+    this.use([
+      embedPlugin({ unresolvedLinks }),
+      internalLinkPlugin({ unresolvedLinks }),
+    ]);
+
+    return async (root, file) => {
+      const resolvedLinks = await Promise.all(
+        Array.from(unresolvedLinks).map(async (link) => ({
+          [link]: (await options.fileResolver?.(link)) ?? link,
+        }))
+      ).then((links) => links.reduce((acc, link) => ({ ...acc, ...link }), {}));
+
+      visit(root, "internalLink", (node, index, parent) => {
+        if (node.value) {
+          node.value = resolvedLinks[node.value];
+          node.data.hProperties.href = href(node);
+        }
+      });
+
+      visit(root, "embed", (node, index, parent) => {
+        switch (node.data.hName) {
+          case "image":
+            node.data.hProperties.src =
+              resolvedLinks[node.data.hProperties.src];
+            break;
+          case "video":
+            node.data.hProperties.src =
+              resolvedLinks[node.data.hProperties.src];
+            break;
+          case "audio":
+            node.data.hProperties.src =
+              resolvedLinks[node.data.hProperties.src];
+            break;
+        }
+      });
+    };
   };
-};
 
 export default remarkObsidian;

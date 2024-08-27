@@ -17,7 +17,13 @@ interface InternalLinkNode extends Node {
   data?: Data;
 }
 
-export function fromMarkdown(): FromMarkdownExtension {
+interface FromMarkdownOptions {
+  unresolvedLinks?: Set<string>;
+}
+
+export function fromMarkdown(
+  options: FromMarkdownOptions = {}
+): FromMarkdownExtension {
   const enterInternalLink: FromMarkdownHandle = function (token) {
     let internalLink: InternalLinkNode = {
       type: "internalLink",
@@ -62,6 +68,10 @@ export function fromMarkdown(): FromMarkdownExtension {
   const exitInternalLink: FromMarkdownHandle = function (token) {
     const internalLink = top(this.stack);
     this.exit(token);
+
+    if (internalLink.value) {
+      options.unresolvedLinks?.add(internalLink.value);
+    }
 
     internalLink.data ??= {};
 
