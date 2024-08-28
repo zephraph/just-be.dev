@@ -83,6 +83,10 @@ export function fromMarkdown(options: FromMarkdownOptions = {}) {
     const width = embed.dimensions?.[0];
     const height = embed.dimensions?.[1];
 
+    if (embed.extension) {
+      embed.value = `/assets/${embed.value}`;
+    }
+
     embed.data ??= {};
     const type = embed.extension
       ? mime.getType(`.${embed.extension}`) ?? ""
