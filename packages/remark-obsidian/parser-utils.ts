@@ -49,20 +49,27 @@ export function createTokenizer(
       const oldEnter = effects.enter;
       const oldExit = effects.exit;
       const oldConsume = effects.consume;
+      const buffer: string[] = [];
+      const flush = () => {
+        console.log(buffer.join(""));
+        buffer.length = 0;
+      };
       effects.enter = (name: keyof TokenTypeMap) => {
-        console.log(`${" ".repeat(stackDepth)}enter`, name);
+        flush();
+        buffer.push(`${" ".repeat(stackDepth)}enter ${name} `);
         stackDepth++;
         return oldEnter(name);
       };
       // @ts-ignore
       effects.enter._isPatched = true;
       effects.exit = (name: keyof TokenTypeMap) => {
+        flush();
         stackDepth--;
-        console.log(`${" ".repeat(stackDepth)}exit`, name);
+        buffer.push(`${" ".repeat(stackDepth)}exit  ${name} `);
         return oldExit(name);
       };
       effects.consume = (code: Code) => {
-        process.stdout.write(String.fromCharCode(code ?? -1));
+        buffer.push(`\x1b[90m${String.fromCharCode(code ?? -1)}\x1b[0m`);
         return oldConsume(code);
       };
     }
