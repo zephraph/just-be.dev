@@ -7,7 +7,7 @@ import type {
 } from "mdast-util-from-markdown";
 import type { EmbedNode as Node } from "micromark-util-types";
 import mime from "mime";
-import { href } from "../internal-link/utils";
+import { href, slugify } from "../internal-link/utils";
 
 interface EmbedNode extends Node {
   data?: Data;
@@ -77,6 +77,7 @@ export function fromMarkdown(options: FromMarkdownOptions = {}) {
     this.exit(token);
 
     if (embed.value) {
+      embed.value = slugify(embed.value);
       options.unresolvedLinks?.add(embed.value);
     }
 

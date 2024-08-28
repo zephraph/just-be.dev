@@ -101,14 +101,14 @@ test("![[Internal Link|Alias]]", async () => {
 test("![[Internal Link.pdf]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf]]");
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf"></object></p>'
   );
 });
 
 test("![[Internal Link.pdf|Alias]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf|Alias]]");
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" title="Alias"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" title="Alias"></object></p>'
   );
 });
 
@@ -117,7 +117,7 @@ test("![[Internal Link.pdf#width=100&height=200]]", async () => {
     "![[Internal Link.pdf#width=100&height=200]]"
   );
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" width="100" height="200"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" width="100" height="200"></object></p>'
   );
 });
 
@@ -126,28 +126,28 @@ test("![[Internal Link.pdf#width=100&height=200|Alias]]", async () => {
     "![[Internal Link.pdf#width=100&height=200|Alias]]"
   );
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" width="100" height="200" title="Alias"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" width="100" height="200" title="Alias"></object></p>'
   );
 });
 
 test("![[Internal Link.pdf#page=5]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf#page=5]]");
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" page="5"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" page="5"></object></p>'
   );
 });
 
 test("![[Internal Link.pdf#page=5|Alias]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf#page=5|Alias]]");
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" page="5" title="Alias"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" page="5" title="Alias"></object></p>'
   );
 });
 
 test("![[Internal Link.pdf#page=5&zoom=2]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf#page=5&zoom=2]]");
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" page="5" zoom="2"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" page="5" zoom="2"></object></p>'
   );
 });
 
@@ -156,49 +156,49 @@ test("![[Internal Link.pdf#page=5&zoom=2|Alias]]", async () => {
     "![[Internal Link.pdf#page=5&zoom=2|Alias]]"
   );
   expect(code).toContain(
-    '<p><object data="Internal Link.pdf" type="application/pdf" page="5" zoom="2" title="Alias"></object></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" page="5" zoom="2" title="Alias"></object></p>'
   );
 });
 
 test("![[Internal Link.jpg]]", async () => {
   const { code } = await md.render("![[Internal Link.jpg]]");
   expect(code).toContain(
-    '<p><img src="Internal Link.jpg" type="image/jpeg"></p>'
+    '<p><img src="/assets/internal-link.jpg" type="image/jpeg"></p>'
   );
 });
 
 test("![[Internal Link.jpg|Alias]]", async () => {
   const { code } = await md.render("![[Internal Link.jpg|Alias]]");
   expect(code).toContain(
-    '<p><img src="Internal Link.jpg" alt="Alias" type="image/jpeg" title="Alias"></p>'
+    '<p><img src="/assets/internal-link.jpg" alt="Alias" type="image/jpeg" title="Alias"></p>'
   );
 });
 
 test("![[Internal Link.mp3]]", async () => {
   const { code } = await md.render("![[Internal Link.mp3]]");
   expect(code).toContain(
-    '<p><audio controls><source src="Internal Link.mp3" type="audio/mpeg"></audio></p>'
+    '<p><audio controls><source src="/assets/internal-link.mp3" type="audio/mpeg"></audio></p>'
   );
 });
 
 test("![[Internal Link.mp3|Alias]]", async () => {
   const { code } = await md.render("![[Internal Link.mp3|Alias]]");
   expect(code).toContain(
-    '<p><audio controls title="Alias"><source src="Internal Link.mp3" type="audio/mpeg"></audio></p>'
+    '<p><audio controls title="Alias"><source src="/assets/internal-link.mp3" type="audio/mpeg"></audio></p>'
   );
 });
 
 test("![[Internal Link.mp4]]", async () => {
   const { code } = await md.render("![[Internal Link.mp4]]");
   expect(code).toContain(
-    '<p><video controls><source src="Internal Link.mp4" type="video/mp4"></video></p>'
+    '<p><video controls><source src="/assets/internal-link.mp4" type="video/mp4"></video></p>'
   );
 });
 
 test("![[Internal Link.mp4|Alias]]", async () => {
   const { code } = await md.render("![[Internal Link.mp4|Alias]]");
   expect(code).toContain(
-    '<p><video controls title="Alias"><source src="Internal Link.mp4" type="video/mp4"></video></p>'
+    '<p><video controls title="Alias"><source src="/assets/internal-link.mp4" type="video/mp4"></video></p>'
   );
 });
 
