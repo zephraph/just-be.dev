@@ -196,7 +196,6 @@ test("![[Internal Link.mp4]]", async () => {
 });
 
 test("![[Internal Link.mp4|Alias]]", async () => {
-  vi.stubEnv("DEBUG_PARSER", "true");
   const { code } = await md.render("![[Internal Link.mp4|Alias]]");
   expect(code).toContain(
     '<p><video controls title="Alias"><source src="Internal Link.mp4" type="video/mp4"></video></p>'
