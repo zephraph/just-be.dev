@@ -16,6 +16,7 @@
     "micromark-extension-wiki-link": "^0.0.4",
     "micromark-util-character": "^2.1.0",
     "micromark-util-symbol": "^2.0.0",
+    "mime": "^4.0.4",
     "remark-wiki-link": "^2.0.1",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0"

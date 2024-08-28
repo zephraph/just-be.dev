@@ -4,7 +4,23 @@ import typography from "@tailwindcss/typography";
 export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   theme: {
-    extend: {},
+    extend: {
+      typography: ({ theme }) => ({
+        DEFAULT: {
+          css: {
+            // h1: {
+            //   fontFamily: theme("fontFamily.display"),
+            // },
+            // h2: {
+            //   fontFamily: theme("fontFamily.display"),
+            // },
+            // h3: {
+            //   fontFamily: theme("fontFamily.display"),
+            // },
+          },
+        },
+      }),
+    },
   },
   plugins: [typography],
 };

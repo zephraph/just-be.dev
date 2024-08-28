@@ -85,7 +85,7 @@ async function publishAsset(path: string) {
     `${Deno.env.get("SITE")}/api/assets/${hash}${extname(
       path
     )}?${new URLSearchParams({
-      path: path.substring(path.lastIndexOf("assets")),
+      path: slugify(path.substring(path.lastIndexOf("assets"))),
     }).toString()}`,
     {
       method: "POST",

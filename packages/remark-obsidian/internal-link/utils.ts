@@ -17,7 +17,9 @@ export const displayName = (internalLink: InternalLinkNode) => {
   return displayName;
 };
 
-export const href = (internalLink: InternalLinkNode) => {
+export const href = (
+  internalLink: Pick<InternalLinkNode, "value" | "block" | "headings">
+) => {
   const blockOrHeadings = internalLink.block
     ? "#^" + internalLink.block
     : internalLink.headings?.length

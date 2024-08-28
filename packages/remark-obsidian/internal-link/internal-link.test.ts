@@ -2,6 +2,10 @@ import { test, assert } from "vitest";
 import { micromark } from "micromark";
 import { html, syntax } from ".";
 
+// uncomment this to see the parser debug info
+// import { vi } from "vitest";
+// vi.stubEnv("DEBUG_PARSER", "1");
+
 test("[[Internal Link]]", () => {
   let serialized = micromark("[[Internal Link]]", {
     extensions: [syntax()],

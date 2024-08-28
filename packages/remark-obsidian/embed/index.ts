@@ -1,18 +1,16 @@
 import type { RemarkPlugin } from "@astrojs/markdown-remark";
-import { fromMarkdown } from "./mdast";
 import { syntax } from "./syntax";
+import { fromMarkdown } from "./mdast";
 
 export { syntax } from "./syntax";
 export { html } from "./html";
 export { fromMarkdown } from "./mdast";
 
-interface InternalLinkPluginOptions {
-  unresolvedLinks?: Set<string>;
+interface EmbedPluginOptions {
+  unresolvedLinks: Set<string>;
 }
 
-export const internalLinkPlugin = (
-  options: InternalLinkPluginOptions = {}
-): RemarkPlugin =>
+export const embedPlugin = (options: EmbedPluginOptions): RemarkPlugin =>
   function () {
     // TODO: Fix this type
     const data = this.data() as any;
@@ -25,4 +23,4 @@ export const internalLinkPlugin = (
     );
   };
 
-export default internalLinkPlugin;
+export default embedPlugin;

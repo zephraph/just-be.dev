@@ -11,11 +11,26 @@ export interface InternalLinkNode {
   alias?: string | null;
   block?: string | null;
   headings?: string[] | null;
+  data?: Record<string, any>;
 }
+
+export interface EmbedNode {
+  type: "embed";
+  value?: string | null;
+  alias?: string | null;
+  block?: string | null;
+  headings?: string[] | null;
+  extension?: string | null;
+  pdfParams?: Record<string, string>;
+  dimensions?: number[] | null;
+  data?: Record<string, any>;
+}
+
 declare module "micromark-util-types" {
   export interface TokenTypeMap extends TokenTypeMap {
     internalLink: "internalLink";
-    internalLinkMarker: "internalLinkMarker";
+    internalLinkStartMarker: "internalLinkStartMarker";
+    internalLinkEndMarker: "internalLinkEndMarker";
     internalLinkTarget: "internalLinkTarget";
     internalLinkAliasMarker: "internalLinkAliasMarker";
     internalLinkAlias: "internalLinkAlias";
@@ -25,13 +40,30 @@ declare module "micromark-util-types" {
     internalLinkBlock: "internalLinkBlock";
 
     embed: "embed";
-    embedMarker: "embedMarker";
+    embedStartMarker: "embedStartMarker";
+    embedEndMarker: "embedEndMarker";
+    embedTarget: "embedTarget";
+    embedExtensionMarker: "embedExtensionMarker";
+    embedExtension: "embedExtension";
+    embedDimensionMarker: "embedDimensionMarker";
+    embedDimensionValue: "embedDimensionValue";
+    embedDimensionSeparator: "embedDimensionSeparator";
+    embedPdfExtension: "embedPdfExtension";
+
+    embedPdfParamsMarker: "embedPdfParamsMarker";
+    embedPdfParam: "embedPdfParam";
+    embedPdfParams: "embedPdfParams";
+    embedPdfParamKey: "embedPdfParamKey";
+    embedPdfParamValue: "embedPdfParamValue";
+    embedPdfKVSeparator: "embedPdfKVSeparator";
+    embedPdfParamSeparator: "embedPdfParamSeparator";
   }
 
-  export { InternalLinkNode };
+  export { InternalLinkNode, EmbedNode };
 
   export interface CompileData extends CompileData {
     internalLinkStack: internalLinkNode[];
+    embedStack: embedNode[];
   }
 }
 
