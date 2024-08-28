@@ -126,6 +126,7 @@ export function fromMarkdown(options: FromMarkdownOptions = {}) {
         embed.data.hName = "img";
         embed.data.hProperties = {
           src: embed.value,
+          alt: embed.alias,
           type,
         };
         break;
@@ -147,6 +148,10 @@ export function fromMarkdown(options: FromMarkdownOptions = {}) {
     }
 
     embed.data.hProperties ??= {};
+
+    if (embed.alias) {
+      embed.data.hProperties.title = embed.alias;
+    }
 
     if (width) {
       embed.data.hProperties.width = width;

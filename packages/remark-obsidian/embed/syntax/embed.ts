@@ -8,6 +8,7 @@ import { markdownLineEnding } from "micromark-util-character";
 import { internalLinkBlock } from "../../internal-link/syntax/block";
 import { internalLinkHeading } from "../../internal-link/syntax/heading";
 import { embedExtension } from "./extension";
+import { internalLinkAlias } from "../../internal-link/syntax/alias";
 
 // prettier-ignore
 const defaultSupportedExtensions = [ 
@@ -61,9 +62,14 @@ const tokenize = ({
         effects.exit("embedTarget");
         return effects.attempt(
           internalLinkBlock,
-          consumeEnd,
+          consumeAliasOrEnd,
           consumeHeadings
         )(code);
+      }
+
+      if (code === embedCode.aliasMarker[0]) {
+        effects.exit("embedTarget");
+        return effects.attempt(internalLinkAlias, consumeEnd)(code);
       }
 
       if (code === embedCode.end[0]) {
@@ -76,7 +82,17 @@ const tokenize = ({
     }
 
     function consumeHeadings(code: Code) {
-      return effects.attempt(internalLinkHeading, consumeEnd, consumeEnd)(code);
+      return effects.attempt(
+        internalLinkHeading,
+        consumeAliasOrEnd,
+        consumeEnd
+      )(code);
+    }
+
+    function consumeAliasOrEnd(code: Code) {
+      return code === embedCode.aliasMarker[0]
+        ? effects.attempt(internalLinkAlias, consumeEnd)(code)
+        : consumeEnd(code);
     }
 
     function consumeEnd(code: Code) {

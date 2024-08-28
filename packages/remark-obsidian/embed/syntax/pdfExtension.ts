@@ -3,6 +3,8 @@ import { codifyString, createTokenizer } from "../../parser-utils";
 import { codes } from "micromark-util-symbol";
 import { markdownLineEnding } from "micromark-util-character";
 import { embedCode } from "./utils";
+import { internalLinkAlias } from "../../internal-link/syntax/alias";
+import { embed } from "./embed";
 
 const pdfMarker = codifyString("pdf");
 
@@ -29,6 +31,10 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
 
     if (code === embedCode.end[0]) {
       return ok(code);
+    }
+
+    if (code === embedCode.aliasMarker[0]) {
+      return effects.attempt(internalLinkAlias, ok)(code);
     }
 
     if (code === embedCode.pdfParams[0]) {
@@ -97,6 +103,13 @@ const tokenize = createTokenizer(({ effects, ok, nok, consumeMarker }) => {
         valueLen = 0;
         return consumePdfParamKey(code);
       });
+    }
+
+    if (code === embedCode.aliasMarker[0]) {
+      effects.exit("embedPdfParamValue");
+      effects.exit("embedPdfParam");
+      effects.exit("embedPdfParams");
+      return effects.attempt(internalLinkAlias, ok)(code);
     }
 
     if (code === embedCode.end[0]) {

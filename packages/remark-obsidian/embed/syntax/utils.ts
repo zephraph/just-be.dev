@@ -2,7 +2,8 @@ import { codifyString } from "../../parser-utils";
 
 import { internalLinkCode } from "../../internal-link/syntax/utils";
 
-const { blockMarker, headingMarker, headingOrBlockStart } = internalLinkCode;
+const { blockMarker, headingMarker, headingOrBlockStart, aliasMarker } =
+  internalLinkCode;
 
 export const embedCode = {
   start: codifyString("![["),
@@ -18,6 +19,7 @@ export const embedCode = {
   pdfParamSeparator: codifyString("&"),
   pdfKVSeparator: codifyString("="),
 
+  aliasMarker,
   blockMarker,
   headingMarker,
   headingOrBlockStart,

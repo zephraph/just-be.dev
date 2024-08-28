@@ -4,8 +4,8 @@ import { embedCode } from "./utils";
 import { codes } from "micromark-util-symbol";
 import { markdownLineEnding } from "micromark-util-character";
 import { embedPdfExtension } from "./pdfExtension";
-
-const digitCodes = codifyString("0123456789");
+import { embedDimension } from "./dimension";
+import { internalLinkAlias } from "../../internal-link/syntax/alias";
 
 interface EmbedTokenizerOptions {
   extensionCodes: number[][];
@@ -52,11 +52,18 @@ const tokenize = (opts: EmbedTokenizerOptions) =>
         extensions.length === 1 &&
         extensions[0].length === extensionIndex
       ) {
-        effects.enter("embedDimensionMarker");
-        return consumeMarker(code, embedCode.dimension, (code) => {
-          effects.exit("embedDimensionMarker");
-          return consumeDimension(code);
-        });
+        effects.exit("embedExtension");
+        effects.exit("embedTarget");
+        return effects.attempt(embedDimension, ok, (code) =>
+          effects.attempt(internalLinkAlias, ok)(code)
+        )(code);
+      }
+
+      if (code === embedCode.aliasMarker[0]) {
+        effects.exit("embedExtension");
+        effects.exit("embedTarget");
+
+        return effects.attempt(internalLinkAlias, ok)(code);
       }
 
       if (code === embedCode.pdfParams[0]) {
@@ -75,48 +82,6 @@ const tokenize = (opts: EmbedTokenizerOptions) =>
       effects.consume(code);
       extensionIndex++;
       return consumeExtension;
-    };
-
-    // In the form 100 or 100x200
-    let dimensionValues = 0;
-    const consumeDimension: State = (code) => {
-      if (code === codes.eof || markdownLineEnding(code)) {
-        return nok(code);
-      }
-
-      if (embedCode.dimensionSeparator[0] === code) {
-        return nok(code);
-      }
-
-      effects.enter("embedDimensionValue");
-      dimensionValues++;
-      return consumeDimensionValue(code);
-    };
-
-    const consumeDimensionValue: State = (code) => {
-      if (code === codes.eof || markdownLineEnding(code)) {
-        return nok(code);
-      }
-
-      if (code === embedCode.end[0]) {
-        effects.exit("embedDimensionValue");
-        return ok(code);
-      }
-
-      if (code === embedCode.dimensionSeparator[0] && dimensionValues === 1) {
-        effects.enter("embedDimensionSeparator");
-        return consumeMarker(code, embedCode.dimensionSeparator, (code) => {
-          effects.exit("embedDimensionSeparator");
-          return consumeDimension(code);
-        });
-      }
-
-      if (digitCodes.includes(code)) {
-        effects.consume(code);
-        return consumeDimensionValue;
-      }
-
-      return nok(code);
     };
 
     return start;

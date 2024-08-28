@@ -14,10 +14,8 @@ export const remarkObsidian = (
 ): RemarkPlugin =>
   function () {
     let unresolvedLinks: Set<string> = new Set();
-    this.use([
-      embedPlugin({ unresolvedLinks }),
-      internalLinkPlugin({ unresolvedLinks }),
-    ]);
+    this.use(embedPlugin({ unresolvedLinks }));
+    this.use(internalLinkPlugin({ unresolvedLinks }));
 
     return async (root) => {
       const resolvedLinks = await Promise.all(

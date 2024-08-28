@@ -17,6 +17,7 @@ export interface InternalLinkNode {
 export interface EmbedNode {
   type: "embed";
   value?: string | null;
+  alias?: string | null;
   block?: string | null;
   headings?: string[] | null;
   extension?: string | null;

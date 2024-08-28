@@ -91,10 +91,24 @@ test("![[Internal Link]]", async () => {
   expect(code).toContain('<p><object data="/internal-link"></object></p>');
 });
 
+test("![[Internal Link|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link|Alias]]");
+  expect(code).toContain(
+    '<p><object data="/internal-link" title="Alias"></object></p>'
+  );
+});
+
 test("![[Internal Link.pdf]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf]]");
   expect(code).toContain(
     '<p><object data="Internal Link.pdf" type="application/pdf"></object></p>'
+  );
+});
+
+test("![[Internal Link.pdf|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link.pdf|Alias]]");
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" title="Alias"></object></p>'
   );
 });
 
@@ -107,10 +121,26 @@ test("![[Internal Link.pdf#width=100&height=200]]", async () => {
   );
 });
 
+test("![[Internal Link.pdf#width=100&height=200|Alias]]", async () => {
+  const { code } = await md.render(
+    "![[Internal Link.pdf#width=100&height=200|Alias]]"
+  );
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" width="100" height="200" title="Alias"></object></p>'
+  );
+});
+
 test("![[Internal Link.pdf#page=5]]", async () => {
   const { code } = await md.render("![[Internal Link.pdf#page=5]]");
   expect(code).toContain(
     '<p><object data="Internal Link.pdf" type="application/pdf" page="5"></object></p>'
+  );
+});
+
+test("![[Internal Link.pdf#page=5|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link.pdf#page=5|Alias]]");
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" page="5" title="Alias"></object></p>'
   );
 });
 
@@ -121,10 +151,26 @@ test("![[Internal Link.pdf#page=5&zoom=2]]", async () => {
   );
 });
 
+test("![[Internal Link.pdf#page=5&zoom=2|Alias]]", async () => {
+  const { code } = await md.render(
+    "![[Internal Link.pdf#page=5&zoom=2|Alias]]"
+  );
+  expect(code).toContain(
+    '<p><object data="Internal Link.pdf" type="application/pdf" page="5" zoom="2" title="Alias"></object></p>'
+  );
+});
+
 test("![[Internal Link.jpg]]", async () => {
   const { code } = await md.render("![[Internal Link.jpg]]");
   expect(code).toContain(
     '<p><img src="Internal Link.jpg" type="image/jpeg"></p>'
+  );
+});
+
+test("![[Internal Link.jpg|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link.jpg|Alias]]");
+  expect(code).toContain(
+    '<p><img src="Internal Link.jpg" alt="Alias" type="image/jpeg" title="Alias"></p>'
   );
 });
 
@@ -135,10 +181,25 @@ test("![[Internal Link.mp3]]", async () => {
   );
 });
 
+test("![[Internal Link.mp3|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link.mp3|Alias]]");
+  expect(code).toContain(
+    '<p><audio controls title="Alias"><source src="Internal Link.mp3" type="audio/mpeg"></audio></p>'
+  );
+});
+
 test("![[Internal Link.mp4]]", async () => {
   const { code } = await md.render("![[Internal Link.mp4]]");
   expect(code).toContain(
     '<p><video controls><source src="Internal Link.mp4" type="video/mp4"></video></p>'
+  );
+});
+
+test("![[Internal Link.mp4|Alias]]", async () => {
+  vi.stubEnv("DEBUG_PARSER", "true");
+  const { code } = await md.render("![[Internal Link.mp4|Alias]]");
+  expect(code).toContain(
+    '<p><video controls title="Alias"><source src="Internal Link.mp4" type="video/mp4"></video></p>'
   );
 });
 
@@ -149,9 +210,23 @@ test("![[Internal Link#Section]]", async () => {
   );
 });
 
+test("![[Internal Link#Section|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link#Section|Alias]]");
+  expect(code).toContain(
+    '<p><object data="/internal-link#section" title="Alias"></object></p>'
+  );
+});
+
 test("![[Internal Link#^block-id]]", async () => {
   const { code } = await md.render("![[Internal Link#^block-id]]");
   expect(code).toContain(
     '<p><object data="/internal-link#^block-id"></object></p>'
+  );
+});
+
+test("![[Internal Link#^block-id|Alias]]", async () => {
+  const { code } = await md.render("![[Internal Link#^block-id|Alias]]");
+  expect(code).toContain(
+    '<p><object data="/internal-link#^block-id" title="Alias"></object></p>'
   );
 });
