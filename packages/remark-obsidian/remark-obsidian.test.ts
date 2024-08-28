@@ -49,40 +49,40 @@ test("[[Internal Links#Main Section#Sub Section|Alias]]", async () => {
 test("[[Internal Links#^Abc-123]]", async () => {
   const { code } = await md.render("[[Internal Links#^Abc-123]]");
   expect(code).toContain(
-    '<a href="/internal-links#^abc-123">Internal Links > ^Abc-123</a>'
+    '<a href="/internal-links#abc-123">Internal Links > ^Abc-123</a>'
   );
 });
 
 test("[[Internal Links#^Abc-123|Alias]]", async () => {
   const { code } = await md.render("[[Internal Links#^Abc-123|Alias]]");
-  expect(code).toContain('<a href="/internal-links#^abc-123">Alias</a>');
+  expect(code).toContain('<a href="/internal-links#abc-123">Alias</a>');
 });
 
 test("[[#Main Section]]", async () => {
   const { code } = await md.render("[[#Main Section]]");
-  expect(code).toContain('<a href="/#main-section">Main Section</a>');
+  expect(code).toContain('<a href="#main-section">Main Section</a>');
 });
 
 test("[[#Main Section|Alias]]", async () => {
   const { code } = await md.render("[[#Main Section|Alias]]");
-  expect(code).toContain('<a href="/#main-section">Alias</a>');
+  expect(code).toContain('<a href="#main-section">Alias</a>');
 });
 
 test("[[#Main Section#Sub Section]]", async () => {
   const { code } = await md.render("[[#Main Section#Sub Section]]");
   expect(code).toContain(
-    '<a href="/#main-section#sub-section">Main Section > Sub Section</a>'
+    '<a href="#main-section#sub-section">Main Section > Sub Section</a>'
   );
 });
 
 test("[[#^Abc-123]]", async () => {
   const { code } = await md.render("[[#^Abc-123]]");
-  expect(code).toContain('<a href="/#^abc-123">^Abc-123</a>');
+  expect(code).toContain('<a href="#abc-123">^Abc-123</a>');
 });
 
 test("[[#^Abc-123|Alias]]", async () => {
   const { code } = await md.render("[[#^Abc-123|Alias]]");
-  expect(code).toContain('<a href="/#^abc-123">Alias</a>');
+  expect(code).toContain('<a href="#abc-123">Alias</a>');
 });
 
 // New embed tests
@@ -219,13 +219,13 @@ test("![[Internal Link#Section|Alias]]", async () => {
 test("![[Internal Link#^block-id]]", async () => {
   const { code } = await md.render("![[Internal Link#^block-id]]");
   expect(code).toContain(
-    '<p><object data="/internal-link#^block-id"></object></p>'
+    '<p><object data="/internal-link#block-id"></object></p>'
   );
 });
 
 test("![[Internal Link#^block-id|Alias]]", async () => {
   const { code } = await md.render("![[Internal Link#^block-id|Alias]]");
   expect(code).toContain(
-    '<p><object data="/internal-link#^block-id" title="Alias"></object></p>'
+    '<p><object data="/internal-link#block-id" title="Alias"></object></p>'
   );
 });

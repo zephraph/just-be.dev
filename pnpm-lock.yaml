@@ -43,6 +43,9 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
+      vite-tsconfig-paths:
+        specifier: ^5.0.1
+        version: 5.0.1(typescript@5.5.4)(vite@5.3.5(@types/node@22.1.0))
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20240729.0
@@ -2835,6 +2838,14 @@ packages:
 
   vite-plugin-full-reload@1.2.0:
     resolution: {integrity: sha512-kz18NW79x0IHbxRSHm0jttP4zoO9P9gXh+n6UTwlNKnviTTEpOlum6oS9SmecrTtSr+muHEn5TUuC75UovQzcA==}
+
+  vite-tsconfig-paths@5.0.1:
+    resolution: {integrity: sha512-yqwv+LstU7NwPeNqajZzLEBVpUFU6Dugtb2P84FXuvaoYA+/70l9MHE+GYfYAycVyPSDYZ7mjOFuYBRqlEpTig==}
+    peerDependencies:
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
   vite@5.3.5:
     resolution: {integrity: sha512-MdjglKR6AQXQb9JGiS7Rc2wC6uMjcm7Go/NHNO63EwiJXfuk9PgqiP/n5IDJCziMkfw9n4Ubp7lttNwz+8ZVKA==}
@@ -6089,6 +6100,17 @@ snapshots:
     dependencies:
       picocolors: 1.0.1
       picomatch: 2.3.1
+
+  vite-tsconfig-paths@5.0.1(typescript@5.5.4)(vite@5.3.5(@types/node@22.1.0)):
+    dependencies:
+      debug: 4.3.6
+      globrex: 0.1.2
+      tsconfck: 3.1.1(typescript@5.5.4)
+    optionalDependencies:
+      vite: 5.3.5(@types/node@22.1.0)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   vite@5.3.5(@types/node@22.1.0):
     dependencies:

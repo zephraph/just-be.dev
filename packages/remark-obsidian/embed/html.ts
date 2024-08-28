@@ -3,7 +3,7 @@
 import type { CompileData, Handle, HtmlExtension } from "micromark-util-types";
 import mime from "mime";
 import { safeTpl } from "../parser-utils";
-import { slugify } from "../internal-link/utils";
+import { slugify } from "~/utils";
 
 export function html(): HtmlExtension {
   const enterEmbed: Handle = function () {
@@ -71,13 +71,10 @@ export function html(): HtmlExtension {
         ? `#${embed.headings.at(-1)}`
         : "";
 
-      this.tag(`<object data="${embed.value}${anchor}"></object>`);
+      this.tag(
+        `<object data="/${slugify(embed.value)}${slugify(anchor)}"></object>`
+      );
       return;
-    }
-
-    console.log("extension?", embed.extension);
-    if (embed.extension) {
-      embed.value = `/assets/${slugify(embed.value)}`;
     }
 
     if (embed.extension === "pdf") {
@@ -85,22 +82,22 @@ export function html(): HtmlExtension {
         embed.pdfParams &&
         Object.entries(embed.pdfParams)
           .map(([key, value]: [string, unknown]) => `${key}="${value}"`)
-          .join(" ") + " ";
+          .join(" ");
       this.tag(
-        `<object data="/assets/${embed.value}" type="application/pdf" ${
-          params ?? ""
-        }></object>`
+        `<object data="/assets/${slugify(
+          embed.value
+        )}" type="application/pdf"${safeTpl` ${params}`}></object>`
       );
       return;
     }
 
-    const width = safeTpl`width="${embed.dimensions?.[0]}" `;
+    const width = safeTpl` width="${embed.dimensions?.[0]}" `;
     const height = safeTpl`height="${embed.dimensions?.[1]}" `;
 
     this.tag(
-      `<object src="/assets/${embed.value}" type="${mime.getType(
+      `<object data="/assets/${slugify(embed.value)}" type="${mime.getType(
         embed.extension
-      )}" ${width}${height}/>`
+      )}"${width}${height}></object>`
     );
   };
 

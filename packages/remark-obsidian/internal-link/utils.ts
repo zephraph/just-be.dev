@@ -1,6 +1,7 @@
+import { slugify } from "~/utils";
 import type { InternalLinkNode } from "../types";
 
-export const slugify = (s: string) => s.toLowerCase().replace(/\s+/g, "-");
+export { slugify } from "~/utils";
 
 export const displayName = (internalLink: InternalLinkNode) => {
   let displayName = internalLink.alias ?? internalLink.value ?? "";
@@ -29,6 +30,6 @@ export const href = (
   return slugify(
     internalLink.value
       ? `/${internalLink.value}${blockOrHeadings}`
-      : `/${blockOrHeadings}`
+      : `${blockOrHeadings}`
   );
 };
