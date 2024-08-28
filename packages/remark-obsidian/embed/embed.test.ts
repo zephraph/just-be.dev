@@ -12,10 +12,7 @@ test("![[Internal Link]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(
-    serialized,
-    '<p><embed inline-content src="Internal Link" /></p>'
-  );
+  assert.equal(serialized, '<p><object data="/internal-link"></object></p>');
 });
 
 test("![[Internal Link.pdf]]", () => {
@@ -26,7 +23,7 @@ test("![[Internal Link.pdf]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.pdf" type="application/pdf" /></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf"></object></p>'
   );
 });
 
@@ -38,7 +35,7 @@ test("![[Internal Link.pdf#width=100&height=200]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.pdf" type="application/pdf" width="100" height="200" /></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" width="100" height="200"></object></p>'
   );
 });
 
@@ -50,7 +47,7 @@ test("![[Internal Link.pdf#page=5]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.pdf" type="application/pdf" page="5" /></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" page="5"></object></p>'
   );
 });
 
@@ -62,7 +59,7 @@ test("![[Internal Link.pdf#page=5&zoom=2]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.pdf" type="application/pdf" page="5" zoom="2" /></p>'
+    '<p><object data="/assets/internal-link.pdf" type="application/pdf" page="5" zoom="2"></object></p>'
   );
 });
 
@@ -74,7 +71,7 @@ test("![[Internal Link.jpg]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.jpg" type="image/jpeg" /></p>'
+    '<p><object data="/assets/internal-link.jpg" type="image/jpeg"></object></p>'
   );
 });
 
@@ -86,7 +83,7 @@ test("![[Internal Link.mp3]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.mp3" type="audio/mpeg" /></p>'
+    '<p><object data="/assets/internal-link.mp3" type="audio/mpeg"></object></p>'
   );
 });
 
@@ -98,7 +95,7 @@ test("![[Internal Link.mp4]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed src="Internal Link.mp4" type="video/mp4" /></p>'
+    '<p><object data="/assets/internal-link.mp4" type="video/mp4"></object></p>'
   );
 });
 
@@ -110,7 +107,7 @@ test("![[Internal Link#Section]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed inline-content src="Internal Link#Section" /></p>'
+    '<p><object data="/internal-link#section"></object></p>'
   );
 });
 
@@ -122,6 +119,6 @@ test("![[Internal Link#^block-id]]", () => {
 
   assert.equal(
     serialized,
-    '<p><embed inline-content src="Internal Link#block-id" /></p>'
+    '<p><object data="/internal-link#block-id"></object></p>'
   );
 });

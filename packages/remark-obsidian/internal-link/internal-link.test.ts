@@ -83,7 +83,7 @@ test("[[Internal Link#^Abc123]]", () => {
 
   assert.equal(
     serialized,
-    '<p><a href="/internal-link#^abc123">Internal Link > ^Abc123</a></p>'
+    '<p><a href="/internal-link#abc123">Internal Link > ^Abc123</a></p>'
   );
 });
 
@@ -93,7 +93,7 @@ test("[[Internal Link#^Abc123|Alias]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/internal-link#^abc123">Alias</a></p>');
+  assert.equal(serialized, '<p><a href="/internal-link#abc123">Alias</a></p>');
 });
 
 test("[[#Main Section]]", () => {
@@ -102,7 +102,7 @@ test("[[#Main Section]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/#main-section">Main Section</a></p>');
+  assert.equal(serialized, '<p><a href="#main-section">Main Section</a></p>');
 });
 
 test("[[#Main Section|Alias]]", () => {
@@ -111,7 +111,7 @@ test("[[#Main Section|Alias]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/#main-section">Alias</a></p>');
+  assert.equal(serialized, '<p><a href="#main-section">Alias</a></p>');
 });
 
 test("[[#Main Section#Sub Section]]", () => {
@@ -122,7 +122,7 @@ test("[[#Main Section#Sub Section]]", () => {
 
   assert.equal(
     serialized,
-    '<p><a href="/#main-section#sub-section">Main Section > Sub Section</a></p>'
+    '<p><a href="#main-section#sub-section">Main Section > Sub Section</a></p>'
   );
 });
 
@@ -134,7 +134,7 @@ test("[[#Main Section#Sub Section|Alias]]", () => {
 
   assert.equal(
     serialized,
-    '<p><a href="/#main-section#sub-section">Alias</a></p>'
+    '<p><a href="#main-section#sub-section">Alias</a></p>'
   );
 });
 
@@ -144,7 +144,7 @@ test("[[#^Abc123]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/#^abc123">^Abc123</a></p>');
+  assert.equal(serialized, '<p><a href="#abc123">^Abc123</a></p>');
 });
 
 test("[[#^Abc123|Alias]]", () => {
@@ -153,5 +153,5 @@ test("[[#^Abc123|Alias]]", () => {
     htmlExtensions: [html()],
   });
 
-  assert.equal(serialized, '<p><a href="/#^abc123">Alias</a></p>');
+  assert.equal(serialized, '<p><a href="#abc123">Alias</a></p>');
 });
