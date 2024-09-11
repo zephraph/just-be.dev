@@ -14,6 +14,7 @@ export const normalizeFrontmatter: RemarkPlugin = () => {
      */
     if (fm.homepage) {
       fm.layout = "homepage";
+      fm.title = "Just Be";
     } else if (!fm.layout) {
       fm.layout = "default";
     }

@@ -20,6 +20,7 @@ slug ??= HOME_SLUG;
 
 let html = "";
 let layout = "default";
+let title = "";
 
 if (!isULID(slug)) {
   slug = (await Astro.locals.runtime.env.KV_MAPPINGS.get(slug)) as string;
@@ -45,6 +46,7 @@ if (isULID(slug)) {
   if (!content) return Astro.rewrite("/404");
   const { code, metadata } = await Astro.locals.render(content);
   html = code;
+  title = metadata.frontmatter.title;
   // The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
   // so that the import below works correctly
   layout = metadata.frontmatter.layout.slice(9, -6);
@@ -59,6 +61,6 @@ slug = slug === HOME_SLUG ? "" : slug;
 const Layout = (await import(`../layouts/${layout}.astro`)).default;
 ---
 
-<Layout id={slug}>
+<Layout id={slug} title={title}>
   <Fragment set:html={html} />
 </Layout>
