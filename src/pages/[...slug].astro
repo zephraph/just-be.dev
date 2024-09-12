@@ -48,6 +48,7 @@ if (!isULID(slug)) {
     return Astro.rewrite("/404");
   }
 }
+slug = slug.toUpperCase();
 
 // We've already done redirection of the home slug, so skip if it matches that
 if (slug !== HOME_SLUG) {
@@ -73,9 +74,7 @@ if (process.env.NODE_ENV === "development") {
 
   // In prod pull from R2
 } else {
-  const result = await Astro.locals.runtime.env.R2_BUCKET.get(
-    slug.toUpperCase()
-  );
+  const result = await Astro.locals.runtime.env.R2_BUCKET.get(slug);
   if (!result) return Astro.rewrite("/404");
   content = await result.text();
 }
