@@ -1,6 +1,9 @@
 ---
 export const prerender = false;
 
+/** 1 month in seconds */
+const CACHE_TTL = 60 * 60 * 24 * 30;
+
 // This matches to the note in my obsidian setup
 // that's homepage. I probably could avoid hard coding this
 // by having a mapping in the KV store, but this is
@@ -13,54 +16,83 @@ function isULID(ulid: string) {
   return ulidRegex.test(ulid);
 }
 
+/**
+ * If a `get` KV request returns null and it was requested with a cacheTTL,
+ * the empty result will be cached. That's usually not what we want, so this
+ * function requests the slug again without a cacheTTL to bust the cache.
+ */
+function bustKVCache(slug: string) {
+  // We don't actually want to wait for this, we just want to make sure it happens
+  Astro.locals.runtime.ctx.waitUntil(
+    Astro.locals.runtime.env.KV_MAPPINGS.get(slug)
+  );
+}
+
 let { slug } = Astro.params;
 
+// Automatically redirect home slug to root
+if (slug === HOME_SLUG) {
+  return Astro.redirect("/", 308);
+}
+
+const originalSlug = slug;
 // default to homepage slug
 slug ??= HOME_SLUG;
 
-let html = "";
-let layout = "default";
-let title = "";
-
 if (!isULID(slug)) {
-  slug = (await Astro.locals.runtime.env.KV_MAPPINGS.get(slug)) as string;
-  if (!slug) return Astro.rewrite("/404");
-}
-
-if (isULID(slug)) {
-  let content = "";
-
-  // In dev read note from symlinked directory
-  if (process.env.NODE_ENV === "development") {
-    const fs = await import("node:fs/promises");
-    content = await fs.readFile(`./notes/${slug}.md`, "utf-8");
-
-    // In prod pull from R2
-  } else {
-    const result = await Astro.locals.runtime.env.R2_BUCKET.get(
-      slug.toUpperCase()
-    );
-    if (!result) return Astro.rewrite("/404");
-    content = await result.text();
+  slug = (await Astro.locals.runtime.env.KV_MAPPINGS.get(slug, {
+    cacheTtl: CACHE_TTL,
+  })) as string;
+  if (!slug) {
+    bustKVCache(slug);
+    return Astro.rewrite("/404");
   }
-  if (!content) return Astro.rewrite("/404");
-  const { code, metadata } = await Astro.locals.render(content);
-  html = code;
-  title = metadata.frontmatter.title;
-  // The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
-  // so that the import below works correctly
-  layout = metadata.frontmatter.layout.slice(9, -6);
 }
 
+// We've already done redirection of the home slug, so skip if it matches that
+if (slug !== HOME_SLUG) {
+  // If the original path is different from the canonical mapping, redirect
+  const redirectPath = await Astro.locals.runtime.env.KV_MAPPINGS.get(slug, {
+    cacheTtl: CACHE_TTL,
+  });
+  if (redirectPath && redirectPath !== originalSlug) {
+    return Astro.redirect(redirectPath, 308);
+  }
+
+  if (!redirectPath) {
+    bustKVCache(slug);
+  }
+}
+
+let content = "";
+
+// In dev read note from symlinked directory
+if (process.env.NODE_ENV === "development") {
+  const fs = await import("node:fs/promises");
+  content = await fs.readFile(`./notes/${slug}.md`, "utf-8");
+
+  // In prod pull from R2
+} else {
+  const result = await Astro.locals.runtime.env.R2_BUCKET.get(
+    slug.toUpperCase()
+  );
+  if (!result) return Astro.rewrite("/404");
+  content = await result.text();
+}
+if (!content) return Astro.rewrite("/404");
+
+const { code: html = "", metadata } = await Astro.locals.render(content);
 if (!html) return Astro.rewrite("/404");
 
-// The slug is used to determine the canonical URL. For every page that _isn't_ the hope page I want that
-// to the the ULID. For the home page, I just want the root URL to be canonical.
-slug = slug === HOME_SLUG ? "" : slug;
+const { title, description, layout = "default" } = metadata.frontmatter;
 
-const Layout = (await import(`../layouts/${layout}.astro`)).default;
+// The slice here is a hack to remove the "@layouts/" and ".astro" from the layout name
+// so that the import below works correctly
+const layoutName = layout.slice(9, -6);
+
+const Layout = (await import(`../layouts/${layoutName}.astro`)).default;
 ---
 
-<Layout id={slug} title={title}>
+<Layout title={title} description={description}>
   <Fragment set:html={html} />
 </Layout>
