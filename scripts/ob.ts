@@ -3,44 +3,49 @@
  */
 import { ulid } from "jsr:@std/ulid";
 import { Command } from "jsr:@cliffy/command@1.0.0-rc.5";
-import { basename, dirname, join, extname } from "jsr:@std/path";
+import { basename, dirname, extname, join } from "jsr:@std/path";
 import { move } from "jsr:@std/fs";
 import { extractYaml } from "jsr:@std/front-matter";
 import { contentType } from "jsr:@std/media-types";
 import { isULID, slugify } from "../src/utils.ts";
+import { crypto } from "jsr:@std/crypto";
 
-const rename = new Command()
-  .description("Renames a note with a ULID")
-  .arguments("<path:string>")
-  .action(async (_, path) => {
-    // Ignore non-markdown files
-    if (!path.endsWith(".md")) return;
+async function extractH1(path: string): Promise<string> {
+  using file = await Deno.open(path, { read: true });
 
-    const file = basename(path, ".md");
-    const dir = dirname(path);
-    const targetDir = "logs";
-    if (/\d{4}/.test(file)) {
-      if (dir.endsWith(targetDir)) return;
-      const targetFile = join(dir, targetDir, `${file}.md`);
-      await move(path, targetFile, {
-        overwrite: false,
-      });
+  let content = "";
+
+  const buf = new Uint8Array(100);
+  while (true) {
+    const bytesRead = await file.read(buf);
+    if (bytesRead === null) break;
+
+    content += new TextDecoder().decode(buf);
+
+    const h1Match = content.match(/^# (.+)$/m);
+    if (h1Match) {
+      return h1Match[1].trim();
     }
-    if (!isULID(file)) {
-      return Deno.rename(path, join(dir, `${ulid()}.md`));
-    }
-  });
+
+    if (content.length > 1000) break;
+  }
+
+  return "";
+}
 
 async function publishNote(path: string) {
   const file = basename(path, ".md");
   if (!isULID(file)) {
     throw new Error("File must have a ULID name to be published");
   }
+
   const content = await Deno.readTextFile(path);
-  let fm = {};
+  let fm: Record<string, any> = {};
   if (content.startsWith("---")) {
     fm = extractYaml(content).attrs;
   }
+  fm.title = await extractH1(path);
+
   return fetch(
     `${Deno.env.get("SITE")}/api/notes/${file}${
       fm ? "?" + new URLSearchParams(fm).toString() : ""
@@ -59,6 +64,7 @@ async function publishNote(path: string) {
       : console.error("Error publishing", res.status + " " + (await res.text()))
   );
 }
+
 async function publishAsset(path: string) {
   // Calculate the SHA256 hash of the file
   const hash = await crypto.subtle
@@ -94,6 +100,27 @@ const publish = new Command()
   .arguments("<path:string>")
   .action((_, path) => {
     return path.endsWith(".md") ? publishNote(path) : publishAsset(path);
+  });
+
+const rename = new Command()
+  .description("Renames a note with a ULID")
+  .arguments("<path:string>")
+  .action(async (_, path) => {
+    // Ignore non-markdown files
+    if (!path.endsWith(".md")) return;
+    const file = basename(path, ".md");
+    const dir = dirname(path);
+    const targetDir = "logs";
+    if (/\d{4}/.test(file)) {
+      if (dir.endsWith(targetDir)) return;
+      const targetFile = join(dir, targetDir, `${file}.md`);
+      await move(path, targetFile, {
+        overwrite: false,
+      });
+    }
+    if (!isULID(file)) {
+      return Deno.rename(path, join(dir, `${ulid()}.md`));
+    }
   });
 
 await new Command()

@@ -5,7 +5,12 @@
 import { Hono } from "hono";
 import type { APIContext, APIRoute } from "astro";
 import { bearerAuth } from "hono/bearer-auth";
-import { isValidSha256, slugify } from "~/utils";
+import { isULID, isValidSha256, slugify } from "~/utils";
+
+// A way to alias tags to different slugs
+const tagMap = {
+  recurse: "rc",
+};
 
 // Dump cf env in top level of context
 type AstroContext = APIContext & APIContext["locals"]["runtime"]["env"];
@@ -21,27 +26,27 @@ const app = new Hono<{ Bindings: AstroContext }>()
   .post("/notes/:id", async (c) => {
     const id = c.req.param("id");
     const props: Record<string, any> = c.req.query();
-    // Alises (as stored in obsidian) are treated as slugs for navigation
-    if (props.aliases) {
-      const slugs: string[] = props.aliases
-        .split(",")
-        .filter(Boolean)
-        .map(slugify);
-      await Promise.all(
-        slugs.map((slug) =>
-          c.env.KV_MAPPINGS.get(slug).then((currentId) => {
-            if (currentId) {
-              // Mappings are immutable. If a slug is already mapped to a different id, throw an error.
-              if (currentId !== id) {
-                throw new Error(`Slug ${slug} is mapped to ${currentId}`);
-              }
-              return;
-            }
-            return c.env.KV_MAPPINGS.put(slug, id);
-          })
-        )
-      );
+    let slug = props.slug || slugify(props.title);
+    if (isULID(slug)) {
+      throw new Error("Title or H1s should not be a ULID");
     }
+
+    const primaryTag = props.tags.split(",")[0];
+    // Set the prefix URL to the first tag (or it's mapped value) if it exists
+    if (primaryTag && primaryTag !== slug) {
+      slug = `${
+        tagMap[primaryTag as keyof typeof tagMap] ?? props.tags[0]
+      }/${slug}`;
+    }
+    await c.env.KV_MAPPINGS.get(slug).then((mappedID) => {
+      if (mappedID && mappedID !== id) {
+        throw new Error(`Slug ${slug} is already mapped to ${mappedID}`);
+      }
+      return Promise.all([
+        c.env.KV_MAPPINGS.put(slug, id),
+        c.env.KV_MAPPINGS.put(id, slug),
+      ]);
+    });
     const result = await c.env.R2_BUCKET.put(id, await c.req.blob(), {
       onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
     });
