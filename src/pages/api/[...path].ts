@@ -31,7 +31,7 @@ const app = new Hono<{ Bindings: AstroContext }>()
       throw new Error("Title or H1s should not be a ULID");
     }
 
-    const primaryTag = props.tags.split(",")[0];
+    const primaryTag = props.tags?.split(",")[0];
     // Set the prefix URL to the first tag (or it's mapped value) if it exists
     if (primaryTag && primaryTag !== slug) {
       slug = `${
