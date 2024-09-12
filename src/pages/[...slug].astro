@@ -1,4 +1,6 @@
 ---
+import { isULID } from "../utils.ts";
+
 export const prerender = false;
 
 /** 1 month in seconds */
@@ -9,12 +11,6 @@ const CACHE_TTL = 60 * 60 * 24 * 30;
 // by having a mapping in the KV store, but this is
 // simpler for now.
 const HOME_SLUG = "01J4CPMJ91NF1DNQPE3TZ50HH0";
-
-const ulidRegex = /^[0-9A-HJ-NP-TV-Z]{26}$/i;
-
-function isULID(ulid: string) {
-  return ulidRegex.test(ulid);
-}
 
 /**
  * If a `get` KV request returns null and it was requested with a cacheTTL,
