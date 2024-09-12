@@ -7,20 +7,7 @@ import { basename, dirname, join, extname } from "jsr:@std/path";
 import { move } from "jsr:@std/fs";
 import { extractYaml } from "jsr:@std/front-matter";
 import { contentType } from "jsr:@std/media-types";
-
-// async function write(text: string) {
-//   const encoder = new TextEncoder();
-//   const data = encoder.encode(text);
-
-//   // Write the data to stdout without a newline
-//   await Deno.stdout.write(data);
-// }
-
-function isULID(str: string) {
-  // ULID regex to validate the format
-  const ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
-  return ulidRegex.test(str);
-}
+import { isULID, slugify } from "../src/utils.ts";
 
 const rename = new Command()
   .description("Renames a note with a ULID")
