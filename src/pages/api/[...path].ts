@@ -26,7 +26,8 @@ const app = new Hono<{ Bindings: AstroContext }>()
   .post("/notes/:id", async (c) => {
     const id = c.req.param("id");
     const props: Record<string, any> = c.req.query();
-    if (!props.draft && !props.homepage) {
+    const draft = props.draft ? props.draft === "true" : false;
+    if (!draft && !props.homepage) {
       let slug = props.slug || slugify(props.title);
       if (isULID(slug)) {
         throw new Error("Title or H1s should not be a ULID");
