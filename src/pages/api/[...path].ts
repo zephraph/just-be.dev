@@ -26,27 +26,31 @@ const app = new Hono<{ Bindings: AstroContext }>()
   .post("/notes/:id", async (c) => {
     const id = c.req.param("id");
     const props: Record<string, any> = c.req.query();
-    let slug = props.slug || slugify(props.title);
-    if (isULID(slug)) {
-      throw new Error("Title or H1s should not be a ULID");
+    const draft = props.draft ? props.draft === "true" : false;
+    if (!draft && !props.homepage) {
+      let slug = props.slug || slugify(props.title);
+      if (isULID(slug)) {
+        throw new Error("Title or H1s should not be a ULID");
+      }
+
+      const primaryTag = props.tags?.split(",")[0];
+      // Set the prefix URL to the first tag (or it's mapped value) if it exists
+      if (primaryTag && primaryTag !== slug) {
+        slug = `${
+          tagMap[primaryTag as keyof typeof tagMap] ?? props.tags[0]
+        }/${slug}`;
+      }
+      await c.env.KV_MAPPINGS.get(slug).then((mappedID) => {
+        if (mappedID && mappedID !== id) {
+          throw new Error(`Slug ${slug} is already mapped to ${mappedID}`);
+        }
+        return Promise.all([
+          c.env.KV_MAPPINGS.put(slug, id),
+          c.env.KV_MAPPINGS.put(id, slug),
+        ]);
+      });
     }
 
-    const primaryTag = props.tags?.split(",")[0];
-    // Set the prefix URL to the first tag (or it's mapped value) if it exists
-    if (primaryTag && primaryTag !== slug) {
-      slug = `${
-        tagMap[primaryTag as keyof typeof tagMap] ?? props.tags[0]
-      }/${slug}`;
-    }
-    await c.env.KV_MAPPINGS.get(slug).then((mappedID) => {
-      if (mappedID && mappedID !== id) {
-        throw new Error(`Slug ${slug} is already mapped to ${mappedID}`);
-      }
-      return Promise.all([
-        c.env.KV_MAPPINGS.put(slug, id),
-        c.env.KV_MAPPINGS.put(id, slug),
-      ]);
-    });
     const result = await c.env.R2_BUCKET.put(id, await c.req.blob(), {
       onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
     });
