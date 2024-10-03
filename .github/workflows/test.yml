@@ -25,3 +25,9 @@ jobs:
 
       - name: Run Vitest
         run: pnpm run test
+
+      - name: Run Astro check
+        run: pnpm run astro check
+
+      - name: Run Astro build
+        run: pnpm run build
