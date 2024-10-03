@@ -2,7 +2,7 @@ import type { MarkdownAstroData, RemarkPlugin } from "@astrojs/markdown-remark";
 import type { Heading } from "mdast";
 import { matter } from "vfile-matter";
 
-export const normalizeFrontmatter: RemarkPlugin = () => {
+export const myRemark: RemarkPlugin = () => {
   return (root, file) => {
     // Populate frontmatter
     matter(file);
@@ -37,4 +37,4 @@ export const normalizeFrontmatter: RemarkPlugin = () => {
   };
 };
 
-export default normalizeFrontmatter;
+export default myRemark;
