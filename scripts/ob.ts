@@ -83,6 +83,11 @@ async function publishNote(path: string) {
 
   fm.title ??= await extractH1(path);
 
+  // Normalize stage to a string if it's an array
+  if (Array.isArray(fm.stage)) {
+    fm.stage = fm.stage[0];
+  }
+
   return fetch(
     `${Deno.env.get("SITE")}/api/notes/${file}${
       fm ? "?" + new URLSearchParams(fm).toString() : ""
