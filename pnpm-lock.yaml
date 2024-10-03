@@ -67,7 +67,7 @@ importers:
     dependencies:
       '@sentry/cloudflare':
         specifier: ^8.25.0
-        version: 8.32.0
+        version: 8.33.1
       '@sentry/vite-plugin':
         specifier: ^2.22.0
         version: 2.22.0
@@ -1269,20 +1269,20 @@ packages:
     engines: {node: '>= 10'}
     hasBin: true
 
-  '@sentry/cloudflare@8.32.0':
-    resolution: {integrity: sha512-IeD3rdHDFHtOoL3LJZrksop/ZSqigrcDuvk75x1NYmUJSxI+n1xpxF0wVZ0FhOcaDQSPbXNzyV7eYohmE46xJw==}
+  '@sentry/cloudflare@8.33.1':
+    resolution: {integrity: sha512-s4zzF4dyB+7CAHs6nFZCORDuajOo5emjW07z9W5l+Oti5sfGw9iW0JucjFDHruiyWqqcs4ZOoGx/wK30xKdumw==}
     engines: {node: '>=14.18'}
 
-  '@sentry/core@8.32.0':
-    resolution: {integrity: sha512-+xidTr0lZ0c755tq4k75dXPEb8PA+qvIefW3U9+dQMORLokBrYoKYMf5zZTG2k/OfSJS6OSxatUj36NFuCs3aA==}
+  '@sentry/core@8.33.1':
+    resolution: {integrity: sha512-3SS41suXLFzxL3OQvTMZ6q92ZapELVq2l2SoWlZopcamWhog2Ru0dp2vkunq97kFHb2TzKRTlFH4+4gbT8SJug==}
     engines: {node: '>=14.18'}
 
-  '@sentry/types@8.32.0':
-    resolution: {integrity: sha512-hxckvN2MzS5SgGDgVQ0/QpZXk13Vrq4BtZLwXhPhyeTmZtUiUfWvcL5TFQqLinfKdTKPe9q2MxeAJ0D4LalhMg==}
+  '@sentry/types@8.33.1':
+    resolution: {integrity: sha512-GjoAMvwtpIemoF/IiwZ7A60g4nQv3qwzR21GvJqDVUoKD0e8pv9OLX+HyXoUat4wEDGSuDUcUyUKD2G+od73QA==}
     engines: {node: '>=14.18'}
 
-  '@sentry/utils@8.32.0':
-    resolution: {integrity: sha512-t1WVERhgmYURxbBj9J4/H2P2X+VKqm7B3ce9iQyrZbdf5NekhcU4jHIecPUWCPHjQkFIqkVTorqeBmDTlg/UmQ==}
+  '@sentry/utils@8.33.1':
+    resolution: {integrity: sha512-uzuYpiiJuFY3N4WNHMBWUQX5oNv2t/TbG0OHRp3Rr7yeu+HSfD542TIp9/gMZ+G0Cxd8AmVO3wkKIFbk0TL4Qg==}
     engines: {node: '>=14.18'}
 
   '@sentry/vite-plugin@2.22.0':
@@ -4371,24 +4371,24 @@ snapshots:
       - encoding
       - supports-color
 
-  '@sentry/cloudflare@8.32.0':
+  '@sentry/cloudflare@8.33.1':
     dependencies:
-      '@sentry/core': 8.32.0
-      '@sentry/types': 8.32.0
-      '@sentry/utils': 8.32.0
+      '@sentry/core': 8.33.1
+      '@sentry/types': 8.33.1
+      '@sentry/utils': 8.33.1
     optionalDependencies:
       '@cloudflare/workers-types': 4.20240925.0
 
-  '@sentry/core@8.32.0':
+  '@sentry/core@8.33.1':
     dependencies:
-      '@sentry/types': 8.32.0
-      '@sentry/utils': 8.32.0
+      '@sentry/types': 8.33.1
+      '@sentry/utils': 8.33.1
 
-  '@sentry/types@8.32.0': {}
+  '@sentry/types@8.33.1': {}
 
-  '@sentry/utils@8.32.0':
+  '@sentry/utils@8.33.1':
     dependencies:
-      '@sentry/types': 8.32.0
+      '@sentry/types': 8.33.1
 
   '@sentry/vite-plugin@2.22.0':
     dependencies:
