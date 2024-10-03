@@ -7,7 +7,7 @@ export const myRemark: RemarkPlugin = () => {
     // Populate frontmatter
     matter(file);
     const fm = ((file.data.astro as MarkdownAstroData).frontmatter = file.data
-      .matter as Record<string, unknown>);
+      .matter as Record<string, any>);
 
     /**
      * Treat the homepage as a special case for layouts and fallback to default.
@@ -33,6 +33,40 @@ export const myRemark: RemarkPlugin = () => {
         (node) => node.type === "heading" && node.depth === 1
       ) as Heading | undefined;
       fm.title = title?.children.find((node) => node.type === "text")?.value;
+    }
+
+    if (fm.stage === "draft" || fm.stage?.[0] === "draft") {
+      const draftCallout = {
+        type: "html" as const,
+        value: "<i>This document is a work in progress</i>",
+      };
+
+      const firstHeadingIndex = root.children.findIndex(
+        (node) => node.type === "heading" && node.depth === 1
+      );
+
+      if (firstHeadingIndex !== -1) {
+        root.children.splice(firstHeadingIndex + 1, 0, draftCallout);
+      } else {
+        root.children.unshift(draftCallout);
+      }
+    }
+
+    if (fm.published) {
+      const publishedLabel = {
+        type: "html" as const,
+        value: `<p><sup ${
+          fm.updated ? `title="Published on ${fm.published}"` : ""
+        }>${fm.updated ?? fm.published}</sup></p>`,
+      };
+
+      const firstHeadingIndex = root.children.findIndex(
+        (node) => node.type === "heading" && node.depth === 1
+      );
+
+      if (firstHeadingIndex !== -1) {
+        root.children.splice(firstHeadingIndex + 1, 0, publishedLabel);
+      }
     }
   };
 };

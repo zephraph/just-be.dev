@@ -16,7 +16,7 @@ async function extractH1(path: string): Promise<string> {
 
   let content = "";
 
-  const buf = new Uint8Array(100);
+  const buf = new Uint8Array(1024);
   while (true) {
     const bytesRead = await file.read(buf);
     if (bytesRead === null) break;
