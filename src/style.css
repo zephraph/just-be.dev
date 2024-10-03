@@ -28,6 +28,7 @@ h2:has(+ p > sup) {
 
 h1 + p:has(> sup) {
   margin-top: 0rem !important;
+  margin-bottom: 0.5rem !important;
 }
 h1 + p > sup,
 h2 + p > sup {
