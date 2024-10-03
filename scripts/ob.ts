@@ -9,6 +9,7 @@ import { extractYaml } from "jsr:@std/front-matter";
 import { contentType } from "jsr:@std/media-types";
 import { isULID, slugify } from "../src/utils.ts";
 import { crypto } from "jsr:@std/crypto";
+import { stringify } from "jsr:@std/yaml";
 
 async function extractH1(path: string): Promise<string> {
   using file = await Deno.open(path, { read: true });
@@ -33,6 +34,13 @@ async function extractH1(path: string): Promise<string> {
   return "";
 }
 
+async function updateFrontmatter(path: string, fm: Record<string, any>) {
+  let content = await Deno.readTextFile(path);
+  content = content.replace(/^---[\s\S]*?---\n/, '');
+
+  await Deno.writeTextFile(path, "---\n" + stringify(fm, { schema: "extended" }) + "---\n" + content);
+}
+
 async function publishNote(path: string) {
   const file = basename(path, ".md");
   if (!isULID(file)) {
@@ -44,7 +52,36 @@ async function publishNote(path: string) {
   if (content.startsWith("---")) {
     fm = extractYaml(content).attrs;
   }
-  fm.title = await extractH1(path);
+  if (fm.published instanceof Date) {
+    fm.published = fm.published.toISOString().split("T")[0];
+  }
+  if (fm.updated instanceof Date) {
+    fm.updated = fm.updated.toISOString().split("T")[0];
+  }
+  // Convert draft to stage
+  // TODO: Remove this when all notes are migrated
+  if (fm.draft) {
+    fm.stage = 'draft';
+    delete fm.draft;
+    await updateFrontmatter(path, fm);
+  }
+  if (!fm.homepage) {
+    const today = new Date().toISOString().split("T")[0];
+    if (!fm.published) {
+      fm.stage = 'draft';
+      fm.published = today;
+      await updateFrontmatter(path, fm);
+    } else if (fm.published !== today) {
+      fm.updated = today;
+      await updateFrontmatter(path, fm);
+    }
+    if (fm.draft === false) {
+      delete fm.draft;
+      await updateFrontmatter(path, fm);
+    }
+  }
+
+  fm.title ??= await extractH1(path);
 
   return fetch(
     `${Deno.env.get("SITE")}/api/notes/${file}${

@@ -26,20 +26,23 @@ const app = new Hono<{ Bindings: AstroContext }>()
   .post("/notes/:id", async (c) => {
     const id = c.req.param("id");
     const props: Record<string, any> = c.req.query();
-    const draft = props.draft ? props.draft === "true" : false;
-    if (!draft && !props.homepage) {
-      let slug = props.slug || slugify(props.title);
-      if (isULID(slug)) {
-        throw new Error("Title or H1s should not be a ULID");
-      }
+    const draft = props.stage === "draft";
 
-      const primaryTag = props.tags?.split(",")[0];
-      // Set the prefix URL to the first tag (or it's mapped value) if it exists
-      if (primaryTag && primaryTag !== slug) {
-        slug = `${
-          tagMap[primaryTag as keyof typeof tagMap] ?? props.tags[0]
-        }/${slug}`;
-      }
+    // Construct the slug
+    let slug = props.slug || slugify(props.title);
+    if (isULID(slug)) {
+      throw new Error("Title and H1s should not be a ULID");
+    }
+
+    const primaryTag = props.tags?.split(",")[0];
+    // Set the prefix URL to the first tag (or its mapped value) if it exists
+    if (primaryTag && primaryTag !== slug) {
+      slug = `${
+        tagMap[primaryTag as keyof typeof tagMap] ?? props.tags[0]
+      }/${slug}`;
+    }
+
+    if (!draft && !props.homepage) {
       await c.env.KV_MAPPINGS.get(slug).then((mappedID) => {
         if (mappedID && mappedID !== id) {
           throw new Error(`Slug ${slug} is already mapped to ${mappedID}`);
@@ -51,8 +54,20 @@ const app = new Hono<{ Bindings: AstroContext }>()
       });
     }
 
+    // This is pulled out because cf will included undefined values as a string
+    // in the metadata which I don't want.
+    const customMetadata: Record<string, string> = {
+      slug,
+    };
+    ["stage", "title", "published", "updated"].forEach((key) => {
+      if (props[key]) {
+        customMetadata[key] = props[key];
+      }
+    });
+
     const result = await c.env.R2_BUCKET.put(id, await c.req.blob(), {
       onlyIf: { etagDoesNotMatch: c.req.header("If-None-Match") },
+      customMetadata,
     });
     if (!result) return c.json({ error: "Failed to upload" }, 500);
     const { size, version, httpEtag: etag } = result;
