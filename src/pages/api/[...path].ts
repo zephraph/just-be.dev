@@ -59,7 +59,7 @@ const app = new Hono<{ Bindings: AstroContext }>()
     const customMetadata: Record<string, string> = {
       slug,
     };
-    ["stage", "title", "published", "updated"].forEach((key) => {
+    ["stage", "title", "published", "updated", "tags"].forEach((key) => {
       if (props[key]) {
         customMetadata[key] = props[key];
       }
