@@ -53,19 +53,22 @@ export const myRemark: RemarkPlugin = () => {
     }
 
     if (fm.published) {
-      const publishedLabel = {
+      let dateLabel = {
         type: "html" as const,
-        value: `<p><sup ${
-          fm.updated ? `title="Published on ${fm.published}"` : ""
-        }>${fm.updated ?? fm.published}</sup></p>`,
+        value: `<p><sup>${fm.published}</sup></p>`,
       };
+
+      // If the document is associated with an event, skip showing the updated date
+      if (fm.updated && !fm.tags?.includes("events")) {
+        dateLabel.value = `<p><sup title="Published on ${fm.published}">${fm.updated}</sup></p>`;
+      }
 
       const firstHeadingIndex = root.children.findIndex(
         (node) => node.type === "heading" && node.depth === 1
       );
 
       if (firstHeadingIndex !== -1) {
-        root.children.splice(firstHeadingIndex + 1, 0, publishedLabel);
+        root.children.splice(firstHeadingIndex + 1, 0, dateLabel);
       }
     }
   };

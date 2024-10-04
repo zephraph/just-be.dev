@@ -75,10 +75,6 @@ async function publishNote(path: string) {
       fm.updated = today;
       await updateFrontmatter(path, fm);
     }
-    if (fm.draft === false) {
-      delete fm.draft;
-      await updateFrontmatter(path, fm);
-    }
   }
 
   fm.title ??= await extractH1(path);
