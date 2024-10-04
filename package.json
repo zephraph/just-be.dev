@@ -33,7 +33,7 @@
     "@tailwindcss/typography": "^0.5.14",
     "vite-plugin-full-reload": "^1.2.0",
     "vitest": "^2.0.5",
-    "wrangler": "3.78.12"
+    "wrangler": "3.80.0"
   },
   "pnpm": {
     "patchedDependencies": {
