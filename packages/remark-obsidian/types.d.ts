@@ -26,6 +26,13 @@ export interface EmbedNode {
   data?: Record<string, any>;
 }
 
+export interface CodeNode {
+  type: "code";
+  lang?: string | null;
+  value?: string;
+  data?: Record<string, any>;
+}
+
 declare module "micromark-util-types" {
   export interface TokenTypeMap extends TokenTypeMap {
     internalLink: "internalLink";
