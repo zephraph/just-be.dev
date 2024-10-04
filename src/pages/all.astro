@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/default.astro";
-let { objects: pages } = await Astro.locals.runtime.env.R2_BUCKET.list({
+const { objects: pages } = await Astro.locals.runtime.env.R2_BUCKET.list({
   prefix: "0",
   // @ts-expect-error This is actually supported but the types are wrong
   include: ["customMetadata"],
