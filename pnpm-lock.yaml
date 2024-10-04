@@ -83,6 +83,10 @@ importers:
       remark-frontmatter:
         specifier: ^5.0.0
         version: 5.0.0
+    devDependencies:
+      '@worker-tools/html-rewriter':
+        specifier: 0.1.0-pre.19
+        version: 0.1.0-pre.19
 
   packages/my-remark:
     dependencies:
@@ -1313,6 +1317,12 @@ packages:
   '@shikijs/vscode-textmate@9.2.2':
     resolution: {integrity: sha512-TMp15K+GGYrWlZM8+Lnj9EaHEFmOen0WJBrfa17hF7taDOYthuPPV0GWzfd/9iMij0akS/8Yw2ikquH7uVi/fg==}
 
+  '@stardazed/streams-compression@1.0.0':
+    resolution: {integrity: sha512-SQCiwxdIVJ5xxUBYptN+fc+tJpSDbxQuJ0+3u2SmHjIzr6JIRZ28AVFtFnGy6x6j3UBlaLx73w9rC6UAFxnd1g==}
+
+  '@stardazed/zlib@1.0.1':
+    resolution: {integrity: sha512-MS6PCYiRNJ32c69+3NPyL+bu7LpiFDvMcBXnlhQnF8CKMG0R/xRVCCo422NPkQ0+Cox3xKpk5Lc1LfWFS4b3cw==}
+
   '@tailwindcss/typography@0.5.15':
     resolution: {integrity: sha512-AqhlCXl+8grUz8uqExv5OTtgpjuVIwFTSXTrh8y9/pw6q2ek7fJ+Y8ZEVw7EB2DCcuCOtEjf9w3+J3rzts01uA==}
     peerDependencies:
@@ -1418,6 +1428,12 @@ packages:
 
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
+
+  '@worker-tools/html-rewriter@0.1.0-pre.19':
+    resolution: {integrity: sha512-IUbEZwvSdp8vtaB1LAZ/sBRJGNycd9a8cbkqO05rMEPm5MC59Sb+wiGCWaaRXrwQLDAyWeod4QC/q0TuSUI5EA==}
+
+  '@worker-tools/resolvable-promise@0.2.0-pre.6':
+    resolution: {integrity: sha512-+5RcuruCLB/P3FYYb376RgyImXaq9BBQoOskUbgPyNK3O0AXPakrXUj1EELv+lcnUSdFws/ufdrrWODLJyoTmg==}
 
   acorn-walk@8.3.3:
     resolution: {integrity: sha512-MxXdReSRhGO7VlFe1bRG/oI7/mdLV9B9JJT0N8vZOhF7gFRR5l3M8W9G8JxmKV+JC5mGqJ0QvqfSOLsCPa4nUw==}
@@ -4435,6 +4451,12 @@ snapshots:
 
   '@shikijs/vscode-textmate@9.2.2': {}
 
+  '@stardazed/streams-compression@1.0.0':
+    dependencies:
+      '@stardazed/zlib': 1.0.1
+
+  '@stardazed/zlib@1.0.1': {}
+
   '@tailwindcss/typography@0.5.15(tailwindcss@3.4.13)':
     dependencies:
       lodash.castarray: 4.4.0
@@ -4592,6 +4614,13 @@ snapshots:
       vscode-uri: 2.1.2
 
   '@vscode/l10n@0.0.18': {}
+
+  '@worker-tools/html-rewriter@0.1.0-pre.19':
+    dependencies:
+      '@stardazed/streams-compression': 1.0.0
+      '@worker-tools/resolvable-promise': 0.2.0-pre.6
+
+  '@worker-tools/resolvable-promise@0.2.0-pre.6': {}
 
   acorn-walk@8.3.3:
     dependencies:
