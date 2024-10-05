@@ -23,6 +23,7 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
   element(element: Element) {
     this.lang = element.getAttribute("data-lang") ?? "";
     this.code = "";
+    element.removeAndKeepContent();
   }
   async text(text: Text) {
     this.code += decode(text.text);
@@ -74,14 +75,28 @@ export const onRequest = defineMiddleware(async (context, next) => {
   });
   context.locals.render = processor.render;
   const res = await next();
-  if (import.meta.env.DEV && typeof HTMLRewriter === "undefined") {
-    // @ts-expect-error Isn't defined on globalThis, but that's fine
-    globalThis.HTMLRewriter = (
-      await import("@worker-tools/html-rewriter/base64")
-    ).HTMLRewriter;
-  }
 
-  return new HTMLRewriter()
-    .on("code[data-lang]", new SyntaxHighlightRewriter(context.locals.runtime))
-    .transform(res);
+  try {
+    if (import.meta.env.DEV && typeof HTMLRewriter === "undefined") {
+      // @ts-expect-error Isn't defined on globalThis, but that's fine
+      globalThis.HTMLRewriter = (
+        await import("@worker-tools/html-rewriter/base64")
+      ).HTMLRewriter;
+    }
+
+    return new HTMLRewriter()
+      .on(
+        "code[data-lang]",
+        new SyntaxHighlightRewriter(context.locals.runtime)
+      )
+      .on("pre:not(.shiki)", {
+        element: (element) => {
+          element.removeAndKeepContent();
+        },
+      })
+      .transform(res);
+  } catch (e) {
+    console.error(e);
+    return res;
+  }
 });
