@@ -14,6 +14,11 @@
     {
       "matchPackageNames": ["tailwindcss", "@tailwindcss/**"],
       "groupName": "tailwind"
+    },
+    {
+      "matchPackageNames": ["actions/**"],
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions"
     }
   ]
 }
