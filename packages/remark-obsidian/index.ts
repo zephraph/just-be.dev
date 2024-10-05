@@ -1,9 +1,9 @@
-import type { RemarkPlugin } from "@astrojs/markdown-remark";
+import type { Node, RemarkPlugin } from "@astrojs/markdown-remark";
 import { visit } from "unist-util-visit";
 import internalLinkPlugin from "./internal-link";
 import embedPlugin from "./embed";
 import { href } from "./internal-link/utils";
-import type { EmbedNode, InternalLinkNode } from "./types";
+import type { CodeNode, EmbedNode, InternalLinkNode } from "./types";
 
 interface RemarkObsidianOptions {
   fileResolver?: (path: string) => Promise<string>;
@@ -46,6 +46,16 @@ export const remarkObsidian = (
             node.data.hProperties.src =
               resolvedLinks[node.data.hProperties.src];
             break;
+        }
+      });
+
+      visit(root, "code", (node: CodeNode) => {
+        if (node.lang) {
+          node.data = {
+            hProperties: {
+              ["data-lang"]: node.lang,
+            },
+          };
         }
       });
     };

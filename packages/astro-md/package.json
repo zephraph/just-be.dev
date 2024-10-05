@@ -12,5 +12,8 @@
   "dependencies": {
     "@astrojs/markdown-remark": "catalog:",
     "remark-frontmatter": "^5.0.0"
+  },
+  "devDependencies": {
+    "@worker-tools/html-rewriter": "0.1.0-pre.19"
   }
 }

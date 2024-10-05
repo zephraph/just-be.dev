@@ -11,6 +11,10 @@ PNPM_VERSION = "v9.7.0"
 binding = "KV_MAPPINGS"
 id = "36e4319084c4498fa08e5bf00f36331a"
 
+[[kv_namespaces]]
+binding = "KV_HIGHLIGHT"
+id = "9503a7c1e6f948cb8f1754c08e046179"
+
 [[r2_buckets]]
 binding = "R2_BUCKET"
 bucket_name = "just-be-dev"
