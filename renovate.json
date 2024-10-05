@@ -4,7 +4,8 @@
   "packageRules": [
     {
       "extends": ["monorepo:astro"],
-      "matchPackageNames": ["@astrojs/**"]
+      "matchPackageNames": ["astro", "@astrojs/**"],
+      "groupName": "monorepo:astro"
     },
     {
       "matchPackageNames": ["wrangler", "@cloudflare/**"],
