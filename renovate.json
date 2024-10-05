@@ -3,9 +3,8 @@
   "extends": ["config:recommended"],
   "packageRules": [
     {
-      "extends": ["monorepo:astro"],
       "matchPackageNames": ["astro", "@astrojs/**"],
-      "groupName": "monorepo:astro"
+      "groupName": "astro"
     },
     {
       "matchPackageNames": ["wrangler", "@cloudflare/**"],
