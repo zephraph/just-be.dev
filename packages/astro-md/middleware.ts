@@ -7,7 +7,7 @@ import { remarkObsidian } from "../remark-obsidian";
 import remarkFrontmatter from "remark-frontmatter";
 
 const decode = (str: string) =>
-  str.replace(/&#x(\d+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  str.replace(/&#x(\w+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 
 const theme = "nord";
 
