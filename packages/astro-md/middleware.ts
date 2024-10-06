@@ -6,6 +6,9 @@ import { myRemark } from "../my-remark";
 import { remarkObsidian } from "../remark-obsidian";
 import remarkFrontmatter from "remark-frontmatter";
 
+// Cache for 30 days
+const syntaxHighlightCacheTtl = 60 * 60 * 24 * 30;
+
 const decode = (str: string) =>
   str.replace(/&#x(\w+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 
@@ -37,11 +40,17 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 
-      const cachedResult = await this.cache.get(hash);
+      const cachedResult = await this.cache.get(hash, {
+        cacheTtl: syntaxHighlightCacheTtl,
+      });
       if (cachedResult) {
         text.replace(cachedResult, { html: true });
         return;
       }
+      // When setting cacheTtl, even misses are cached. If we've gotten
+      // to this point the cache is empty, so let's clear the miss so that
+      // the next request has the actual content (after we write it)
+      this.runtime.ctx.waitUntil(this.cache.get(hash));
 
       const res = await fetch(
         `https://highlight.val.just-be.dev?lang=${this.lang}&theme=${theme}`,
