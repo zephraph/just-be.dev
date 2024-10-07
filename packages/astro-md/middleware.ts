@@ -66,7 +66,7 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
       this.runtime.ctx.waitUntil(this.cache.get(hash));
 
       const res = await fetch(
-        `https://highlight.val.just-be.dev?lang=${this.lang}&theme=${theme}`,
+        `https://just_be-highlight.web.val.run?lang=${this.lang}&theme=${theme}`,
         {
           method: "POST",
           body: this.code,
