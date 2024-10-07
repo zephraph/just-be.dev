@@ -5,6 +5,7 @@ import { defineMiddleware } from "astro:middleware";
 import { myRemark } from "../my-remark";
 import { remarkObsidian } from "../remark-obsidian";
 import remarkFrontmatter from "remark-frontmatter";
+import { isLangSupported } from "./syntax-highlighting";
 
 // Cache for 30 days
 const syntaxHighlightCacheTtl = 60 * 60 * 24 * 30;
@@ -18,17 +19,27 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
   private lang: string = "";
   private code: string = "";
   cache: KVNamespace;
+  cacheVersion: string;
+  skip: boolean = false;
 
   constructor(private runtime: Runtime["runtime"]) {
     this.cache = runtime.env.KV_HIGHLIGHT;
+    this.cacheVersion = runtime.env.SYNTAX_VERSION;
   }
 
   element(element: Element) {
     this.lang = element.getAttribute("data-lang") ?? "";
     this.code = "";
+    if (!isLangSupported(this.lang)) {
+      element.removeAttribute("data-lang");
+      element.removeAttribute("class");
+      this.skip = true;
+      return;
+    }
     element.removeAndKeepContent();
   }
   async text(text: Text) {
+    if (this.skip) return;
     this.code += decode(text.text);
     if (text.lastInTextNode) {
       const hashBuffer = await crypto.subtle.digest(
@@ -39,8 +50,9 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
       const hash = hashArray
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
+      const key = `${this.cacheVersion}:${hash}`;
 
-      const cachedResult = await this.cache.get(hash, {
+      const cachedResult = await this.cache.get(key, {
         cacheTtl: syntaxHighlightCacheTtl,
       });
       if (cachedResult) {
@@ -50,10 +62,10 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
       // When setting cacheTtl, even misses are cached. If we've gotten
       // to this point the cache is empty, so let's clear the miss so that
       // the next request has the actual content (after we write it)
-      this.runtime.ctx.waitUntil(this.cache.get(hash));
+      this.runtime.ctx.waitUntil(this.cache.get(key));
 
       const res = await fetch(
-        `https://highlight.val.just-be.dev?lang=${this.lang}&theme=${theme}`,
+        `https://just_be-highlight.web.val.run?lang=${this.lang}&theme=${theme}`,
         {
           method: "POST",
           body: this.code,
@@ -63,7 +75,7 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
         }
       );
       const data = await res.text();
-      this.runtime.ctx.waitUntil(this.cache.put(hash, data));
+      this.runtime.ctx.waitUntil(this.cache.put(key, data));
       text.replace(data, { html: true });
     } else {
       text.remove();
@@ -98,11 +110,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
         "code[data-lang]",
         new SyntaxHighlightRewriter(context.locals.runtime)
       )
-      .on("pre:not(.shiki)", {
-        element: (element) => {
-          element.removeAndKeepContent();
-        },
-      })
       .transform(res);
   } catch (e) {
     console.error(e);

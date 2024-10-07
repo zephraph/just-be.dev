@@ -6,6 +6,7 @@ compatibility_flags = ["nodejs_als"]
 [vars]
 NODE_VERSION = "v20.16.0"
 PNPM_VERSION = "v9.7.0"
+SYNTAX_VERSION = "0"
 
 [[kv_namespaces]]
 binding = "KV_MAPPINGS"
