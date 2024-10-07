@@ -19,12 +19,12 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
   private lang: string = "";
   private code: string = "";
   cache: KVNamespace;
-  salt: string;
+  cacheVersion: string;
   skip: boolean = false;
 
   constructor(private runtime: Runtime["runtime"]) {
     this.cache = runtime.env.KV_HIGHLIGHT;
-    this.salt = runtime.env.SYNTAX_SALT;
+    this.cacheVersion = runtime.env.SYNTAX_VERSION;
   }
 
   element(element: Element) {
@@ -44,16 +44,15 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
     if (text.lastInTextNode) {
       const hashBuffer = await crypto.subtle.digest(
         "SHA-1",
-        new TextEncoder().encode(
-          `${this.salt}-${theme}-${this.lang}-${this.code}`
-        )
+        new TextEncoder().encode(`${theme}-${this.lang}-${this.code}`)
       );
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hash = hashArray
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
+      const key = `${this.cacheVersion}:${hash}`;
 
-      const cachedResult = await this.cache.get(hash, {
+      const cachedResult = await this.cache.get(key, {
         cacheTtl: syntaxHighlightCacheTtl,
       });
       if (cachedResult) {
@@ -63,7 +62,7 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
       // When setting cacheTtl, even misses are cached. If we've gotten
       // to this point the cache is empty, so let's clear the miss so that
       // the next request has the actual content (after we write it)
-      this.runtime.ctx.waitUntil(this.cache.get(hash));
+      this.runtime.ctx.waitUntil(this.cache.get(key));
 
       const res = await fetch(
         `https://just_be-highlight.web.val.run?lang=${this.lang}&theme=${theme}`,
@@ -76,7 +75,7 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
         }
       );
       const data = await res.text();
-      this.runtime.ctx.waitUntil(this.cache.put(hash, data));
+      this.runtime.ctx.waitUntil(this.cache.put(key, data));
       text.replace(data, { html: true });
     } else {
       text.remove();
