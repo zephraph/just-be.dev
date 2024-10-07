@@ -14,6 +14,7 @@ export const onRequest = defineMiddleware(
         options: {
           dsn: context.env.SENTRY_DSN,
         },
+        // @ts-ignore This may fail due to a type mismatch, but it's correct
         request,
         context: context.ctx,
       },
