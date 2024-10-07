@@ -74,6 +74,11 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
           },
         }
       );
+      if (!res.ok) {
+        // Something went wrong with the request, just return the original code
+        text.replace(`<code>${this.code}</code>`, { html: true });
+        return;
+      }
       const data = await res.text();
       this.runtime.ctx.waitUntil(this.cache.put(key, data));
       text.replace(data, { html: true });
