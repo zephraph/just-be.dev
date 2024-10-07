@@ -1,4 +1,4 @@
-import type { Node, RemarkPlugin } from "@astrojs/markdown-remark";
+import type { RemarkPlugin } from "@astrojs/markdown-remark";
 import { visit } from "unist-util-visit";
 import internalLinkPlugin from "./internal-link";
 import embedPlugin from "./embed";
