@@ -5,6 +5,7 @@ import { defineMiddleware } from "astro:middleware";
 import { myRemark } from "../my-remark";
 import { remarkObsidian } from "../remark-obsidian";
 import remarkFrontmatter from "remark-frontmatter";
+import { isLangSupported } from "./syntax-highlighting";
 
 // Cache for 30 days
 const syntaxHighlightCacheTtl = 60 * 60 * 24 * 30;
@@ -19,6 +20,7 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
   private code: string = "";
   cache: KVNamespace;
   salt: string;
+  skip: boolean = false;
 
   constructor(private runtime: Runtime["runtime"]) {
     this.cache = runtime.env.KV_HIGHLIGHT;
@@ -28,9 +30,16 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
   element(element: Element) {
     this.lang = element.getAttribute("data-lang") ?? "";
     this.code = "";
+    if (!isLangSupported(this.lang)) {
+      element.removeAttribute("data-lang");
+      element.removeAttribute("class");
+      this.skip = true;
+      return;
+    }
     element.removeAndKeepContent();
   }
   async text(text: Text) {
+    if (this.skip) return;
     this.code += decode(text.text);
     if (text.lastInTextNode) {
       const hashBuffer = await crypto.subtle.digest(
@@ -102,11 +111,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
         "code[data-lang]",
         new SyntaxHighlightRewriter(context.locals.runtime)
       )
-      .on("pre:not(.shiki)", {
-        element: (element) => {
-          element.removeAndKeepContent();
-        },
-      })
       .transform(res);
   } catch (e) {
     console.error(e);

@@ -52,3 +52,8 @@ blockquote ul {
 .prose pre:has(code[data-lang]) {
   @apply bg-inherit my-0;
 }
+
+/* Work around for nested pre tags */
+.prose pre:has(pre[data-lang]) {
+  @apply bg-inherit mx-0 -my-5 p-0;
+}
