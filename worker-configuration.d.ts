@@ -9,6 +9,7 @@ interface Env {
 	PUBLISH_KEY: string;
 	SENTRY_DSN: string;
 	SENTRY_AUTH_TOKEN: string;
+	SYNTAX_SALT: string;
 	R2_BUCKET: R2Bucket;
 	R2_ASSETS: R2Bucket;
 }

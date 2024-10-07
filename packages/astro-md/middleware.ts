@@ -18,9 +18,11 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
   private lang: string = "";
   private code: string = "";
   cache: KVNamespace;
+  salt: string;
 
   constructor(private runtime: Runtime["runtime"]) {
     this.cache = runtime.env.KV_HIGHLIGHT;
+    this.salt = runtime.env.SYNTAX_SALT;
   }
 
   element(element: Element) {
@@ -33,7 +35,9 @@ class SyntaxHighlightRewriter implements HTMLRewriterElementContentHandlers {
     if (text.lastInTextNode) {
       const hashBuffer = await crypto.subtle.digest(
         "SHA-1",
-        new TextEncoder().encode(`${theme}-${this.lang}-${this.code}`)
+        new TextEncoder().encode(
+          `${this.salt}-${theme}-${this.lang}-${this.code}`
+        )
       );
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hash = hashArray
