@@ -16,11 +16,11 @@ const listCommand = new Deno.Command("wrangler", {
 
 const listResult = await listCommand.output();
 const keys = JSON.parse(new TextDecoder().decode(listResult.stdout).trim()).map(
-  (k) => k.name
+  (k: { name: string }) => k.name
 );
 
 const keysToDelete = keys.filter(
-  (key) => !key.startsWith(`${SYNTAX_VERSION}:`)
+  (key: string) => !key.startsWith(`${SYNTAX_VERSION}:`)
 );
 
 if (keysToDelete.length > 0) {
