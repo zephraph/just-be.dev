@@ -1,0 +1,36 @@
+---
+import Layout from '../../layouts/default.astro';
+
+interface Game {
+	title: string;
+	path: string;
+}
+
+const games: Game[] = [
+	{
+		title: 'Hangul Hero',
+		path: '/games/hangul-hero'
+	}
+];
+---
+
+<Layout title="Games - just-be.dev">
+	<main class="container mx-auto px-4 py-8">
+		<h1 class="text-4xl font-bold mb-8 text-gray-800">Games</h1>
+		
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{games.map(game => (
+				<a href={game.path} class="group">
+					<div class="bg-white rounded-lg overflow-hidden shadow-lg transition-transform duration-200 hover:scale-105 border border-gray-200">
+						<div class="p-4">
+							<h2 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+								{game.title}
+							</h2>
+						</div>
+					</div>
+				</a>
+			))}
+		</div>
+
+	</main>
+</Layout> 
