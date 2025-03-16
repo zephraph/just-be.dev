@@ -1091,6 +1091,46 @@ import Layout from "../../layouts/default.astro";
     draw(): void {
       this.p.background(0);
 
+      // Create CRT-style radial background
+      const centerX = this.p.width / 2;
+      const centerY = this.p.height / 2;
+      const maxDist = Math.sqrt(
+        Math.pow(this.p.width / 2, 2) + Math.pow(this.p.height / 2, 2)
+      );
+
+      for (let i = 0; i < 4; i++) {
+        const gradient = this.p.drawingContext.createRadialGradient(
+          centerX,
+          centerY,
+          0,
+          centerX,
+          centerY,
+          maxDist * (1.4 - i * 0.15)
+        );
+
+        if (i === 0) {
+          gradient.addColorStop(0, "rgba(96, 0, 192, 0.25)");
+          gradient.addColorStop(0.85, "rgba(32, 0, 64, 0.15)");
+          gradient.addColorStop(1, "rgba(0, 0, 0, 0.3)");
+        } else {
+          gradient.addColorStop(0, "rgba(96, 0, 192, 0.06)");
+          gradient.addColorStop(0.85, "rgba(32, 0, 64, 0.03)");
+          gradient.addColorStop(1, "rgba(0, 0, 0, 0.08)");
+        }
+
+        this.p.drawingContext.fillStyle = gradient;
+        this.p.noStroke();
+
+        // Create bulge effect by using ellipse with larger bulge
+        const bulgeAmount = 1.2 - i * 0.015;
+        this.p.ellipse(
+          centerX,
+          centerY,
+          this.p.width * bulgeAmount,
+          this.p.height * bulgeAmount
+        );
+      }
+
       // Draw background characters
       this.backgroundChars.forEach((char) => char.draw(this.p));
 
