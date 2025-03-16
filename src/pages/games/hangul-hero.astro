@@ -4,62 +4,466 @@ import Layout from "../../layouts/default.astro";
 
 <Layout title="Hangul Hero - Korean Typing Game">
   <main class="container mx-auto px-4 py-8">
-    <div class="not-prose">
-      <h1
-        class="text-8xl font-bold text-center mb-8 font-bangers tracking-wider"
-        style="text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
-      >
-        <span style="color: #FF6B6B">한</span><span style="color: #4ECDC4"
-          >글</span
-        >
-        <span style="color: #45B7D1">H</span><span style="color: #96CEB4"
-          >E</span
-        ><span style="color: #FFEEAD">R</span><span style="color: #D4A5A5"
-          >O</span
-        >
-      </h1>
-    </div>
-
     <div class="max-w-2xl mx-auto">
-      <div class="bg-gray-800 rounded-lg p-4 mb-4">
-        <div class="flex justify-between items-center">
-          <div class="text-white">
-            Score: <span id="score">0</span>
-          </div>
-          <div class="text-white">
-            Lives: <span id="lives">3</span>
+      <div class="arcade-cabinet">
+        <div class="cabinet-top">
+          <div class="marquee">
+            <div class="marquee-pattern"></div>
+            <div class="marquee-decoration left">
+              <div class="korean-chars">
+                <div class="char-column">
+                  <span style="color: #FF6B6B">ㄱ</span>
+                  <span style="color: #4ECDC4">ㅏ</span>
+                  <span style="color: #45B7D1">ㄴ</span>
+                  <span style="color: #96CEB4">ㅗ</span>
+                  <span style="color: #FFEEAD">ㄹ</span>
+                  <span style="color: #D4A5A5">ㅎ</span>
+                </div>
+                <div class="char-column">
+                  <span style="color: #45B7D1">ㅂ</span>
+                  <span style="color: #FF6B6B">ㅓ</span>
+                  <span style="color: #FFEEAD">ㅅ</span>
+                  <span style="color: #4ECDC4">ㅜ</span>
+                  <span style="color: #96CEB4">ㅈ</span>
+                  <span style="color: #D4A5A5">ㅣ</span>
+                </div>
+                <div class="char-column">
+                  <span style="color: #FF6B6B">ㅊ</span>
+                  <span style="color: #4ECDC4">ㅑ</span>
+                  <span style="color: #45B7D1">ㅋ</span>
+                  <span style="color: #FFEEAD">ㅠ</span>
+                  <span style="color: #96CEB4">ㅌ</span>
+                  <span style="color: #D4A5A5">ㅡ</span>
+                </div>
+              </div>
+            </div>
+            <div class="marquee-decoration right">
+              <div class="korean-chars">
+                <div class="char-column">
+                  <span style="color: #4ECDC4">ㅍ</span>
+                  <span style="color: #FF6B6B">ㅕ</span>
+                  <span style="color: #96CEB4">ㄷ</span>
+                  <span style="color: #FFEEAD">ㅛ</span>
+                  <span style="color: #45B7D1">ㅇ</span>
+                  <span style="color: #D4A5A5">ㅐ</span>
+                </div>
+                <div class="char-column">
+                  <span style="color: #FF6B6B">ㅁ</span>
+                  <span style="color: #4ECDC4">ㅔ</span>
+                  <span style="color: #D4A5A5">ㅃ</span>
+                  <span style="color: #96CEB4">ㅒ</span>
+                  <span style="color: #FFEEAD">ㄸ</span>
+                  <span style="color: #45B7D1">ㅉ</span>
+                </div>
+                <div class="char-column">
+                  <span style="color: #4ECDC4">ㄲ</span>
+                  <span style="color: #FF6B6B">ㅖ</span>
+                  <span style="color: #96CEB4">ㅆ</span>
+                  <span style="color: #FFEEAD">ㅢ</span>
+                  <span style="color: #45B7D1">ㅚ</span>
+                  <span style="color: #D4A5A5">ㅟ</span>
+                </div>
+              </div>
+            </div>
+            <h1
+              class="text-8xl font-bold text-center font-bangers tracking-wider marquee-title"
+              style="text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;"
+            >
+              <span style="color: #FF6B6B">한</span><span style="color: #4ECDC4"
+                >글</span
+              >
+              <span style="color: #45B7D1">H</span><span style="color: #96CEB4"
+                >E</span
+              ><span style="color: #FFEEAD">R</span><span style="color: #D4A5A5"
+                >O</span
+              >
+            </h1>
           </div>
         </div>
-      </div>
-
-      <div
-        id="game-container"
-        class="bg-gray-900 rounded-lg aspect-[4/3] relative overflow-hidden"
-      >
-        <!-- Hidden input for Korean character capture -->
-        <input
-          type="text"
-          id="korean-input"
-          class="opacity-0 absolute -left-[9999px] -top-[9999px]"
-          autocomplete="off"
-          aria-hidden="true"
-        />
-        <!-- p5.js canvas will be inserted here -->
+        <div class="screen-bezel">
+          <div class="screen-container">
+            <div class="screen-overlay"></div>
+            <div class="screen-content">
+              <div class="terminal-header">
+                <div class="terminal-stats">
+                  <div class="stat-box">
+                    <div class="stat-label">SCORE</div>
+                    <div id="score" class="stat-value">0</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-label">LIVES</div>
+                    <div id="lives" class="stat-value">3</div>
+                  </div>
+                </div>
+              </div>
+              <div id="game-container" class="game-screen">
+                <input
+                  type="text"
+                  id="korean-input"
+                  class="opacity-0 absolute -left-[9999px] -top-[9999px]"
+                  autocomplete="off"
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cabinet-bottom">
+          <div class="control-panel">
+            <div class="instructions">TYPE THE FALLING CHARACTERS</div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 </Layout>
 
 <style>
-  #game-container {
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+  .arcade-cabinet {
+    background: linear-gradient(45deg, #2a2a2a, #3a3a3a);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow:
+      0 0 0 4px #1a1a1a,
+      0 0 0 8px #3a3a3a,
+      0 10px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid #4a4a4a;
+  }
+
+  .cabinet-top {
+    margin: -2rem -2rem 1rem -2rem;
+    padding: 1.5rem;
+    background: linear-gradient(180deg, #1a1a1a, #2a2a2a);
+    border-radius: 1rem 1rem 0 0;
+    border-bottom: 4px solid #4a4a4a;
+    box-shadow:
+      inset 0 2px 5px rgba(255, 255, 255, 0.1),
+      inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .marquee {
     position: relative;
+    background: linear-gradient(90deg, #ff3366, #ff6633);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow:
+      inset 0 0 20px rgba(255, 255, 255, 0.5),
+      inset 0 0 40px rgba(255, 255, 255, 0.2),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    overflow: hidden;
+    border: 2px solid #333;
+  }
+
+  .marquee::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: radial-gradient(
+        circle at 50% 50%,
+        rgba(255, 255, 255, 0.2) 0%,
+        transparent 60%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.2) 25%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.2) 75%,
+        rgba(255, 255, 255, 0.1) 100%
+      );
+    animation: shine 3s linear infinite;
+  }
+
+  .marquee-decoration {
+    position: absolute;
+    top: 50%;
+    width: 160px;
+    transform: translateY(-50%);
+  }
+
+  .marquee-decoration.left {
+    left: 0;
+  }
+
+  .marquee-decoration.right {
+    right: 0;
+  }
+
+  .korean-chars {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .char-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .korean-chars span {
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow:
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor;
+  }
+
+  .marquee-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 25% 50%, #fff 1px, transparent 1px),
+      radial-gradient(circle at 75% 50%, #fff 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.1;
+    animation: twinkle 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes shine {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes twinkle {
+    from {
+      opacity: 0.05;
+    }
+    to {
+      opacity: 0.15;
+    }
+  }
+
+  .marquee-title {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    padding: 0.5rem;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0.1) 80%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: title-shine 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+  }
+
+  @keyframes title-shine {
+    0%,
+    100% {
+      background-position: -200% center;
+    }
+    50% {
+      background-position: 200% center;
+    }
+  }
+
+  .screen-bezel {
+    background: linear-gradient(45deg, #111, #333);
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow:
+      inset 0 0 10px rgba(0, 0, 0, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 2px solid #444;
+  }
+
+  .screen-container {
+    position: relative;
+    background: #000;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 2px solid #1a1a1a;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+  }
+
+  .screen-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.06),
+        rgba(0, 255, 0, 0.02),
+        rgba(0, 0, 255, 0.06)
+      );
+    background-size:
+      100% 2px,
+      3px 100%;
+    pointer-events: none;
+    z-index: 10;
+    border-radius: 0.5rem;
+  }
+
+  .screen-content {
+    position: relative;
+    z-index: 1;
+    background: #000;
+    animation: flicker 0.15s infinite;
+  }
+
+  .terminal-header {
+    background: linear-gradient(180deg, #000000, #111111);
+    padding: 0.75rem;
+    border-bottom: 2px solid #333;
+  }
+
+  .terminal-stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .stat-box {
+    background: linear-gradient(180deg, #111111, #000000);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #333;
+    box-shadow:
+      inset 0 0 5px rgba(51, 255, 51, 0.2),
+      0 0 10px rgba(51, 255, 51, 0.1);
+    flex: 1;
+    text-align: center;
+  }
+
+  .stat-label {
+    font-family: "Press Start 2P", monospace;
+    color: #33ff33;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-shadow: 0 0 5px rgba(51, 255, 51, 0.5);
+  }
+
+  .stat-value {
+    font-family: "Press Start 2P", monospace;
+    color: #ffff00;
+    font-size: 1.25rem;
+    text-shadow:
+      0 0 5px rgba(255, 255, 0, 0.5),
+      0 0 10px rgba(255, 255, 0, 0.3);
+  }
+
+  .game-screen {
+    background: #000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cabinet-bottom {
+    margin: 1rem -2rem -2rem -2rem;
+    padding: 1rem;
+    background: linear-gradient(0deg, #1a1a1a, #2a2a2a);
+    border-radius: 0 0 1rem 1rem;
+    border-top: 4px solid #4a4a4a;
+  }
+
+  .control-panel {
+    background: linear-gradient(90deg, #2a2a2a, #3a3a3a);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow:
+      inset 0 0 10px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+    text-align: center;
+  }
+
+  .instructions {
+    font-family: "Press Start 2P", monospace;
+    color: #ffff00;
+    font-size: 0.875rem;
+    text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+    letter-spacing: 0.1em;
   }
 
   #game-container canvas {
-    border-radius: 0.5rem;
+    border-radius: 0;
+    display: block;
+  }
+
+  @keyframes flicker {
+    0% {
+      opacity: 0.97;
+    }
+    5% {
+      opacity: 0.95;
+    }
+    10% {
+      opacity: 0.9;
+    }
+    15% {
+      opacity: 0.95;
+    }
+    20% {
+      opacity: 0.98;
+    }
+    25% {
+      opacity: 0.95;
+    }
+    30% {
+      opacity: 0.9;
+    }
+    35% {
+      opacity: 0.95;
+    }
+    40% {
+      opacity: 0.98;
+    }
+    45% {
+      opacity: 0.95;
+    }
+    50% {
+      opacity: 0.9;
+    }
+    55% {
+      opacity: 0.95;
+    }
+    60% {
+      opacity: 0.98;
+    }
+    65% {
+      opacity: 0.95;
+    }
+    70% {
+      opacity: 0.9;
+    }
+    75% {
+      opacity: 0.95;
+    }
+    80% {
+      opacity: 0.98;
+    }
+    85% {
+      opacity: 0.95;
+    }
+    90% {
+      opacity: 0.9;
+    }
+    95% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0.98;
+    }
   }
 </style>
 
@@ -119,12 +523,12 @@ import Layout from "../../layouts/default.astro";
 
     getRandomColor(): string {
       const colors = [
-        "#FF6B6B",
-        "#4ECDC4",
-        "#45B7D1",
-        "#96CEB4",
-        "#FFEEAD",
-        "#D4A5A5",
+        "#00ff00", // Neon green
+        "#ff0066", // Hot pink
+        "#00ffff", // Cyan
+        "#ffff00", // Yellow
+        "#ff3399", // Pink
+        "#33ccff", // Light blue
       ];
       return colors[Math.floor(Math.random() * colors.length)];
     }
@@ -137,11 +541,38 @@ import Layout from "../../layouts/default.astro";
       p.push();
       p.textSize(this.size);
       p.textAlign(p.CENTER, p.CENTER);
+
+      // Draw outer glow
+      if (!this.isBackground) {
+        const glowColor = p.color(this.color);
+        glowColor.setAlpha(this.opacity * 80);
+        p.fill(glowColor);
+        p.textSize(this.size + 4);
+        p.text(this.char, this.x, this.y);
+
+        // Draw middle glow
+        glowColor.setAlpha(this.opacity * 120);
+        p.fill(glowColor);
+        p.textSize(this.size + 2);
+        p.text(this.char, this.x, this.y);
+      }
+
+      // Draw main character
       const c = p.color(this.color);
       c.setAlpha(this.opacity * 255);
       p.fill(c);
+      p.textSize(this.size);
       p.noStroke();
       p.text(this.char, this.x, this.y);
+
+      // Draw inner highlight
+      if (!this.isBackground) {
+        const highlightColor = p.color("#ffffff");
+        highlightColor.setAlpha(this.opacity * 180);
+        p.fill(highlightColor);
+        p.textSize(this.size * 0.9);
+        p.text(this.char, this.x, this.y);
+      }
       p.pop();
     }
   }
@@ -379,7 +810,7 @@ import Layout from "../../layouts/default.astro";
     }
 
     draw(): void {
-      this.p.background(17, 24, 39); // bg-gray-900
+      this.p.background(0);
 
       // Draw background characters
       this.backgroundChars.forEach((char) => char.draw(this.p));
@@ -392,26 +823,61 @@ import Layout from "../../layouts/default.astro";
         this.p.push();
         this.p.textSize(40);
         this.p.textAlign(this.p.CENTER, this.p.CENTER);
-        this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+
+        // Draw text glow
+        const glowColor = this.p.color("#ff0066");
+        glowColor.setAlpha(this.startTextOpacity * 100);
+        this.p.fill(glowColor);
+        this.p.textSize(42);
+
         const text =
-          this.lives <= 0 ? "Game Over! Click to Play Again" : "Click to Start";
+          this.lives <= 0 ? "GAME OVER - CLICK TO RESTART" : "CLICK TO START";
+        this.p.text(text, this.p.width / 2, this.p.height / 2);
+
+        // Draw main text
+        this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+        this.p.textSize(40);
         this.p.text(text, this.p.width / 2, this.p.height / 2);
         this.p.pop();
       }
 
-      // Draw last typed character with fade effect
+      // Draw last typed character with enhanced arcade effect
       if (this.lastTypedChar && this.isPlaying) {
         const timeSinceTyped = this.p.millis() - this.lastTypedCharTime;
-        const fadeTime = 1000; // Fade out over 1 second
+        const fadeTime = 1000;
         if (timeSinceTyped < fadeTime) {
           this.p.push();
-          this.p.textSize(50);
+          const baseSize = 50;
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
           const opacity = this.p.map(timeSinceTyped, 0, fadeTime, 255, 0);
+
+          // Draw outer glow
+          const glowColor = this.p.color(this.lastTypedCharColor);
+          glowColor.setAlpha(opacity * 0.3);
+          this.p.fill(glowColor);
+          this.p.textSize(baseSize + 6);
+          this.p.text(this.lastTypedChar, this.p.width / 2, this.p.height - 50);
+
+          // Draw middle glow
+          glowColor.setAlpha(opacity * 0.6);
+          this.p.fill(glowColor);
+          this.p.textSize(baseSize + 3);
+          this.p.text(this.lastTypedChar, this.p.width / 2, this.p.height - 50);
+
+          // Draw main character
           const c = this.p.color(this.lastTypedCharColor);
           c.setAlpha(opacity);
           this.p.fill(c);
+          this.p.textSize(baseSize);
           this.p.text(this.lastTypedChar, this.p.width / 2, this.p.height - 50);
+
+          // Draw inner highlight
+          const highlightColor = this.p.color("#ffffff");
+          highlightColor.setAlpha(opacity * 0.7);
+          this.p.fill(highlightColor);
+          this.p.textSize(baseSize * 0.9);
+          this.p.text(this.lastTypedChar, this.p.width / 2, this.p.height - 50);
+
           this.p.pop();
         } else {
           this.lastTypedChar = null;
@@ -431,15 +897,15 @@ import Layout from "../../layouts/default.astro";
       this.lastTypedCharTime = this.p.millis();
 
       if (charIndex !== -1) {
-        // Matched a falling character
-        this.lastTypedCharColor = "#22C55E"; // Green color for matches
+        // Matched a falling character - use neon colors for success
+        this.lastTypedCharColor = "#00ff00";
         this.fallingChars.splice(charIndex, 1);
         this.score += 10;
         const scoreElement = document.getElementById("score");
         if (scoreElement) scoreElement.textContent = this.score.toString();
       } else {
-        // No match found
-        this.lastTypedCharColor = "#EF4444"; // Red color for misses
+        // No match found - use hot pink for errors
+        this.lastTypedCharColor = "#ff0066";
       }
     }
   }
