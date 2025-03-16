@@ -97,7 +97,14 @@ import Layout from "../../layouts/default.astro";
           </div>
         </div>
         <div class="cabinet-bottom">
-          <div class="control-panel"></div>
+          <div class="control-panel">
+            <button id="start-button" class="arcade-start-button">
+              <div class="button-surface">
+                <div class="button-text">시작</div>
+              </div>
+              <div class="button-base"></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -107,6 +114,10 @@ import Layout from "../../layouts/default.astro";
 <style>
   :root {
     --cabinet-color: #d4a5a5;
+    --button-color: #4ade80; /* Light green */
+    --button-glow: rgba(74, 222, 128, 0.5);
+    --button-color-active: #fbbf24; /* Amber/yellow */
+    --button-glow-active: rgba(251, 191, 36, 0.5);
   }
 
   .arcade-cabinet {
@@ -167,10 +178,96 @@ import Layout from "../../layouts/default.astro";
       inset 0 0 10px rgba(0, 0, 0, 0.3),
       0 2px 4px rgba(0, 0, 0, 0.2);
     text-align: center;
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 2rem;
   }
 
-  .control-panel::after {
-    display: none;
+  .arcade-start-button {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+    transition: transform 0.1s;
+  }
+
+  .arcade-start-button:active {
+    transform: translateY(3px);
+  }
+
+  .arcade-start-button:active .button-surface {
+    transform: translateY(-1px);
+    box-shadow:
+      0 0 15px var(--button-glow),
+      0 0 30px var(--button-glow),
+      0 0 45px var(--button-glow),
+      inset 0 0 8px rgba(255, 255, 255, 0.5);
+  }
+
+  .arcade-start-button .button-surface {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at 30% 30%,
+      color-mix(in srgb, var(--button-color) 85%, white),
+      var(--button-color) 60%,
+      color-mix(in srgb, var(--button-color) 85%, black)
+    );
+    border-radius: 8px;
+    transform: translateY(-4px);
+    transition:
+      transform 0.1s,
+      box-shadow 0.1s,
+      background 0.3s;
+    box-shadow:
+      0 0 20px var(--button-glow),
+      0 0 40px var(--button-glow),
+      0 0 60px var(--button-glow),
+      inset 0 0 15px rgba(255, 255, 255, 0.8),
+      inset 2px 2px 2px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 2px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+
+  .button-base {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: color-mix(in srgb, var(--button-color) 85%, black);
+    border-radius: 8px;
+    z-index: 1;
+    box-shadow:
+      inset 0 0 2px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s;
+  }
+
+  .button-text {
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    text-shadow:
+      0 0 5px rgba(255, 255, 255, 0.8),
+      0 0 10px rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
   }
 
   .marquee {
@@ -431,6 +528,34 @@ import Layout from "../../layouts/default.astro";
       opacity: 0.98;
     }
   }
+
+  .arcade-start-button.active .button-surface {
+    background: radial-gradient(
+      circle at 30% 30%,
+      color-mix(in srgb, var(--button-color-active) 85%, white),
+      var(--button-color-active) 60%,
+      color-mix(in srgb, var(--button-color-active) 85%, black)
+    );
+    box-shadow:
+      0 0 20px var(--button-glow-active),
+      0 0 40px var(--button-glow-active),
+      0 0 60px var(--button-glow-active),
+      inset 0 0 15px rgba(255, 255, 255, 0.8),
+      inset 2px 2px 2px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .arcade-start-button.active:active .button-surface {
+    box-shadow:
+      0 0 15px var(--button-glow-active),
+      0 0 30px var(--button-glow-active),
+      0 0 45px var(--button-glow-active),
+      inset 0 0 8px rgba(255, 255, 255, 0.5);
+  }
+
+  .arcade-start-button.active .button-base {
+    background: color-mix(in srgb, var(--button-color-active) 85%, black);
+  }
 </style>
 
 <script>
@@ -560,8 +685,8 @@ import Layout from "../../layouts/default.astro";
 
   class Game {
     private p: p5;
-    private isPlaying: boolean;
-    private isPaused: boolean;
+    public isPlaying: boolean;
+    public isPaused: boolean;
     private score: number;
     private lives: number;
     private fallingChars: FallingChar[];
@@ -662,10 +787,13 @@ import Layout from "../../layouts/default.astro";
     togglePause(): void {
       this.isPaused = !this.isPaused;
       const input = document.getElementById("korean-input") as HTMLInputElement;
+      const startButton = document.getElementById("start-button");
       if (this.isPaused) {
         input?.blur(); // Remove focus from input when paused
+        startButton?.classList.remove("active");
       } else {
         input?.focus(); // Restore focus when unpaused
+        startButton?.classList.add("active");
       }
     }
 
@@ -673,6 +801,7 @@ import Layout from "../../layouts/default.astro";
       if (this.isPlaying) return;
 
       this.isPlaying = true;
+      this.isPaused = false;
       this.score = 0;
       this.lives = 3;
       this.fallingChars = [];
@@ -685,15 +814,24 @@ import Layout from "../../layouts/default.astro";
 
       // Focus the input when game starts
       const input = document.getElementById("korean-input") as HTMLInputElement;
+      const startButton = document.getElementById("start-button");
       if (input) {
         input.focus();
+      }
+      if (startButton) {
+        startButton.classList.add("active");
       }
     }
 
     gameOver(): void {
       this.isPlaying = false;
+      this.isPaused = false;
       this.fallingChars = [];
       this.lastTypedChar = null;
+      const startButton = document.getElementById("start-button");
+      if (startButton) {
+        startButton.classList.remove("active");
+      }
     }
 
     private calculateDifficulty(): void {
@@ -1148,6 +1286,25 @@ import Layout from "../../layouts/default.astro";
 
       // Setup input handling
       game.setupInput();
+
+      // Setup start button
+      const startButton = document.getElementById("start-button");
+      if (startButton) {
+        startButton.addEventListener("click", () => {
+          if (!game.isPlaying) {
+            game.start();
+          } else {
+            game.togglePause();
+          }
+          // Focus the input after starting
+          const input = document.getElementById(
+            "korean-input"
+          ) as HTMLInputElement;
+          if (input && !game.isPaused) {
+            input.focus();
+          }
+        });
+      }
     };
 
     p.draw = () => {
