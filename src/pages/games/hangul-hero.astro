@@ -1214,24 +1214,180 @@ import Layout from "../../layouts/default.astro";
       // Draw start/game over text
       if (!this.isPlaying) {
         this.p.push();
-        this.p.textSize(40);
         this.p.textAlign(this.p.CENTER, this.p.CENTER);
 
-        // Draw text glow
-        const glowColor = this.p.color("#ff0066");
-        glowColor.setAlpha(this.startTextOpacity * 100);
-        this.p.fill(glowColor);
-        this.p.textSize(42);
+        // Draw title text with wave animation
+        const titleText = this.lives <= 0 ? "GAME OVER" : "한글 HERO";
+        const colors = [
+          "#FF6B6B", // Pink/Red
+          "#4ECDC4", // Teal
+          "#45B7D1", // Light Blue
+          "#96CEB4", // Sage
+          "#FFEEAD", // Light Yellow
+          "#D4A5A5", // Light Pink
+        ];
 
-        const text =
-          this.lives <= 0 ? "GAME OVER - CLICK TO RESTART" : "CLICK TO START";
-        this.p.text(text, this.p.width / 2, this.p.height / 2);
+        if (this.lives <= 0) {
+          // Game Over text
+          this.p.textSize(40);
+          this.p.textFont(this.pixelFont);
+
+          // Draw text glow
+          const glowColor = this.p.color("#ff0066");
+          glowColor.setAlpha(this.startTextOpacity * 100);
+          this.p.fill(glowColor);
+          this.p.textSize(42);
+          this.p.text(titleText, this.p.width / 2, this.p.height / 2 - 20);
+
+          // Draw main text
+          this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+          this.p.textSize(40);
+          this.p.text(titleText, this.p.width / 2, this.p.height / 2 - 20);
+        } else {
+          // 한글 HERO title with wave animation
+          this.p.textSize(60);
+
+          // Calculate total width for centering
+          const chars = titleText.split("");
+          let totalWidth = 0;
+          chars.forEach((char) => {
+            // Use appropriate font for Korean/English characters
+            if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char)) {
+              this.p.textFont("Arial");
+            } else {
+              this.p.textFont(this.pixelFont);
+            }
+            totalWidth += this.p.textWidth(char);
+          });
+
+          let currentX = this.p.width / 2 - totalWidth / 2 + 40;
+
+          // Draw each character with animation
+          chars.forEach((char, i) => {
+            const color = colors[i % colors.length];
+            const yOffset = Math.sin(this.p.millis() / 600 + i * 0.5) * 20;
+
+            // Use appropriate font for each character
+            if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char)) {
+              this.p.textFont("Arial");
+            } else {
+              this.p.textFont(this.pixelFont);
+            }
+
+            // Outer glow
+            this.p.fill(color + "CC");
+            for (let offset = 4; offset >= 1; offset--) {
+              this.p.text(
+                char,
+                currentX,
+                this.p.height / 2 - 20 + yOffset - offset
+              );
+              this.p.text(
+                char,
+                currentX,
+                this.p.height / 2 - 20 + yOffset + offset
+              );
+              this.p.text(
+                char,
+                currentX - offset,
+                this.p.height / 2 - 20 + yOffset
+              );
+              this.p.text(
+                char,
+                currentX + offset,
+                this.p.height / 2 - 20 + yOffset
+              );
+            }
+
+            // Main character
+            this.p.fill(color);
+            this.p.text(char, currentX, this.p.height / 2 - 20 + yOffset);
+
+            // Update x position for next character
+            currentX += this.p.textWidth(char);
+          });
+        }
+
+        // Draw subtitle with button reference
+        this.p.textSize(20);
+        this.p.textAlign(this.p.CENTER, this.p.CENTER);
+
+        const pressText = "PRESS ";
+        const buttonText = "시작";
+        const toStartText = this.lives <= 0 ? " TO RESTART" : " TO START";
+
+        // Calculate total width for centering
+        const startTextWidth = this.p.textWidth(
+          pressText + buttonText + toStartText
+        );
+        const startX = this.p.width / 2 - startTextWidth / 2;
+
+        this.p.textAlign(this.p.LEFT, this.p.CENTER);
+
+        // Draw "PRESS" with normal opacity
+        this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+        this.p.text(pressText, startX, this.p.height / 2 + 90);
+
+        // Draw button text with arcade button glow effect
+        const buttonX = startX + this.p.textWidth(pressText);
+
+        // Switch to Arial for Korean text
+        this.p.textFont("Arial");
+
+        // Calculate button dimensions
+        const buttonPadding = 10;
+        const buttonHeight = 30;
+        const buttonWidth = this.p.textWidth(buttonText) + buttonPadding * 2;
+        const buttonY = this.p.height / 2 + 90 - buttonHeight / 2;
+
+        // Draw button base (shadow)
+        this.p.fill(44, 132, 76, this.startTextOpacity * 255);
+        this.p.noStroke();
+        this.p.rect(buttonX, buttonY + 4, buttonWidth, buttonHeight, 6);
+
+        // Draw button surface
+        this.p.fill(74, 222, 128, this.startTextOpacity * 255);
+        this.p.rect(buttonX, buttonY, buttonWidth, buttonHeight, 6);
+
+        // Add highlight to button
+        const gradientHeight = buttonHeight * 0.4;
+        this.p.fill(255, 255, 255, this.startTextOpacity * 40);
+        this.p.rect(buttonX, buttonY, buttonWidth, gradientHeight, 6, 6, 0, 0);
+
+        // Outer button glow
+        this.p.fill(74, 222, 128, this.startTextOpacity * 80);
+        for (let offset = 2; offset >= 1; offset--) {
+          this.p.text(
+            buttonText,
+            buttonX + buttonPadding - offset,
+            buttonY + buttonHeight / 2 + 4 - offset
+          );
+          this.p.text(
+            buttonText,
+            buttonX + buttonPadding + offset,
+            buttonY + buttonHeight / 2 + 4 + offset
+          );
+        }
+
+        // Inner button text
+        this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+        this.p.text(
+          buttonText,
+          buttonX + buttonPadding,
+          buttonY + buttonHeight / 2 + 4
+        );
+
+        // Switch back to pixel font for the rest
         this.p.textFont(this.pixelFont);
 
-        // Draw main text
+        // Draw "TO START/RESTART" with normal opacity
         this.p.fill(255, 255, 255, this.startTextOpacity * 255);
-        this.p.textSize(40);
-        this.p.text(text, this.p.width / 2, this.p.height / 2);
+        this.p.text(
+          toStartText,
+          buttonX + buttonWidth + 5,
+          this.p.height / 2 + 90
+        );
+
         this.p.pop();
       }
 
@@ -1361,6 +1517,7 @@ import Layout from "../../layouts/default.astro";
     };
 
     p.mousePressed = () => {
+      // Remove the click-to-start functionality
       if (
         p.mouseX >= 0 &&
         p.mouseX < p.width &&
