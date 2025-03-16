@@ -98,6 +98,9 @@ import Layout from "../../layouts/default.astro";
         </div>
         <div class="cabinet-bottom">
           <div class="control-panel">
+            <div class="speaker-grill">
+              <div class="speaker-pattern"></div>
+            </div>
             <button id="start-button" class="arcade-start-button">
               <div class="button-surface">
                 <div class="button-text">시작</div>
@@ -181,9 +184,47 @@ import Layout from "../../layouts/default.astro";
     position: relative;
     min-height: 80px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
-    padding-right: 2rem;
+    padding: 1rem 2rem;
+  }
+
+  .speaker-grill {
+    position: relative;
+    width: 160px;
+    height: 100px;
+    background: linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--cabinet-color) 95%, black),
+      color-mix(in srgb, var(--cabinet-color) 85%, black)
+    );
+    border-radius: 4px;
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      0 1px 2px rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    margin: -1rem 0 -1rem -2rem;
+    border-radius: 0.5rem;
+  }
+
+  .speaker-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.7) 0,
+      rgba(0, 0, 0, 0.7) 1.5px,
+      transparent 1.5px
+    );
+    background-size: 6px 6px;
+    background-position: 2px 2px;
+  }
+
+  .speaker-inner {
+    display: none;
   }
 
   .arcade-start-button {
