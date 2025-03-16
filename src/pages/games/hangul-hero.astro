@@ -335,9 +335,9 @@ import Layout from "../../layouts/default.astro";
   }
 
   .instructions {
-    font-family: "Press Start 2P", monospace;
+    font-family: "Bangers", monospace;
     color: #ffff00;
-    font-size: 0.875rem;
+    font-size: 1rem;
     text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
     letter-spacing: 0.1em;
   }
@@ -455,8 +455,15 @@ import Layout from "../../layouts/default.astro";
     size: number;
     opacity: number;
     toDelete: boolean;
+    pixelFont: p5.Font;
 
-    constructor(x: number, char: string, speed: number, isBackground = false) {
+    constructor(
+      x: number,
+      char: string,
+      speed: number,
+      pixelFont: p5.Font,
+      isBackground = false
+    ) {
       this.x = x;
       this.y = -30;
       this.char = char;
@@ -466,6 +473,7 @@ import Layout from "../../layouts/default.astro";
       this.size = isBackground ? 20 : 24;
       this.opacity = isBackground ? 0.3 : 1;
       this.toDelete = false;
+      this.pixelFont = pixelFont;
     }
 
     getRandomColor(): string {
@@ -488,6 +496,13 @@ import Layout from "../../layouts/default.astro";
       p.push();
       p.textSize(this.size);
       p.textAlign(p.CENTER, p.CENTER);
+
+      // Use Arial for Korean characters
+      if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(this.char)) {
+        p.textFont("Arial");
+      } else {
+        p.textFont(this.pixelFont);
+      }
 
       // Draw outer glow
       if (!this.isBackground) {
@@ -552,9 +567,11 @@ import Layout from "../../layouts/default.astro";
     private maxSpeed: number;
     private pauseTextOpacity: number;
     private pauseTextFading: number;
+    private pixelFont: p5.Font;
 
-    constructor(p: p5) {
+    constructor(p: p5, pixelFont: p5.Font) {
       this.p = p;
+      this.pixelFont = pixelFont;
       this.isPlaying = false;
       this.isPaused = false;
       this.score = 0;
@@ -716,7 +733,9 @@ import Layout from "../../layouts/default.astro";
             HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
           const column = Math.floor(this.p.random(this.numColumns));
           const x = column * this.columnWidth + this.columnWidth / 2;
-          this.fallingChars.push(new FallingChar(x, char, this.speed));
+          this.fallingChars.push(
+            new FallingChar(x, char, this.speed, this.pixelFont)
+          );
           this.lastSpawnTime = currentTime;
         }
 
@@ -767,7 +786,9 @@ import Layout from "../../layouts/default.astro";
             const char =
               HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
             const x = col * this.columnWidth + this.columnWidth / 2;
-            this.backgroundChars.push(new FallingChar(x, char, 0.5, true));
+            this.backgroundChars.push(
+              new FallingChar(x, char, 0.5, this.pixelFont, true)
+            );
             this.columnLastY[col] = -30; // Update last Y position for this column
           }
         }
@@ -858,28 +879,28 @@ import Layout from "../../layouts/default.astro";
       // Draw score and lives
       if (this.isPlaying) {
         this.p.push();
-        this.p.textFont("Bangers");
+        this.p.textFont(this.pixelFont);
 
         // Draw score on bottom left
         this.p.textAlign(this.p.LEFT, this.p.BOTTOM);
-        this.p.textSize(24);
+        this.p.textSize(16);
 
         // Score outer glow
-        this.p.fill(255, 99, 107, 100); // #FF636B with alpha
+        this.p.fill(150, 206, 180, 100); // #96CEB4 with alpha
         this.p.text(`SCORE ${this.score}`, 25, this.p.height - 20);
 
         // Score middle glow
-        this.p.fill(255, 99, 107, 150); // #FF636B with alpha
+        this.p.fill(150, 206, 180, 150); // #96CEB4 with alpha
         this.p.text(`SCORE ${this.score}`, 25, this.p.height - 20);
 
         // Score inner text
-        this.p.fill(255, 99, 107, 255); // #FF636B
+        this.p.fill(150, 206, 180, 255); // #96CEB4
         this.p.text(`SCORE ${this.score}`, 25, this.p.height - 20);
 
         // Draw hearts for lives
-        const heartSpacing = 35; // Space between hearts
-        const startX = this.p.width - 20 - heartSpacing * 2; // Start position for first heart
-        const startY = this.p.height - 30; // Vertical position for hearts
+        const heartSpacing = 35;
+        const startX = this.p.width - 20 - heartSpacing * 2;
+        const startY = this.p.height - 30;
 
         for (let i = 0; i < 3; i++) {
           this.drawPixelHeart(
@@ -901,8 +922,8 @@ import Layout from "../../layouts/default.astro";
 
           // Draw pause text in Korean with colors and wave effect
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
-          this.p.textSize(60);
-          this.p.textFont("Arial");
+          this.p.textSize(40);
+          this.p.textFont("Arial"); // Use Arial for Korean pause text
 
           const pauseText = "일시정지";
           const colors = [
@@ -942,7 +963,7 @@ import Layout from "../../layouts/default.astro";
 
           // Subtitle with flashing effect and special glow for "SPACE"
           this.p.textSize(20);
-          this.p.textFont("Bangers");
+          this.p.textFont(this.pixelFont);
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
 
           const pressText = "PRESS ";
@@ -1000,6 +1021,7 @@ import Layout from "../../layouts/default.astro";
         const text =
           this.lives <= 0 ? "GAME OVER - CLICK TO RESTART" : "CLICK TO START";
         this.p.text(text, this.p.width / 2, this.p.height / 2);
+        this.p.textFont(this.pixelFont);
 
         // Draw main text
         this.p.fill(255, 255, 255, this.startTextOpacity * 255);
@@ -1017,6 +1039,15 @@ import Layout from "../../layouts/default.astro";
           const baseSize = 50;
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
           const opacity = this.p.map(timeSinceTyped, 0, fadeTime, 255, 0);
+
+          // Use Arial for Korean characters
+          if (
+            /[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(this.lastTypedChar)
+          ) {
+            this.p.textFont("Arial");
+          } else {
+            this.p.textFont(this.pixelFont);
+          }
 
           // Draw outer glow
           const glowColor = this.p.color(this.lastTypedCharColor);
@@ -1078,8 +1109,13 @@ import Layout from "../../layouts/default.astro";
   // Initialize p5.js
   new p5((p: p5) => {
     let game: Game;
+    let pixelFont: p5.Font;
     const container = document.getElementById("game-container");
     if (!container) return;
+
+    p.preload = () => {
+      pixelFont = p.loadFont("/fonts/PressStart2P-Regular.ttf");
+    };
 
     p.setup = () => {
       const canvas = p.createCanvas(
@@ -1087,9 +1123,9 @@ import Layout from "../../layouts/default.astro";
         container.clientWidth * 0.75
       );
       canvas.parent(container);
-      game = new Game(p);
+      game = new Game(p, pixelFont);
       game.numColumns = Math.floor(p.width / game.columnWidth);
-      p.textFont("Arial");
+      p.textFont(pixelFont);
 
       // Setup input handling
       game.setupInput();
