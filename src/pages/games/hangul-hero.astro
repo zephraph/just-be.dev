@@ -173,38 +173,45 @@ import Layout from "../../layouts/default.astro";
     background: linear-gradient(
       90deg,
       var(--cabinet-color),
-      color-mix(in srgb, var(--cabinet-color) 85%, black)
+      color-mix(in srgb, var(--cabinet-color) 85%, black),
+      var(--cabinet-color)
     );
     padding: 1rem;
     border-radius: 0.5rem;
     box-shadow:
-      inset 0 0 10px rgba(0, 0, 0, 0.3),
-      0 2px 4px rgba(0, 0, 0, 0.2);
+      inset 0 2px 8px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 8px rgba(0, 0, 0, 0.2),
+      0 2px 4px rgba(0, 0, 0, 0.15);
     text-align: center;
     position: relative;
     min-height: 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 1.5rem 2rem;
+    border: 1px solid color-mix(in srgb, var(--cabinet-color) 75%, black);
   }
 
   .speaker-grill {
     position: relative;
-    width: 160px;
+    width: 140px;
     height: 100px;
     background: linear-gradient(
-      45deg,
-      color-mix(in srgb, var(--cabinet-color) 95%, black),
-      color-mix(in srgb, var(--cabinet-color) 85%, black)
+      135deg,
+      color-mix(in srgb, var(--cabinet-color) 95%, black) 0%,
+      color-mix(in srgb, var(--cabinet-color) 85%, black) 50%,
+      color-mix(in srgb, var(--cabinet-color) 98%, black) 100%
     );
     border-radius: 4px;
     box-shadow:
-      inset 0 2px 4px rgba(0, 0, 0, 0.5),
-      0 1px 2px rgba(255, 255, 255, 0.1);
+      inset 0 2px 8px rgba(0, 0, 0, 0.5),
+      inset -2px -2px 6px rgba(0, 0, 0, 0.4),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.15),
+      1px 1px 2px rgba(255, 255, 255, 0.1);
     overflow: hidden;
-    margin: -1rem 0 -1rem -2rem;
-    border-radius: 0.5rem;
+    margin: -1rem 0rem -1rem -1.5rem;
+    border-radius: 0.5rem 50% 50% 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--cabinet-color) 65%, black);
   }
 
   .speaker-pattern {
@@ -214,13 +221,24 @@ import Layout from "../../layouts/default.astro";
     width: 100%;
     height: 100%;
     background-image: radial-gradient(
-      circle at center,
-      rgba(0, 0, 0, 0.7) 0,
-      rgba(0, 0, 0, 0.7) 1.5px,
-      transparent 1.5px
-    );
-    background-size: 6px 6px;
-    background-position: 2px 2px;
+        circle at center,
+        rgba(0, 0, 0, 0.7) 0,
+        rgba(0, 0, 0, 0.7) 1.5px,
+        transparent 1.5px
+      ),
+      linear-gradient(
+        135deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.15) 50%,
+        transparent 100%
+      );
+    background-size:
+      6px 6px,
+      100% 100%;
+    background-position:
+      2px 2px,
+      0 0;
+    opacity: 0.85;
   }
 
   .speaker-inner {
