@@ -97,9 +97,7 @@ import Layout from "../../layouts/default.astro";
           </div>
         </div>
         <div class="cabinet-bottom">
-          <div class="control-panel">
-            <div class="instructions">TYPE THE FALLING CHARACTERS</div>
-          </div>
+          <div class="control-panel"></div>
         </div>
       </div>
     </div>
@@ -107,26 +105,72 @@ import Layout from "../../layouts/default.astro";
 </Layout>
 
 <style>
+  :root {
+    --cabinet-color: #d4a5a5;
+  }
+
   .arcade-cabinet {
-    background: linear-gradient(45deg, #2a2a2a, #3a3a3a);
+    background: linear-gradient(
+      45deg,
+      color-mix(in srgb, var(--cabinet-color) 85%, white),
+      var(--cabinet-color)
+    );
     padding: 2rem;
     border-radius: 1rem;
     box-shadow:
-      0 0 0 4px #1a1a1a,
-      0 0 0 8px #3a3a3a,
+      0 0 0 4px color-mix(in srgb, var(--cabinet-color) 85%, black),
+      0 0 0 8px color-mix(in srgb, var(--cabinet-color) 75%, black),
       0 10px 20px rgba(0, 0, 0, 0.5);
-    border: 1px solid #4a4a4a;
+    border: 1px solid color-mix(in srgb, var(--cabinet-color) 65%, black);
+  }
+
+  .arcade-cabinet::before {
+    display: none;
   }
 
   .cabinet-top {
     margin: -2rem -2rem 1rem -2rem;
     padding: 1.5rem;
-    background: linear-gradient(180deg, #1a1a1a, #2a2a2a);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--cabinet-color) 85%, white),
+      var(--cabinet-color)
+    );
     border-radius: 1rem 1rem 0 0;
-    border-bottom: 4px solid #4a4a4a;
+    border-bottom: 4px solid color-mix(in srgb, var(--cabinet-color) 75%, black);
     box-shadow:
-      inset 0 2px 5px rgba(255, 255, 255, 0.1),
+      inset 0 2px 5px rgba(255, 255, 255, 0.2),
       inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .cabinet-bottom {
+    margin: 1rem -2rem -2rem -2rem;
+    padding: 1rem;
+    background: linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--cabinet-color) 85%, white),
+      var(--cabinet-color)
+    );
+    border-radius: 0 0 1rem 1rem;
+    border-top: 4px solid color-mix(in srgb, var(--cabinet-color) 75%, black);
+  }
+
+  .control-panel {
+    background: linear-gradient(
+      90deg,
+      var(--cabinet-color),
+      color-mix(in srgb, var(--cabinet-color) 85%, black)
+    );
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow:
+      inset 0 0 10px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+
+  .control-panel::after {
+    display: none;
   }
 
   .marquee {
@@ -315,32 +359,6 @@ import Layout from "../../layouts/default.astro";
     position: relative;
     overflow: hidden;
     min-height: 400px;
-  }
-
-  .cabinet-bottom {
-    margin: 1rem -2rem -2rem -2rem;
-    padding: 1rem;
-    background: linear-gradient(0deg, #1a1a1a, #2a2a2a);
-    border-radius: 0 0 1rem 1rem;
-    border-top: 4px solid #4a4a4a;
-  }
-
-  .control-panel {
-    background: linear-gradient(90deg, #2a2a2a, #3a3a3a);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow:
-      inset 0 0 10px rgba(0, 0, 0, 0.5),
-      0 2px 4px rgba(0, 0, 0, 0.3);
-    text-align: center;
-  }
-
-  .instructions {
-    font-family: "Bangers", monospace;
-    color: #ffff00;
-    font-size: 1rem;
-    text-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
-    letter-spacing: 0.1em;
   }
 
   #game-container canvas {
