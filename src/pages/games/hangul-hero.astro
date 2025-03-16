@@ -1040,24 +1040,34 @@ import Layout from "../../layouts/default.astro";
       // Helper function to check if a pixel is on the edge
       const isEdgePixel = (i: number, j: number): boolean => {
         if (heartPixels[i][j] === 0) return false;
-        // Check all adjacent pixels (including diagonals)
-        for (let di = -1; di <= 1; di++) {
-          for (let dj = -1; dj <= 1; dj++) {
-            if (di === 0 && dj === 0) continue;
-            const ni = i + di;
-            const nj = j + dj;
-            if (
-              ni >= 0 &&
-              ni < heartPixels.length &&
-              nj >= 0 &&
-              nj < heartPixels[0].length &&
-              heartPixels[ni][nj] === 0
-            ) {
-              return true;
-            }
-          }
-        }
-        return false;
+
+        // A pixel is an edge if it's a filled pixel (1) and it's either:
+        // 1. On the outer border of the array
+        // 2. Has at least one adjacent empty pixel (0)
+        const isOuterBorder =
+          i === 0 ||
+          i === heartPixels.length - 1 ||
+          j === 0 ||
+          j === heartPixels[0].length - 1;
+
+        if (isOuterBorder) return true;
+
+        // Check orthogonal neighbors only (not diagonals)
+        const neighbors = [
+          [i - 1, j], // up
+          [i + 1, j], // down
+          [i, j - 1], // left
+          [i, j + 1], // right
+        ];
+
+        return neighbors.some(
+          ([ni, nj]) =>
+            ni >= 0 &&
+            ni < heartPixels.length &&
+            nj >= 0 &&
+            nj < heartPixels[0].length &&
+            heartPixels[ni][nj] === 0
+        );
       };
 
       this.p.push();
