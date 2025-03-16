@@ -1,362 +1,429 @@
 ---
-import Layout from '../../layouts/default.astro';
+import Layout from "../../layouts/default.astro";
 ---
 
 <Layout title="Hangul Hero - Korean Typing Game">
-	<main class="container mx-auto px-4 py-8">
-		<h1 class="text-4xl font-bold text-center mb-8">Hangul Hero</h1>
-		
-		<div class="max-w-2xl mx-auto">
-			<div class="bg-gray-800 rounded-lg p-4 mb-4">
-				<div class="flex justify-between items-center">
-					<div class="text-white">
-						Score: <span id="score">0</span>
-					</div>
-					<div class="text-white">
-						Lives: <span id="lives">3</span>
-					</div>
-				</div>
-			</div>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-8">Hangul Hero</h1>
 
-			<div id="game-container" class="bg-gray-900 rounded-lg aspect-[4/3] relative overflow-hidden">
-				<div id="falling-chars"></div>
-				<div id="background-chars"></div>
-				<div id="start-text" class="absolute inset-0 flex items-center justify-center text-white text-4xl opacity-30">Click to Start</div>
-				<div id="last-typed" class="absolute bottom-5 left-1/2 transform -translate-x-1/2 text-5xl text-green-500"></div>
-			</div>
-		</div>
-	</main>
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-gray-800 rounded-lg p-4 mb-4">
+        <div class="flex justify-between items-center">
+          <div class="text-white">
+            Score: <span id="score">0</span>
+          </div>
+          <div class="text-white">
+            Lives: <span id="lives">3</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="game-container"
+        class="bg-gray-900 rounded-lg aspect-[4/3] relative overflow-hidden"
+      >
+        <!-- Hidden input for Korean character capture -->
+        <input
+          type="text"
+          id="korean-input"
+          class="opacity-0 absolute -left-[9999px] -top-[9999px]"
+          autocomplete="off"
+          aria-hidden="true"
+        />
+        <!-- p5.js canvas will be inserted here -->
+      </div>
+    </div>
+  </main>
 </Layout>
 
 <style>
-	#game-container {
-		width: 100%;
-		height: 100%;
-		cursor: pointer;
-		position: relative;
-	}
+  #game-container {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    position: relative;
+  }
 
-	#falling-chars, #background-chars {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		width: 100%;
-		height: 100%;
-		pointer-events: none;
-	}
-
-	.falling-char {
-		position: absolute;
-		font-size: 24px;
-		color: white;
-		animation: fall linear forwards;
-		transform: translateX(-50%);
-	}
-
-	.background-char {
-		position: absolute;
-		font-size: 24px;
-		animation: fall-slow linear forwards;
-		transform: translateX(-50%);
-	}
-
-	@keyframes fall {
-		from {
-			transform: translate(-50%, -30px);
-		}
-		to {
-			transform: translate(-50%, calc(100% + 30px));
-		}
-	}
-
-	@keyframes fall-slow {
-		from {
-			transform: translate(-50%, -30px);
-		}
-		to {
-			transform: translate(-50%, calc(100% + 30px));
-		}
-	}
-
-	@keyframes pop {
-		0% {
-			transform: translate(-50%, 0) scale(1);
-			opacity: 1;
-		}
-		50% {
-			transform: translate(-50%, 0) scale(1.5);
-			opacity: 0.5;
-		}
-		100% {
-			transform: translate(-50%, 0) scale(0);
-			opacity: 0;
-		}
-	}
-
-	#start-text {
-		animation: pulse 2s infinite;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		pointer-events: none;
-	}
-
-	@keyframes pulse {
-		0% { opacity: 0.3; }
-		50% { opacity: 1; }
-		100% { opacity: 0.3; }
-	}
+  #game-container canvas {
+    border-radius: 0.5rem;
+  }
 </style>
 
 <script>
-	// Basic Hangul characters (consonants and vowels)
-	const HANGUL_CHARS = [
-		'ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅅ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ',
-		'ㅏ', 'ㅑ', 'ㅓ', 'ㅕ', 'ㅗ', 'ㅛ', 'ㅜ', 'ㅠ', 'ㅡ', 'ㅣ'
-	];
+  import p5 from "p5";
 
-	interface FallingChar {
-		char: string;
-		x: number;
-		y: number;
-		color: string;
-		element: HTMLElement;
-	}
+  // Basic Hangul characters (consonants and vowels)
+  const HANGUL_CHARS = [
+    "ㄱ",
+    "ㄴ",
+    "ㄷ",
+    "ㄹ",
+    "ㅁ",
+    "ㅂ",
+    "ㅅ",
+    "ㅇ",
+    "ㅈ",
+    "ㅊ",
+    "ㅋ",
+    "ㅌ",
+    "ㅍ",
+    "ㅎ",
+    "ㅏ",
+    "ㅑ",
+    "ㅓ",
+    "ㅕ",
+    "ㅗ",
+    "ㅛ",
+    "ㅜ",
+    "ㅠ",
+    "ㅡ",
+    "ㅣ",
+  ];
 
-	class Game {
-		private container: HTMLElement;
-		private fallingCharsContainer: HTMLElement;
-		private backgroundCharsContainer: HTMLElement;
-		private startText: HTMLElement;
-		private lastTypedElement: HTMLElement;
-		private score: number;
-		private lives: number;
-		private isPlaying: boolean;
-		private fallingChars: FallingChar[];
-		private speed: number;
-		private lastTypedChar: string | null;
-		private backgroundChars: FallingChar[];
-		private gameLoopId: number | null;
-		private columnWidth: number;
-		private numColumns: number;
+  class FallingChar {
+    x: number;
+    y: number;
+    char: string;
+    speed: number;
+    isBackground: boolean;
+    color: string;
+    size: number;
+    opacity: number;
+    toDelete: boolean;
 
-		constructor() {
-			this.container = document.getElementById('game-container')!;
-			this.fallingCharsContainer = document.getElementById('falling-chars')!;
-			this.backgroundCharsContainer = document.getElementById('background-chars')!;
-			this.startText = document.getElementById('start-text')!;
-			this.lastTypedElement = document.getElementById('last-typed')!;
-			this.score = 0;
-			this.lives = 3;
-			this.isPlaying = false;
-			this.fallingChars = [];
-			this.backgroundChars = [];
-			this.speed = 1;
-			this.lastTypedChar = null;
-			this.gameLoopId = null;
-			this.columnWidth = 40; // Increased column width
-			this.numColumns = 0; // Will be calculated based on container width
-			
-			this.init();
-		}
+    constructor(x: number, char: string, speed: number, isBackground = false) {
+      this.x = x;
+      this.y = -30;
+      this.char = char;
+      this.speed = speed;
+      this.isBackground = isBackground;
+      this.color = isBackground ? this.getRandomColor() : "#FFFFFF";
+      this.size = isBackground ? 20 : 24;
+      this.opacity = isBackground ? 0.3 : 1;
+      this.toDelete = false;
+    }
 
-		init(): void {
-			// Event listeners
-			this.container.addEventListener('click', () => this.start());
-			document.addEventListener('keydown', (e: KeyboardEvent) => this.handleKeyPress(e));
+    getRandomColor(): string {
+      const colors = [
+        "#FF6B6B",
+        "#4ECDC4",
+        "#45B7D1",
+        "#96CEB4",
+        "#FFEEAD",
+        "#D4A5A5",
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
 
-			// Calculate number of columns based on container width
-			this.numColumns = Math.floor(this.container.clientWidth / this.columnWidth);
+    update(): void {
+      this.y += this.speed;
+    }
 
-			// Start the background animation immediately
-			this.startBackgroundAnimation();
-		}
+    draw(p: p5): void {
+      p.push();
+      p.textSize(this.size);
+      p.textAlign(p.CENTER, p.CENTER);
+      const c = p.color(this.color);
+      c.setAlpha(this.opacity * 255);
+      p.fill(c);
+      p.noStroke();
+      p.text(this.char, this.x, this.y);
+      p.pop();
+    }
+  }
 
-		startBackgroundAnimation(): void {
-			// Create initial background characters for each column
-			for (let col = 0; col < this.numColumns; col++) {
-				// Add 2-3 characters per column
-				const numChars = 2 + Math.floor(Math.random() * 2);
-				for (let i = 0; i < numChars; i++) {
-					this.addBackgroundChar(col);
-				}
-			}
+  class Game {
+    private p: p5;
+    private isPlaying: boolean;
+    private score: number;
+    private lives: number;
+    private fallingChars: FallingChar[];
+    private backgroundChars: FallingChar[];
+    private speed: number;
+    private lastTypedChar: string | null;
+    private lastTypedCharColor: string;
+    private lastTypedCharTime: number;
+    private startTextOpacity: number;
+    private startTextFading: number;
+    public columnWidth: number;
+    public numColumns: number;
+    private minBackgroundSpacing: number;
+    private columnLastY: number[];
 
-			// Start the background animation loop
-			this.gameLoopId = requestAnimationFrame(() => this.updateBackground());
-		}
+    constructor(p: p5) {
+      this.p = p;
+      this.isPlaying = false;
+      this.score = 0;
+      this.lives = 3;
+      this.fallingChars = [];
+      this.backgroundChars = [];
+      this.speed = 2;
+      this.lastTypedChar = null;
+      this.lastTypedCharColor = "#FFFFFF";
+      this.lastTypedCharTime = 0;
+      this.columnWidth = 40;
+      this.numColumns = 0;
+      this.startTextOpacity = 0;
+      this.startTextFading = 1;
+      this.minBackgroundSpacing = 60;
+      this.columnLastY = [];
+    }
 
-		start(): void {
-			if (this.isPlaying) return;
-			
-			this.isPlaying = true;
-			this.score = 0;
-			this.lives = 3;
-			this.fallingChars = [];
-			this.speed = 1;
-			this.startText.style.display = 'none';
-			
-			document.getElementById('score')!.textContent = this.score.toString();
-			document.getElementById('lives')!.textContent = this.lives.toString();
-			
-			// Clear background animation and start game loop
-			if (this.gameLoopId) {
-				cancelAnimationFrame(this.gameLoopId);
-				this.gameLoopId = null;
-			}
-			this.backgroundChars.forEach(char => char.element.remove());
-			this.backgroundChars = [];
-			
-			this.gameLoop();
-		}
+    setupInput(): void {
+      const input = document.getElementById("korean-input") as HTMLInputElement;
+      if (!input) return;
 
-		gameOver(): void {
-			this.isPlaying = false;
-			this.startText.textContent = 'Game Over! Click to Play Again';
-			this.startText.style.display = 'flex';
-			this.fallingChars.forEach(char => char.element.remove());
-			this.fallingChars = [];
-			this.lastTypedElement.textContent = '';
-		}
+      // Focus input when game container is clicked
+      const container = document.getElementById("game-container");
+      if (container) {
+        container.addEventListener("click", () => {
+          input.focus();
+        });
+      }
 
-		gameLoop(): void {
-			if (!this.isPlaying) return;
+      // Handle input events
+      input.addEventListener("input", (e) => {
+        if (!this.isPlaying) return;
 
-			this.update();
-			this.gameLoopId = requestAnimationFrame(() => this.gameLoop());
-		}
+        const char = (e.target as HTMLInputElement).value;
+        if (char) {
+          this.handleKeyPress(char);
+          // Clear the input for the next character
+          (e.target as HTMLInputElement).value = "";
+        }
+      });
 
-		private getRandomColor(): string {
-			const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5'];
-			return colors[Math.floor(Math.random() * colors.length)];
-		}
+      // Keep input focused when typing
+      input.addEventListener("blur", () => {
+        if (this.isPlaying) {
+          input.focus();
+        }
+      });
+    }
 
-		update(): void {
-			if (!this.isPlaying) return;
+    start(): void {
+      if (this.isPlaying) return;
 
-			// Add new falling characters randomly
-			if (Math.random() < 0.01) { // Reduced spawn rate
-				const char = HANGUL_CHARS[Math.floor(Math.random() * HANGUL_CHARS.length)];
-				// Randomly select a column
-				const column = Math.floor(Math.random() * this.numColumns);
-				const x = column * this.columnWidth + (this.columnWidth / 2);
-				const element = document.createElement('div');
-				element.className = 'falling-char';
-				element.textContent = char;
-				element.style.left = `${x}px`;
-				element.style.animationDuration = `${this.speed * 10}s`; // Slower animation
-				
-				this.fallingCharsContainer.appendChild(element);
-				
-				this.fallingChars.push({
-					char,
-					x,
-					y: 0,
-					color: 'white',
-					element
-				});
-			}
+      this.isPlaying = true;
+      this.score = 0;
+      this.lives = 3;
+      this.fallingChars = [];
+      this.speed = 2;
+      this.columnLastY = new Array(this.numColumns).fill(
+        -this.minBackgroundSpacing
+      );
 
-			// Update falling characters
-			this.fallingChars = this.fallingChars.filter(char => {
-				char.y += this.speed;
-				if (char.y >= this.container.clientHeight) {
-					char.element.remove();
-					this.lives--;
-					document.getElementById('lives')!.textContent = this.lives.toString();
-					if (this.lives <= 0) {
-						this.gameOver();
-					}
-					return false;
-				}
-				return true;
-			});
-		}
+      const scoreElement = document.getElementById("score");
+      const livesElement = document.getElementById("lives");
+      if (scoreElement) scoreElement.textContent = this.score.toString();
+      if (livesElement) livesElement.textContent = this.lives.toString();
 
-		updateBackground(): void {
-			if (this.isPlaying) return;
+      // Focus the input when game starts
+      const input = document.getElementById("korean-input") as HTMLInputElement;
+      if (input) {
+        input.focus();
+      }
+    }
 
-			// Add new background characters randomly to each column
-			for (let col = 0; col < this.numColumns; col++) {
-				if (Math.random() < 0.01) { // Reduced spawn rate per column
-					this.addBackgroundChar(col);
-				}
-			}
+    gameOver(): void {
+      this.isPlaying = false;
+      this.fallingChars = [];
+      this.lastTypedChar = null;
+    }
 
-			// Update and filter background characters
-			this.backgroundChars = this.backgroundChars.filter(char => {
-				char.y += 0.5; // Slower speed for background
-				if (char.y >= this.container.clientHeight) {
-					char.element.remove();
-					return false;
-				}
-				return true;
-			});
+    update(): void {
+      // Update start text opacity for pulsing effect
+      this.startTextOpacity += 0.05 * this.startTextFading;
+      if (this.startTextOpacity >= 1) {
+        this.startTextFading = -1;
+      } else if (this.startTextOpacity <= 0.3) {
+        this.startTextFading = 1;
+      }
 
-			this.gameLoopId = requestAnimationFrame(() => this.updateBackground());
-		}
+      if (this.isPlaying) {
+        // Add new falling characters
+        if (this.p.random(1) < 0.02) {
+          const char =
+            HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
+          const column = Math.floor(this.p.random(this.numColumns));
+          const x = column * this.columnWidth + this.columnWidth / 2;
+          this.fallingChars.push(new FallingChar(x, char, this.speed));
+        }
 
-		addBackgroundChar(column: number): void {
-			const char = HANGUL_CHARS[Math.floor(Math.random() * HANGUL_CHARS.length)];
-			// Position character in the specified column
-			const x = column * this.columnWidth + (this.columnWidth / 2);
-			const element = document.createElement('div');
-			element.className = 'background-char';
-			element.textContent = char;
-			element.style.left = `${x}px`;
-			element.style.color = this.getRandomColor();
-			element.style.animationDuration = '20s'; // Much slower for background
-			
-			this.backgroundCharsContainer.appendChild(element);
-			
-			this.backgroundChars.push({
-				char,
-				x,
-				y: 0,
-				color: this.getRandomColor(),
-				element
-			});
-		}
+        // Update and filter falling characters
+        this.fallingChars = this.fallingChars.filter((char) => {
+          char.update();
+          if (char.y >= this.p.height) {
+            if (!char.isBackground) {
+              this.lives--;
+              const livesElement = document.getElementById("lives");
+              if (livesElement)
+                livesElement.textContent = this.lives.toString();
+              if (this.lives <= 0) {
+                this.gameOver();
+              }
+            }
+            return false;
+          }
+          return true;
+        });
+      }
 
-		handleKeyPress(e: KeyboardEvent): void {
-			if (!this.isPlaying) return;
+      // Background characters
+      // Initialize column tracking if not already done
+      if (this.columnLastY.length !== this.numColumns) {
+        this.columnLastY = new Array(this.numColumns).fill(
+          -this.minBackgroundSpacing
+        );
+      }
 
-			const key = e.key.toLowerCase();
-			const charIndex = this.fallingChars.findIndex(char => 
-				char.char.toLowerCase() === key
-			);
+      // Add new background characters with spacing check
+      for (let col = 0; col < this.numColumns; col++) {
+        if (this.p.random(1) < 0.01) {
+          // Check if there's enough space in this column
+          const lastY = this.columnLastY[col];
+          const existingCharsInColumn = this.backgroundChars.filter(
+            (char) =>
+              Math.abs(
+                char.x - (col * this.columnWidth + this.columnWidth / 2)
+              ) < 1
+          );
 
-			if (charIndex !== -1) {
-				this.lastTypedChar = this.fallingChars[charIndex].char;
-				this.lastTypedElement.textContent = this.lastTypedChar;
-				
-				// Add pop animation
-				const element = this.fallingChars[charIndex].element;
-				element.style.animation = 'pop 0.3s ease-out forwards';
-				
-				// Remove element after animation
-				setTimeout(() => {
-					element.remove();
-				}, 300);
-				
-				this.fallingChars.splice(charIndex, 1);
-				this.score += 10;
-				document.getElementById('score')!.textContent = this.score.toString();
-			}
-		}
-	}
+          const nearestCharY = existingCharsInColumn.reduce((nearest, char) => {
+            return char.y < 0 && char.y > nearest ? char.y : nearest;
+          }, -Infinity);
 
-	// Initialize game when the page loads
-	document.addEventListener('DOMContentLoaded', () => {
-		new Game();
-	});
-</script> 
+          if (
+            nearestCharY === -Infinity ||
+            nearestCharY < -this.minBackgroundSpacing
+          ) {
+            const char =
+              HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
+            const x = col * this.columnWidth + this.columnWidth / 2;
+            this.backgroundChars.push(new FallingChar(x, char, 0.5, true));
+            this.columnLastY[col] = -30; // Update last Y position for this column
+          }
+        }
+      }
+
+      // Update background characters and their column positions
+      this.backgroundChars = this.backgroundChars.filter((char) => {
+        char.update();
+        // Update column tracking
+        const col = Math.floor(char.x / this.columnWidth);
+        if (col >= 0 && col < this.numColumns) {
+          this.columnLastY[col] = Math.max(this.columnLastY[col], char.y);
+        }
+        return char.y < this.p.height;
+      });
+    }
+
+    draw(): void {
+      this.p.background(17, 24, 39); // bg-gray-900
+
+      // Draw background characters
+      this.backgroundChars.forEach((char) => char.draw(this.p));
+
+      // Draw falling characters
+      this.fallingChars.forEach((char) => char.draw(this.p));
+
+      // Draw start/game over text
+      if (!this.isPlaying) {
+        this.p.push();
+        this.p.textSize(40);
+        this.p.textAlign(this.p.CENTER, this.p.CENTER);
+        this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+        const text =
+          this.lives <= 0 ? "Game Over! Click to Play Again" : "Click to Start";
+        this.p.text(text, this.p.width / 2, this.p.height / 2);
+        this.p.pop();
+      }
+
+      // Draw last typed character with fade effect
+      if (this.lastTypedChar && this.isPlaying) {
+        const timeSinceTyped = this.p.millis() - this.lastTypedCharTime;
+        const fadeTime = 1000; // Fade out over 1 second
+        if (timeSinceTyped < fadeTime) {
+          this.p.push();
+          this.p.textSize(50);
+          this.p.textAlign(this.p.CENTER, this.p.CENTER);
+          const opacity = this.p.map(timeSinceTyped, 0, fadeTime, 255, 0);
+          const c = this.p.color(this.lastTypedCharColor);
+          c.setAlpha(opacity);
+          this.p.fill(c);
+          this.p.text(this.lastTypedChar, this.p.width / 2, this.p.height - 50);
+          this.p.pop();
+        } else {
+          this.lastTypedChar = null;
+        }
+      }
+    }
+
+    handleKeyPress(key: string): void {
+      if (!this.isPlaying) return;
+
+      const charIndex = this.fallingChars.findIndex(
+        (char) =>
+          char.char.toLowerCase() === key.toLowerCase() && !char.isBackground
+      );
+
+      this.lastTypedChar = key;
+      this.lastTypedCharTime = this.p.millis();
+
+      if (charIndex !== -1) {
+        // Matched a falling character
+        this.lastTypedCharColor = "#22C55E"; // Green color for matches
+        this.fallingChars.splice(charIndex, 1);
+        this.score += 10;
+        const scoreElement = document.getElementById("score");
+        if (scoreElement) scoreElement.textContent = this.score.toString();
+      } else {
+        // No match found
+        this.lastTypedCharColor = "#EF4444"; // Red color for misses
+      }
+    }
+  }
+
+  // Initialize p5.js
+  new p5((p: p5) => {
+    let game: Game;
+    const container = document.getElementById("game-container");
+    if (!container) return;
+
+    p.setup = () => {
+      const canvas = p.createCanvas(
+        container.clientWidth,
+        container.clientWidth * 0.75
+      );
+      canvas.parent(container);
+      game = new Game(p);
+      game.numColumns = Math.floor(p.width / game.columnWidth);
+      p.textFont("Arial");
+
+      // Setup input handling
+      game.setupInput();
+    };
+
+    p.draw = () => {
+      game.update();
+      game.draw();
+    };
+
+    p.mousePressed = () => {
+      if (
+        p.mouseX >= 0 &&
+        p.mouseX < p.width &&
+        p.mouseY >= 0 &&
+        p.mouseY < p.height
+      ) {
+        game.start();
+      }
+    };
+
+    // Handle window resize
+    p.windowResized = () => {
+      p.resizeCanvas(container.clientWidth, container.clientWidth * 0.75);
+      game.numColumns = Math.floor(p.width / game.columnWidth);
+    };
+  });
+</script>
