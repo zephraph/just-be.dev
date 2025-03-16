@@ -113,7 +113,7 @@ import Layout from "../../layouts/default.astro";
 
 <style>
   :root {
-    --cabinet-color: #d4a5a5;
+    --cabinet-color: #c8b2b2;
     --button-color: #4ade80; /* Light green */
     --button-glow: rgba(74, 222, 128, 0.5);
     --button-color-active: #fbbf24; /* Amber/yellow */
@@ -1079,7 +1079,7 @@ import Layout from "../../layouts/default.astro";
 
           // Draw pause text in Korean with colors and wave effect
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
-          this.p.textSize(40);
+          this.p.textSize(60);
           this.p.textFont("Arial"); // Use Arial for Korean pause text
 
           const pauseText = "일시정지";
@@ -1099,12 +1099,12 @@ import Layout from "../../layouts/default.astro";
           // Draw each character with animation
           pauseText.split("").forEach((char, i) => {
             const color = colors[i % colors.length];
-            const yOffset = Math.sin(this.p.millis() / 300 + i * 0.5) * 15; // Wave animation
+            const yOffset = Math.sin(this.p.millis() / 600 + i * 0.5) * 20;
 
             // Outer glow
             const rgb = this.p.color(color);
             this.p.fill(color + "CC"); // Add 80% alpha using hex
-            for (let offset = 3; offset >= 1; offset--) {
+            for (let offset = 4; offset >= 1; offset--) {
               this.p.text(char, currentX, this.p.height / 2 + yOffset - offset);
               this.p.text(char, currentX, this.p.height / 2 + yOffset + offset);
               this.p.text(char, currentX - offset, this.p.height / 2 + yOffset);
@@ -1118,46 +1118,94 @@ import Layout from "../../layouts/default.astro";
             currentX += this.p.textWidth(char);
           });
 
-          // Subtitle with flashing effect and special glow for "SPACE"
+          // Subtitle with flashing effect and special glow for button text
           this.p.textSize(20);
           this.p.textFont(this.pixelFont);
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
 
           const pressText = "PRESS ";
-          const spaceText = "SPACE";
+          const buttonText = "시작";
           const toResumeText = " TO RESUME";
 
           // Calculate total width for centering
           const resumeTextWidth = this.p.textWidth(
-            pressText + spaceText + toResumeText
+            pressText + buttonText + toResumeText
           );
           const startX = this.p.width / 2 - resumeTextWidth / 2;
 
           this.p.textAlign(this.p.LEFT, this.p.CENTER);
 
+          // Increased spacing by moving the subtitle down a bit more
+          const subtitleY = this.p.height / 2 + 80; // Increased from 60 to 80
+
           // Draw "PRESS" with normal opacity
           this.p.fill(255, 255, 255, this.pauseTextOpacity * 255);
-          this.p.text(pressText, startX, this.p.height / 2 + 60);
+          this.p.text(pressText, startX, subtitleY);
 
-          // Draw "SPACE" with cyan glow
-          const spaceX = startX + this.p.textWidth(pressText);
+          // Draw button text with arcade button glow effect
+          const buttonX = startX + this.p.textWidth(pressText);
 
-          // Outer cyan glow
-          this.p.fill(0, 255, 255, this.pauseTextOpacity * 80);
-          this.p.text(spaceText, spaceX - 1, this.p.height / 2 + 59);
-          this.p.text(spaceText, spaceX + 1, this.p.height / 2 + 61);
+          // Switch to Arial for Korean text
+          this.p.textFont("Arial");
 
-          // Inner cyan text
-          this.p.fill(0, 255, 255, this.pauseTextOpacity * 255);
-          this.p.text(spaceText, spaceX, this.p.height / 2 + 60);
+          // Calculate button dimensions
+          const buttonPadding = 10;
+          const buttonHeight = 30;
+          const buttonWidth = this.p.textWidth(buttonText) + buttonPadding * 2;
+          const buttonY = subtitleY - buttonHeight / 2;
+
+          // Draw button base (shadow)
+          this.p.fill(44, 132, 76, this.pauseTextOpacity * 255); // Darker green
+          this.p.noStroke();
+          this.p.rect(buttonX, buttonY + 4, buttonWidth, buttonHeight, 6);
+
+          // Draw button surface
+          this.p.fill(74, 222, 128, this.pauseTextOpacity * 255); // Light green
+          this.p.rect(buttonX, buttonY, buttonWidth, buttonHeight, 6);
+
+          // Add highlight to button
+          const gradientHeight = buttonHeight * 0.4;
+          this.p.fill(255, 255, 255, this.pauseTextOpacity * 40);
+          this.p.rect(
+            buttonX,
+            buttonY,
+            buttonWidth,
+            gradientHeight,
+            6,
+            6,
+            0,
+            0
+          );
+
+          // Outer button glow
+          this.p.fill(74, 222, 128, this.pauseTextOpacity * 80); // Light green glow
+          for (let offset = 2; offset >= 1; offset--) {
+            this.p.text(
+              buttonText,
+              buttonX + buttonPadding - offset,
+              buttonY + buttonHeight / 2 + 4 - offset
+            );
+            this.p.text(
+              buttonText,
+              buttonX + buttonPadding + offset,
+              buttonY + buttonHeight / 2 + 4 + offset
+            );
+          }
+
+          // Inner button text
+          this.p.fill(255, 255, 255, this.pauseTextOpacity * 255);
+          this.p.text(
+            buttonText,
+            buttonX + buttonPadding,
+            buttonY + buttonHeight / 2 + 4
+          );
+
+          // Switch back to pixel font for the rest
+          this.p.textFont(this.pixelFont);
 
           // Draw "TO RESUME" with normal opacity
           this.p.fill(255, 255, 255, this.pauseTextOpacity * 255);
-          this.p.text(
-            toResumeText,
-            spaceX + this.p.textWidth(spaceText),
-            this.p.height / 2 + 60
-          );
+          this.p.text(toResumeText, buttonX + buttonWidth + 5, subtitleY);
 
           this.p.pop();
         }
