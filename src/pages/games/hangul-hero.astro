@@ -149,6 +149,14 @@ import Layout from "../../layouts/default.astro";
     public numColumns: number;
     private minBackgroundSpacing: number;
     private columnLastY: number[];
+    // New properties for difficulty progression
+    private gameStartTime: number;
+    private lastSpawnTime: number;
+    private initialSpawnInterval: number;
+    private minSpawnInterval: number;
+    private maxActiveChars: number;
+    private initialSpeed: number;
+    private maxSpeed: number;
 
     constructor(p: p5) {
       this.p = p;
@@ -157,7 +165,7 @@ import Layout from "../../layouts/default.astro";
       this.lives = 3;
       this.fallingChars = [];
       this.backgroundChars = [];
-      this.speed = 2;
+      this.speed = 1; // Reduced initial speed
       this.lastTypedChar = null;
       this.lastTypedCharColor = "#FFFFFF";
       this.lastTypedCharTime = 0;
@@ -167,6 +175,14 @@ import Layout from "../../layouts/default.astro";
       this.startTextFading = 1;
       this.minBackgroundSpacing = 60;
       this.columnLastY = [];
+      // Initialize new difficulty properties
+      this.gameStartTime = 0;
+      this.lastSpawnTime = 0;
+      this.initialSpawnInterval = 3000; // Start with 3 seconds between spawns
+      this.minSpawnInterval = 500; // Minimum 0.5 seconds between spawns
+      this.maxActiveChars = 1; // Start with max 1 character
+      this.initialSpeed = 1;
+      this.maxSpeed = 4;
     }
 
     setupInput(): void {
@@ -208,10 +224,12 @@ import Layout from "../../layouts/default.astro";
       this.score = 0;
       this.lives = 3;
       this.fallingChars = [];
-      this.speed = 2;
+      this.speed = this.initialSpeed;
       this.columnLastY = new Array(this.numColumns).fill(
         -this.minBackgroundSpacing
       );
+      this.gameStartTime = this.p.millis();
+      this.lastSpawnTime = this.gameStartTime;
 
       const scoreElement = document.getElementById("score");
       const livesElement = document.getElementById("lives");
@@ -231,6 +249,27 @@ import Layout from "../../layouts/default.astro";
       this.lastTypedChar = null;
     }
 
+    private calculateDifficulty(): void {
+      const gameTime = this.p.millis() - this.gameStartTime;
+      const minutes = gameTime / 60000; // Convert to minutes
+
+      // Gradually increase speed based on time
+      this.speed = Math.min(this.maxSpeed, this.initialSpeed + minutes * 0.5);
+
+      // Gradually increase max active characters
+      this.maxActiveChars = Math.min(5, 1 + Math.floor(minutes));
+
+      // Calculate current spawn interval
+      const spawnIntervalDecrease = Math.min(
+        this.initialSpawnInterval - this.minSpawnInterval,
+        minutes * 500
+      );
+      this.initialSpawnInterval = Math.max(
+        this.initialSpawnInterval - spawnIntervalDecrease,
+        this.minSpawnInterval
+      );
+    }
+
     update(): void {
       // Update start text opacity for pulsing effect
       this.startTextOpacity += 0.05 * this.startTextFading;
@@ -241,13 +280,20 @@ import Layout from "../../layouts/default.astro";
       }
 
       if (this.isPlaying) {
-        // Add new falling characters
-        if (this.p.random(1) < 0.02) {
+        this.calculateDifficulty();
+
+        // Add new falling characters based on current difficulty
+        const currentTime = this.p.millis();
+        if (
+          this.fallingChars.length < this.maxActiveChars &&
+          currentTime - this.lastSpawnTime >= this.initialSpawnInterval
+        ) {
           const char =
             HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
           const column = Math.floor(this.p.random(this.numColumns));
           const x = column * this.columnWidth + this.columnWidth / 2;
           this.fallingChars.push(new FallingChar(x, char, this.speed));
+          this.lastSpawnTime = currentTime;
         }
 
         // Update and filter falling characters
