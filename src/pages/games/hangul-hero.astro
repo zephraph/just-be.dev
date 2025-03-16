@@ -1103,8 +1103,8 @@ import Layout from "../../layouts/default.astro";
 
             // Outer glow
             const rgb = this.p.color(color);
-            this.p.fill(color + "CC"); // Add 80% alpha using hex
-            for (let offset = 4; offset >= 1; offset--) {
+            this.p.fill(color + "99"); // Reduce to 60% alpha
+            for (let offset = 3; offset >= 1; offset--) {
               this.p.text(char, currentX, this.p.height / 2 + yOffset - offset);
               this.p.text(char, currentX, this.p.height / 2 + yOffset + offset);
               this.p.text(char, currentX - offset, this.p.height / 2 + yOffset);
@@ -1112,10 +1112,12 @@ import Layout from "../../layouts/default.astro";
             }
 
             // Main character
-            this.p.fill(color);
+            this.p.fill(255, 255, 255);
+            this.p.text(char, currentX, this.p.height / 2 + yOffset);
+            this.p.fill(color + "FF");
             this.p.text(char, currentX, this.p.height / 2 + yOffset);
 
-            currentX += this.p.textWidth(char);
+            currentX += this.p.textWidth(char) + 5; // Add small spacing between characters
           });
 
           // Subtitle with flashing effect and special glow for button text
@@ -1251,23 +1253,21 @@ import Layout from "../../layouts/default.astro";
           const chars = titleText.split("");
           let totalWidth = 0;
           chars.forEach((char) => {
-            // Use appropriate font for Korean/English characters
             if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char)) {
               this.p.textFont("Arial");
             } else {
               this.p.textFont(this.pixelFont);
             }
-            totalWidth += this.p.textWidth(char);
+            totalWidth += this.p.textWidth(char) + 5; // Account for spacing in width calculation
           });
 
-          let currentX = this.p.width / 2 - totalWidth / 2 + 40;
+          let currentX = this.p.width / 2 - totalWidth / 2 + 46;
 
           // Draw each character with animation
           chars.forEach((char, i) => {
             const color = colors[i % colors.length];
             const yOffset = Math.sin(this.p.millis() / 600 + i * 0.5) * 20;
 
-            // Use appropriate font for each character
             if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char)) {
               this.p.textFont("Arial");
             } else {
@@ -1275,8 +1275,8 @@ import Layout from "../../layouts/default.astro";
             }
 
             // Outer glow
-            this.p.fill(color + "CC");
-            for (let offset = 4; offset >= 1; offset--) {
+            this.p.fill(color + "99");
+            for (let offset = 3; offset >= 1; offset--) {
               this.p.text(
                 char,
                 currentX,
@@ -1300,11 +1300,12 @@ import Layout from "../../layouts/default.astro";
             }
 
             // Main character
-            this.p.fill(color);
+            this.p.fill(255, 255, 255);
+            this.p.text(char, currentX, this.p.height / 2 - 20 + yOffset);
+            this.p.fill(color + "FF");
             this.p.text(char, currentX, this.p.height / 2 - 20 + yOffset);
 
-            // Update x position for next character
-            currentX += this.p.textWidth(char);
+            currentX += this.p.textWidth(char) + 5; // Add small spacing between characters
           });
         }
 
