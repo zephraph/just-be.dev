@@ -589,6 +589,11 @@ import Layout from "../../layouts/default.astro";
     "ㅣ",
   ];
 
+  // Helper function to check if a character is Hangul
+  function isHangul(char: string): boolean {
+    return /[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char);
+  }
+
   class FallingChar {
     x: number;
     y: number;
@@ -642,7 +647,7 @@ import Layout from "../../layouts/default.astro";
       p.textAlign(p.CENTER, p.CENTER);
 
       // Use Arial for Korean characters
-      if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(this.char)) {
+      if (isHangul(this.char)) {
         p.textFont("Arial");
       } else {
         p.textFont(this.pixelFont);
@@ -1253,7 +1258,7 @@ import Layout from "../../layouts/default.astro";
           const chars = titleText.split("");
           let totalWidth = 0;
           chars.forEach((char) => {
-            if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char)) {
+            if (isHangul(char)) {
               this.p.textFont("Arial");
             } else {
               this.p.textFont(this.pixelFont);
@@ -1261,14 +1266,15 @@ import Layout from "../../layouts/default.astro";
             totalWidth += this.p.textWidth(char) + 5; // Account for spacing in width calculation
           });
 
-          let currentX = this.p.width / 2 - totalWidth / 2 + 46;
+          let currentX = this.p.width / 2 - totalWidth / 2;
 
           // Draw each character with animation
           chars.forEach((char, i) => {
             const color = colors[i % colors.length];
             const yOffset = Math.sin(this.p.millis() / 600 + i * 0.5) * 20;
+            const xOffset = isHangul(char) ? 60 : 26;
 
-            if (/[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(char)) {
+            if (isHangul(char)) {
               this.p.textFont("Arial");
             } else {
               this.p.textFont(this.pixelFont);
@@ -1279,31 +1285,39 @@ import Layout from "../../layouts/default.astro";
             for (let offset = 3; offset >= 1; offset--) {
               this.p.text(
                 char,
-                currentX,
+                currentX + xOffset,
                 this.p.height / 2 - 20 + yOffset - offset
               );
               this.p.text(
                 char,
-                currentX,
+                currentX + xOffset,
                 this.p.height / 2 - 20 + yOffset + offset
               );
               this.p.text(
                 char,
-                currentX - offset,
+                currentX + xOffset - offset,
                 this.p.height / 2 - 20 + yOffset
               );
               this.p.text(
                 char,
-                currentX + offset,
+                currentX + xOffset + offset,
                 this.p.height / 2 - 20 + yOffset
               );
             }
 
             // Main character
             this.p.fill(255, 255, 255);
-            this.p.text(char, currentX, this.p.height / 2 - 20 + yOffset);
+            this.p.text(
+              char,
+              currentX + xOffset,
+              this.p.height / 2 - 20 + yOffset
+            );
             this.p.fill(color + "FF");
-            this.p.text(char, currentX, this.p.height / 2 - 20 + yOffset);
+            this.p.text(
+              char,
+              currentX + xOffset,
+              this.p.height / 2 - 20 + yOffset
+            );
 
             currentX += this.p.textWidth(char) + 5; // Add small spacing between characters
           });
@@ -1403,9 +1417,7 @@ import Layout from "../../layouts/default.astro";
           const opacity = this.p.map(timeSinceTyped, 0, fadeTime, 255, 0);
 
           // Use Arial for Korean characters
-          if (
-            /[\u3131-\u314E\u314F-\u3163\uAC00-\uD7A3]/.test(this.lastTypedChar)
-          ) {
+          if (isHangul(this.lastTypedChar)) {
             this.p.textFont("Arial");
           } else {
             this.p.textFont(this.pixelFont);
