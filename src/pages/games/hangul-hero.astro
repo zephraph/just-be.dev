@@ -763,12 +763,17 @@ import Layout from "../../layouts/default.astro";
     opacity: number;
     toDelete: boolean;
     koreanPixelFont: p5.Font;
+    isGrowing: boolean;
+    growthStartTime: number;
+    growthDuration: number;
+    private p: p5;
 
     constructor(
       x: number,
       char: string,
       speed: number,
       koreanPixelFont: p5.Font,
+      p: p5,
       isBackground = false
     ) {
       this.x = x;
@@ -781,6 +786,10 @@ import Layout from "../../layouts/default.astro";
       this.opacity = isBackground ? 0.3 : 1;
       this.toDelete = false;
       this.koreanPixelFont = koreanPixelFont;
+      this.isGrowing = false;
+      this.growthStartTime = 0;
+      this.growthDuration = 200; // Duration of growth animation in ms
+      this.p = p;
     }
 
     getRandomColor(): string {
@@ -797,6 +806,32 @@ import Layout from "../../layouts/default.astro";
 
     update(): void {
       this.y += this.speed;
+
+      if (this.isGrowing) {
+        const currentTime = performance.now();
+        const elapsed = currentTime - this.growthStartTime;
+        const progress = Math.min(elapsed / this.growthDuration, 1);
+
+        // Ease out cubic function for smooth growth
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        this.size = 32 + easedProgress * 48; // Grow from 32 to 80
+
+        // Interpolate color to green
+        const startColor = this.p.color(this.color);
+        const endColor = this.p.color("#00ff00");
+        this.color = this.p
+          .lerpColor(startColor, endColor, easedProgress)
+          .toString();
+
+        if (progress >= 1) {
+          this.toDelete = true;
+        }
+      }
+    }
+
+    startGrowth(): void {
+      this.isGrowing = true;
+      this.growthStartTime = performance.now();
     }
 
     draw(p: p5): void {
@@ -1313,7 +1348,7 @@ import Layout from "../../layouts/default.astro";
           const column = Math.floor(this.p.random(this.numColumns));
           const x = column * this.columnWidth + this.columnWidth / 2;
           this.fallingChars.push(
-            new FallingChar(x, char, this.speed, this.koreanPixelFont)
+            new FallingChar(x, char, this.speed, this.koreanPixelFont, this.p)
           );
           this.lastSpawnTime = currentTime;
         }
@@ -1325,20 +1360,27 @@ import Layout from "../../layouts/default.astro";
       // Update falling characters and handle life loss
       this.fallingChars = this.fallingChars.filter((char) => {
         char.update();
-        if (char.y >= this.p.height) {
+        if (char.y >= this.p.height || char.toDelete) {
           if (!char.isBackground) {
             if (this.isPlaying) {
-              // Set the lost character for the current life
-              if (this.lives > 0 && this.lives <= this.lifeCharacters.length) {
-                this.lifeCharacters[this.lives - 1].setLostChar(char.char);
+              // Only count as a miss if the character hit the bottom (not a successful hit)
+              if (char.y >= this.p.height) {
+                // Set the lost character for the current life
+                if (
+                  this.lives > 0 &&
+                  this.lives <= this.lifeCharacters.length
+                ) {
+                  this.lifeCharacters[this.lives - 1].setLostChar(char.char);
+                }
+                this.lives--;
+                if (this.lives <= 0) {
+                  this.gameOver();
+                }
+                this.startFlashEffect();
               }
-              this.lives--;
-              if (this.lives <= 0) {
-                this.gameOver();
-              }
-              this.startFlashEffect();
+              // Create explosion for both successful hits and misses
+              this.createExplosion(char.x, char.y, char.char);
             }
-            this.createExplosion(char.x, this.p.height, char.char);
           }
           return false;
         }
@@ -1380,7 +1422,7 @@ import Layout from "../../layouts/default.astro";
               HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
             const x = col * this.columnWidth + this.columnWidth / 2;
             this.backgroundChars.push(
-              new FallingChar(x, char, 0.5, this.koreanPixelFont, true)
+              new FallingChar(x, char, 0.5, this.koreanPixelFont, this.p, true)
             );
             this.columnLastY[col] = -30; // Update last Y position for this column
           }
@@ -1961,7 +2003,8 @@ import Layout from "../../layouts/default.astro";
       if (charIndex !== -1) {
         // Matched a falling character - use neon colors for success
         this.lastTypedCharColor = "#00ff00";
-        this.fallingChars.splice(charIndex, 1);
+        const matchedChar = this.fallingChars[charIndex];
+        matchedChar.startGrowth(); // Start the growth animation
         this.score += 10;
       } else {
         // No match found - use hot pink for errors and reduce score
