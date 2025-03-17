@@ -262,10 +262,10 @@ import Layout from "../../layouts/default.astro";
     padding: 4px 6px 4px 4px;
     box-shadow:
       inset 0 2px 4px rgba(255, 255, 255, 0.8),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.2),
-      0 4px 8px rgba(0, 0, 0, 0.3);
+      inset 0 -2px 4px rgba(0, 0, 0, 0.2);
     border: 2px solid color-mix(in srgb, var(--cabinet-color) 75%, black);
     transform: translateZ(5px);
+    transition: box-shadow 0.1s;
   }
 
   .button-mount::before {
@@ -300,18 +300,22 @@ import Layout from "../../layouts/default.astro";
     z-index: 0;
   }
 
-  .arcade-start-button {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    outline: none;
-    padding: 0;
-    transform-style: preserve-3d;
-    transform: translateZ(15px);
-    z-index: 1;
+  .arcade-start-button:active + .button-mount {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.8),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .arcade-start-button.active + .button-mount {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.8),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .arcade-start-button.active:active + .button-mount {
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.8),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.2);
   }
 
   .button-trim {
@@ -326,6 +330,20 @@ import Layout from "../../layouts/default.astro";
       0 4px 8px rgba(0, 0, 0, 0.4),
       0 8px 16px rgba(0, 0, 0, 0.3);
     transform: translateZ(10px);
+  }
+
+  .arcade-start-button {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    transform-style: preserve-3d;
+    transform: translateZ(15px);
+    z-index: 1;
   }
 
   .arcade-start-button:active .button-surface {
@@ -356,9 +374,9 @@ import Layout from "../../layouts/default.astro";
       box-shadow 0.1s,
       background 0.3s;
     box-shadow:
-      0 0 20px var(--button-glow),
-      0 0 40px var(--button-glow),
+      0 0 30px var(--button-glow),
       0 0 60px var(--button-glow),
+      0 0 90px var(--button-glow),
       inset 0 0 15px rgba(255, 255, 255, 0.8),
       inset 2px 2px 2px rgba(255, 255, 255, 0.5),
       inset -2px -2px 2px rgba(0, 0, 0, 0.3),
@@ -664,9 +682,9 @@ import Layout from "../../layouts/default.astro";
       color-mix(in srgb, var(--button-color-active) 85%, black)
     );
     box-shadow:
-      0 0 20px var(--button-glow-active),
-      0 0 40px var(--button-glow-active),
+      0 0 30px var(--button-glow-active),
       0 0 60px var(--button-glow-active),
+      0 0 90px var(--button-glow-active),
       inset 0 0 15px rgba(255, 255, 255, 0.8),
       inset 2px 2px 2px rgba(255, 255, 255, 0.5),
       inset -2px -2px 2px rgba(0, 0, 0, 0.3);
@@ -682,6 +700,18 @@ import Layout from "../../layouts/default.astro";
 
   .arcade-start-button.active .button-base {
     background: color-mix(in srgb, var(--button-color-active) 85%, black);
+  }
+
+  .arcade-start-button:active .button-trim {
+    box-shadow:
+      inset 0 0 10px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .arcade-start-button.active:active .button-trim {
+    box-shadow:
+      inset 0 0 10px rgba(0, 0, 0, 0.5),
+      0 2px 4px rgba(0, 0, 0, 0.2);
   }
 </style>
 
