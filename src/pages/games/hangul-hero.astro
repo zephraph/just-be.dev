@@ -321,7 +321,7 @@ import Layout from "../../layouts/default.astro";
   .button-text {
     color: white;
     font-family: Arial, sans-serif;
-    font-size: 20px;
+    font-size: 32px;
     font-weight: 800;
     text-shadow:
       0 0 5px rgba(255, 255, 255, 0.8),
@@ -663,13 +663,13 @@ import Layout from "../../layouts/default.astro";
     size: number;
     opacity: number;
     toDelete: boolean;
-    pixelFont: p5.Font;
+    koreanPixelFont: p5.Font;
 
     constructor(
       x: number,
       char: string,
       speed: number,
-      pixelFont: p5.Font,
+      koreanPixelFont: p5.Font,
       isBackground = false
     ) {
       this.x = x;
@@ -681,7 +681,7 @@ import Layout from "../../layouts/default.astro";
       this.size = isBackground ? 20 : 24;
       this.opacity = isBackground ? 0.3 : 1;
       this.toDelete = false;
-      this.pixelFont = pixelFont;
+      this.koreanPixelFont = koreanPixelFont;
     }
 
     getRandomColor(): string {
@@ -704,13 +704,8 @@ import Layout from "../../layouts/default.astro";
       p.push();
       p.textSize(this.size);
       p.textAlign(p.CENTER, p.CENTER);
-
-      // Use Arial for Korean characters
-      if (isHangul(this.char)) {
-        p.textFont("Arial");
-      } else {
-        p.textFont(this.pixelFont);
-      }
+      p.textStyle(p.BOLD);
+      p.textFont(this.koreanPixelFont);
 
       // Draw outer glow
       if (!this.isBackground) {
@@ -765,7 +760,6 @@ import Layout from "../../layouts/default.astro";
     public numColumns: number;
     private minBackgroundSpacing: number;
     private columnLastY: number[];
-    // New properties for difficulty progression
     private gameStartTime: number;
     private lastSpawnTime: number;
     private initialSpawnInterval: number;
@@ -776,10 +770,12 @@ import Layout from "../../layouts/default.astro";
     private pauseTextOpacity: number;
     private pauseTextFading: number;
     private pixelFont: p5.Font;
+    private koreanPixelFont: p5.Font;
 
-    constructor(p: p5, pixelFont: p5.Font) {
+    constructor(p: p5, pixelFont: p5.Font, koreanPixelFont: p5.Font) {
       this.p = p;
       this.pixelFont = pixelFont;
+      this.koreanPixelFont = koreanPixelFont;
       this.isPlaying = false;
       this.isPaused = false;
       this.score = 0;
@@ -796,7 +792,6 @@ import Layout from "../../layouts/default.astro";
       this.startTextFading = 1;
       this.minBackgroundSpacing = 60;
       this.columnLastY = [];
-      // Initialize new difficulty properties
       this.gameStartTime = 0;
       this.lastSpawnTime = 0;
       this.initialSpawnInterval = 3000; // Start with 3 seconds between spawns
@@ -955,7 +950,7 @@ import Layout from "../../layouts/default.astro";
           const column = Math.floor(this.p.random(this.numColumns));
           const x = column * this.columnWidth + this.columnWidth / 2;
           this.fallingChars.push(
-            new FallingChar(x, char, this.speed, this.pixelFont)
+            new FallingChar(x, char, this.speed, this.koreanPixelFont)
           );
           this.lastSpawnTime = currentTime;
         }
@@ -1008,7 +1003,7 @@ import Layout from "../../layouts/default.astro";
               HANGUL_CHARS[Math.floor(this.p.random(HANGUL_CHARS.length))];
             const x = col * this.columnWidth + this.columnWidth / 2;
             this.backgroundChars.push(
-              new FallingChar(x, char, 0.5, this.pixelFont, true)
+              new FallingChar(x, char, 0.5, this.koreanPixelFont, true)
             );
             this.columnLastY[col] = -30; // Update last Y position for this column
           }
@@ -1194,7 +1189,8 @@ import Layout from "../../layouts/default.astro";
           // Draw pause text in Korean with colors and wave effect
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
           this.p.textSize(60);
-          this.p.textFont("Arial"); // Use Arial for Korean pause text
+          this.p.textFont(this.koreanPixelFont); // Use koreanPixelFont for Korean pause text
+          this.p.textStyle(this.p.BOLD);
 
           const pauseText = "일시정지";
           const colors = [
@@ -1261,8 +1257,9 @@ import Layout from "../../layouts/default.astro";
           // Draw button text with arcade button glow effect
           const buttonX = startX + this.p.textWidth(pressText);
 
-          // Switch to Arial for Korean text
+          // Use Arial for Korean button text
           this.p.textFont("Arial");
+          this.p.textStyle(this.p.BOLD);
 
           // Calculate button dimensions
           const buttonPadding = 10;
@@ -1313,13 +1310,11 @@ import Layout from "../../layouts/default.astro";
           this.p.text(
             buttonText,
             buttonX + buttonPadding,
-            buttonY + buttonHeight / 2 + 4
+            buttonY + buttonHeight / 2
           );
 
-          // Switch back to pixel font for the rest
-          this.p.textFont(this.pixelFont);
-
           // Draw "TO RESUME" with normal opacity
+          this.p.textFont(this.pixelFont);
           this.p.fill(255, 255, 255, this.pauseTextOpacity * 255);
           this.p.text(toResumeText, buttonX + buttonWidth + 5, subtitleY);
 
@@ -1455,8 +1450,9 @@ import Layout from "../../layouts/default.astro";
         // Draw button text with arcade button glow effect
         const buttonX = startX + this.p.textWidth(pressText);
 
-        // Switch to Arial for Korean text
+        // Use Arial for Korean button text
         this.p.textFont("Arial");
+        this.p.textStyle(this.p.BOLD);
 
         // Calculate button dimensions
         const buttonPadding = 10;
@@ -1498,13 +1494,11 @@ import Layout from "../../layouts/default.astro";
         this.p.text(
           buttonText,
           buttonX + buttonPadding,
-          buttonY + buttonHeight / 2 + 4
+          buttonY + buttonHeight / 2
         );
 
-        // Switch back to pixel font for the rest
-        this.p.textFont(this.pixelFont);
-
         // Draw "TO START/RESTART" with normal opacity
+        this.p.textFont(this.pixelFont);
         this.p.fill(255, 255, 255, this.startTextOpacity * 255);
         this.p.text(
           toStartText,
@@ -1525,9 +1519,10 @@ import Layout from "../../layouts/default.astro";
           this.p.textAlign(this.p.CENTER, this.p.CENTER);
           const opacity = this.p.map(timeSinceTyped, 0, fadeTime, 255, 0);
 
-          // Use Arial for Korean characters
+          // Use koreanPixelFont for Korean characters
           if (isHangul(this.lastTypedChar)) {
-            this.p.textFont("Arial");
+            this.p.textFont(this.koreanPixelFont);
+            this.p.textStyle(this.p.BOLD);
           } else {
             this.p.textFont(this.pixelFont);
           }
@@ -1593,11 +1588,13 @@ import Layout from "../../layouts/default.astro";
   new p5((p: p5) => {
     let game: Game;
     let pixelFont: p5.Font;
+    let koreanPixelFont: p5.Font;
     const container = document.getElementById("game-container");
     if (!container) return;
 
     p.preload = () => {
       pixelFont = p.loadFont("/fonts/PressStart2P-Regular.ttf");
+      koreanPixelFont = p.loadFont("/fonts/UnifontExMono.ttf");
     };
 
     p.setup = () => {
@@ -1606,7 +1603,7 @@ import Layout from "../../layouts/default.astro";
         container.clientWidth * 0.75
       );
       canvas.parent(container);
-      game = new Game(p, pixelFont);
+      game = new Game(p, pixelFont, koreanPixelFont);
       game.numColumns = Math.floor(p.width / game.columnWidth);
       p.textFont(pixelFont);
 
