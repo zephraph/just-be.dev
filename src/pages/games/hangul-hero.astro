@@ -1395,7 +1395,7 @@ import Layout from "../../layouts/default.astro";
         if (col >= 0 && col < this.numColumns) {
           this.columnLastY[col] = Math.max(this.columnLastY[col], char.y);
         }
-        return char.y < this.p.height;
+        return char.y < this.p.height + 30; // Allow characters to go slightly below screen before being removed
       });
 
       // Update flash effect
