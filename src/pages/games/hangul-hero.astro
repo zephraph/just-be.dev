@@ -88,7 +88,7 @@ import Layout from "../../layouts/default.astro";
                 <input
                   type="text"
                   id="korean-input"
-                  class="opacity-0 fixed -left-[9999px] -top-[9999px]"
+                  class="opacity-0 absolute pointer-events-none w-0 h-0 overflow-hidden"
                   autocomplete="off"
                   aria-hidden="true"
                 />
@@ -742,6 +742,47 @@ import Layout from "../../layouts/default.astro";
     }
   }
 
+  class ScoreAnimation {
+    x: number;
+    y: number;
+    opacity: number;
+    startTime: number;
+    duration: number;
+    text: string;
+
+    constructor(x: number, y: number, text: string) {
+      this.x = x + 54;
+      this.y = y;
+      this.opacity = 1;
+      this.startTime = performance.now();
+      this.duration = 1000; // Animation duration in milliseconds
+      this.text = text;
+    }
+
+    update(): boolean {
+      const elapsed = performance.now() - this.startTime;
+      const progress = elapsed / this.duration;
+
+      if (progress >= 1) {
+        return false; // Animation is complete
+      }
+
+      this.opacity = 1 - progress;
+      this.y -= 1; // Move upward
+      return true;
+    }
+
+    draw(p: p5, font: p5.Font): void {
+      p.push();
+      p.textFont(font);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textSize(16);
+      p.fill(255, 0, 0, this.opacity * 255);
+      p.text(this.text, this.x, this.y);
+      p.pop();
+    }
+  }
+
   class Game {
     private p: p5;
     public isPlaying: boolean;
@@ -771,6 +812,10 @@ import Layout from "../../layouts/default.astro";
     private pauseTextFading: number;
     private pixelFont: p5.Font;
     private koreanPixelFont: p5.Font;
+    private scoreAnimations: ScoreAnimation[];
+    private scoreColor: p5.Color;
+    private scoreColorTransitionStart: number;
+    private scoreColorTransitionDuration: number;
 
     constructor(p: p5, pixelFont: p5.Font, koreanPixelFont: p5.Font) {
       this.p = p;
@@ -801,6 +846,10 @@ import Layout from "../../layouts/default.astro";
       this.maxSpeed = 4;
       this.pauseTextOpacity = 0.3;
       this.pauseTextFading = 1;
+      this.scoreAnimations = [];
+      this.scoreColor = p.color("#96CEB4"); // Initialize as p5.Color
+      this.scoreColorTransitionStart = 0;
+      this.scoreColorTransitionDuration = 500; // 500ms for color transition
     }
 
     setupInput(): void {
@@ -819,7 +868,7 @@ import Layout from "../../layouts/default.astro";
       const container = document.getElementById("game-container");
       if (container) {
         container.addEventListener("click", () => {
-          input.focus();
+          input.focus({ preventScroll: true });
         });
       }
 
@@ -838,7 +887,7 @@ import Layout from "../../layouts/default.astro";
       // Keep input focused when typing
       input.addEventListener("blur", () => {
         if (this.isPlaying && !this.isPaused) {
-          input.focus();
+          input.focus({ preventScroll: true });
         }
       });
     }
@@ -851,7 +900,7 @@ import Layout from "../../layouts/default.astro";
         input?.blur(); // Remove focus from input when paused
         startButton?.classList.remove("active");
       } else {
-        input?.focus(); // Restore focus when unpaused
+        input?.focus({ preventScroll: true }); // Restore focus when unpaused
         startButton?.classList.add("active");
       }
     }
@@ -875,7 +924,7 @@ import Layout from "../../layouts/default.astro";
       const input = document.getElementById("korean-input") as HTMLInputElement;
       const startButton = document.getElementById("start-button");
       if (input) {
-        input.focus();
+        input.focus({ preventScroll: true });
       }
       if (startButton) {
         startButton.classList.add("active");
@@ -1151,17 +1200,66 @@ import Layout from "../../layouts/default.astro";
         this.p.textAlign(this.p.LEFT, this.p.BOTTOM);
         this.p.textSize(16);
 
+        // Calculate score color based on transition
+        let currentScoreColor = this.scoreColor;
+        if (this.scoreColorTransitionStart > 0) {
+          const elapsed = this.p.millis() - this.scoreColorTransitionStart;
+          const progress = Math.min(
+            1,
+            elapsed / this.scoreColorTransitionDuration
+          );
+
+          if (progress < 1) {
+            // Interpolate between red and normal color
+            const normalColor = this.p.color("#96CEB4");
+            const redColor = this.p.color("#FF0000");
+            currentScoreColor = this.p.lerpColor(
+              redColor,
+              normalColor,
+              progress
+            );
+          } else {
+            this.scoreColorTransitionStart = 0;
+            currentScoreColor = this.p.color("#96CEB4");
+          }
+        }
+
         // Score outer glow
-        this.p.fill(150, 206, 180, 100); // #96CEB4 with alpha
+        this.p.fill(currentScoreColor);
+        this.p.fill(
+          this.p.red(currentScoreColor),
+          this.p.green(currentScoreColor),
+          this.p.blue(currentScoreColor),
+          100
+        );
         this.p.text(`SCORE ${this.score}`, 25, this.p.height - 20);
 
         // Score middle glow
-        this.p.fill(150, 206, 180, 150); // #96CEB4 with alpha
+        this.p.fill(
+          this.p.red(currentScoreColor),
+          this.p.green(currentScoreColor),
+          this.p.blue(currentScoreColor),
+          150
+        );
         this.p.text(`SCORE ${this.score}`, 25, this.p.height - 20);
 
         // Score inner text
-        this.p.fill(150, 206, 180, 255); // #96CEB4
+        this.p.fill(
+          this.p.red(currentScoreColor),
+          this.p.green(currentScoreColor),
+          this.p.blue(currentScoreColor),
+          255
+        );
         this.p.text(`SCORE ${this.score}`, 25, this.p.height - 20);
+
+        // Draw score animations
+        this.scoreAnimations = this.scoreAnimations.filter((animation) => {
+          const isActive = animation.update();
+          if (isActive) {
+            animation.draw(this.p, this.pixelFont);
+          }
+          return isActive;
+        });
 
         // Draw hearts for lives
         const heartSpacing = 35;
@@ -1578,8 +1676,24 @@ import Layout from "../../layouts/default.astro";
         this.fallingChars.splice(charIndex, 1);
         this.score += 10;
       } else {
-        // No match found - use hot pink for errors
+        // No match found - use hot pink for errors and reduce score
         this.lastTypedCharColor = "#ff0066";
+        if (this.score > 0) {
+          this.score = Math.max(0, this.score - 1);
+          // Calculate position for score reduction animation
+          const scoreText = `SCORE ${this.score}`;
+          const scoreWidth = this.p.textWidth(scoreText);
+          const numberStart = 25 + this.p.textWidth("SCORE "); // Position after "SCORE "
+          const numberWidth = this.p.textWidth(this.score.toString());
+          const centerOfNumber = numberStart + numberWidth / 2;
+
+          // Add score reduction animation centered over the number
+          this.scoreAnimations.push(
+            new ScoreAnimation(centerOfNumber, this.p.height - 40, "-1")
+          );
+          // Start score color transition
+          this.scoreColorTransitionStart = this.p.millis();
+        }
       }
     }
   }
@@ -1624,7 +1738,7 @@ import Layout from "../../layouts/default.astro";
             "korean-input"
           ) as HTMLInputElement;
           if (input && !game.isPaused) {
-            input.focus();
+            input.focus({ preventScroll: true });
           }
         });
       }
@@ -1633,18 +1747,6 @@ import Layout from "../../layouts/default.astro";
     p.draw = () => {
       game.update();
       game.draw();
-    };
-
-    p.mousePressed = () => {
-      // Remove the click-to-start functionality
-      if (
-        p.mouseX >= 0 &&
-        p.mouseX < p.width &&
-        p.mouseY >= 0 &&
-        p.mouseY < p.height
-      ) {
-        game.start();
-      }
     };
 
     // Handle window resize
