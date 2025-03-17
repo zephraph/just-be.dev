@@ -7,6 +7,7 @@ import { myRemark } from "./packages/my-remark";
 import mdRenderer from "./packages/astro-md";
 import astroCloudflareSentry from "./packages/astro-cf-sentry";
 import fullReload from "vite-plugin-full-reload";
+import inject from "@rollup/plugin-inject";
 
 // https://astro.build/config
 export default defineConfig({
@@ -38,6 +39,10 @@ export default defineConfig({
     },
   }),
   vite: {
-    plugins: [fullReload(["notes/**/*.md"])],
+    plugins: [fullReload(["notes/**/*.md"]),
+    inject({
+      p5: 'p5',
+    }),
+  ],
   },
 });

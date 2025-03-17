@@ -619,6 +619,7 @@ import Layout from "../../layouts/default.astro";
 
 <script>
   import p5 from "p5";
+  import "p5/lib/addons/p5.sound";
 
   // Basic Hangul characters (consonants and vowels)
   const HANGUL_CHARS = [
@@ -1703,12 +1704,16 @@ import Layout from "../../layouts/default.astro";
     let game: Game;
     let pixelFont: p5.Font;
     let koreanPixelFont: p5.Font;
+    let buttonPressedSound: p5.SoundFile;
+    let buttonReleasedSound: p5.SoundFile;
     const container = document.getElementById("game-container");
     if (!container) return;
 
     p.preload = () => {
       pixelFont = p.loadFont("/fonts/PressStart2P-Regular.ttf");
       koreanPixelFont = p.loadFont("/fonts/UnifontExMono.ttf");
+      buttonPressedSound = p.loadSound("/sounds/button-pressed.mp3");
+      buttonReleasedSound = p.loadSound("/sounds/button-depressed.mp3");
     };
 
     p.setup = () => {
@@ -1721,12 +1726,25 @@ import Layout from "../../layouts/default.astro";
       game.numColumns = Math.floor(p.width / game.columnWidth);
       p.textFont(pixelFont);
 
+      // Initialize audio context
+      p.userStartAudio();
+
       // Setup input handling
       game.setupInput();
 
       // Setup start button
       const startButton = document.getElementById("start-button");
       if (startButton) {
+        startButton.addEventListener("mousedown", () => {
+          buttonPressedSound.rate(0.5);
+          buttonPressedSound.play();
+        });
+
+        startButton.addEventListener("mouseup", () => {
+          buttonReleasedSound.rate(0.5);
+          buttonReleasedSound.play();
+        });
+
         startButton.addEventListener("click", () => {
           if (!game.isPlaying) {
             game.start();
