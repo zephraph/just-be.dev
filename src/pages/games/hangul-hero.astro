@@ -784,6 +784,100 @@ import Layout from "../../layouts/default.astro";
     }
   }
 
+  class Particle {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    alpha: number;
+    size: number;
+    color: string;
+    koreanPixelFont: p5.Font;
+
+    constructor(x: number, y: number, char: string, koreanPixelFont: p5.Font) {
+      this.x = x;
+      this.y = y;
+      // Increase velocity range for more explosive effect
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 8 + 4; // Random speed between 4 and 12
+      this.vx = Math.cos(angle) * speed;
+      this.vy = Math.sin(angle) * speed - 2; // Initial upward boost
+      this.alpha = 1;
+      // Fixed pixel sizes for sharper look
+      this.size = Math.floor(Math.random() * 3) * 2 + 2; // 2, 4, or 6 pixels
+      // Get a random neon color
+      this.color = this.getRandomColor();
+      this.koreanPixelFont = koreanPixelFont;
+    }
+
+    getRandomColor(): string {
+      const colors = [
+        "#ff0066", // Hot pink
+        "#00ff00", // Neon green
+        "#00ffff", // Cyan
+        "#ffff00", // Yellow
+        "#ff3399", // Pink
+        "#33ccff", // Light blue
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    update(): boolean {
+      // Apply gravity
+      this.vy += 0.3;
+
+      // Add some horizontal drift
+      this.vx *= 0.99;
+
+      // Update position
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Fade out faster for sharper disappearance
+      this.alpha -= 0.03;
+
+      // Keep size constant for pixel-perfect look
+      // this.size *= 0.99; // Removed size reduction
+
+      // Return true if particle is still alive
+      return this.alpha > 0;
+    }
+
+    draw(p: p5): void {
+      p.push();
+      p.noStroke();
+
+      // Calculate pixel-perfect position
+      const pixelX = Math.round(this.x);
+      const pixelY = Math.round(this.y);
+
+      // Draw main pixel
+      const mainColor = p.color(this.color);
+      mainColor.setAlpha(this.alpha * 255);
+      p.fill(mainColor);
+      p.rect(
+        pixelX - this.size / 2,
+        pixelY - this.size / 2,
+        this.size,
+        this.size
+      );
+
+      // Draw white highlight pixel in corner (1px)
+      const highlightColor = p.color("#ffffff");
+      highlightColor.setAlpha(this.alpha * 255);
+      p.fill(highlightColor);
+      p.rect(pixelX - this.size / 2, pixelY - this.size / 2, 1, 1);
+
+      // Draw dark edge on bottom-right (1px)
+      const shadowColor = p.color(0, 0, 0);
+      shadowColor.setAlpha(this.alpha * 255);
+      p.fill(shadowColor);
+      p.rect(pixelX + this.size / 2 - 1, pixelY + this.size / 2 - 1, 1, 1);
+
+      p.pop();
+    }
+  }
+
   class Game {
     private p: p5;
     public isPlaying: boolean;
@@ -817,6 +911,7 @@ import Layout from "../../layouts/default.astro";
     private scoreColor: p5.Color;
     private scoreColorTransitionStart: number;
     private scoreColorTransitionDuration: number;
+    private particles: Particle[];
 
     constructor(p: p5, pixelFont: p5.Font, koreanPixelFont: p5.Font) {
       this.p = p;
@@ -851,6 +946,7 @@ import Layout from "../../layouts/default.astro";
       this.scoreColor = p.color("#96CEB4"); // Initialize as p5.Color
       this.scoreColorTransitionStart = 0;
       this.scoreColorTransitionDuration = 500; // 500ms for color transition
+      this.particles = [];
     }
 
     setupInput(): void {
@@ -935,7 +1031,15 @@ import Layout from "../../layouts/default.astro";
     gameOver(): void {
       this.isPlaying = false;
       this.isPaused = false;
+
+      // Create explosions for all remaining falling characters simultaneously
+      this.fallingChars.forEach((char) => {
+        this.createExplosion(char.x, char.y, char.char);
+      });
+
+      // Clear falling chars immediately since we don't need to wait for staggered explosions
       this.fallingChars = [];
+
       this.lastTypedChar = null;
       const startButton = document.getElementById("start-button");
       if (startButton) {
@@ -962,6 +1066,14 @@ import Layout from "../../layouts/default.astro";
         this.initialSpawnInterval - spawnIntervalDecrease,
         this.minSpawnInterval
       );
+    }
+
+    createExplosion(x: number, y: number, char: string): void {
+      // Create more particles for a denser explosion effect
+      const numParticles = 20;
+      for (let i = 0; i < numParticles; i++) {
+        this.particles.push(new Particle(x, y, char, this.koreanPixelFont));
+      }
     }
 
     update(): void {
@@ -1004,22 +1116,29 @@ import Layout from "../../layouts/default.astro";
           );
           this.lastSpawnTime = currentTime;
         }
+      }
 
-        // Update and filter falling characters
-        this.fallingChars = this.fallingChars.filter((char) => {
-          char.update();
-          if (char.y >= this.p.height) {
-            if (!char.isBackground) {
+      // Always update existing characters and particles
+      this.fallingChars = this.fallingChars.filter((char) => {
+        char.update();
+        if (char.y >= this.p.height) {
+          if (!char.isBackground) {
+            if (this.isPlaying) {
               this.lives--;
               if (this.lives <= 0) {
                 this.gameOver();
               }
             }
-            return false;
+            // Create explosion effect when character hits bottom
+            this.createExplosion(char.x, this.p.height, char.char);
           }
-          return true;
-        });
-      }
+          return false;
+        }
+        return true;
+      });
+
+      // Update and filter particles
+      this.particles = this.particles.filter((particle) => particle.update());
 
       // Background characters
       // Initialize column tracking if not already done
@@ -1191,6 +1310,9 @@ import Layout from "../../layouts/default.astro";
 
       // Draw falling characters
       this.fallingChars.forEach((char) => char.draw(this.p));
+
+      // Draw particles
+      this.particles.forEach((particle) => particle.draw(this.p));
 
       // Draw score and lives
       if (this.isPlaying) {
