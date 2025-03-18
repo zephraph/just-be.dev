@@ -4,12 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    '@astrojs/markdown-remark':
-      specifier: ^5.2.0
-      version: 5.2.0
-
 patchedDependencies:
   '@astrojs/markdown-remark':
     hash: v5kacvnx7x7h7wln5itqdcnhza
@@ -49,6 +43,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.7
         version: 3.4.13
+      type-fest:
+        specifier: ^4.37.0
+        version: 4.37.0
       typescript:
         specifier: ^5.5.4
         version: 5.6.2
@@ -2849,8 +2846,8 @@ packages:
   tslib@2.7.0:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
 
-  type-fest@4.26.1:
-    resolution: {integrity: sha512-yOGpmOAL7CkKe/91I5O3gPICmJNLJ1G4zFYVAsRHg7M64biSnPtRj0WNQt++bRkjYOqjWXrhnUw1utzmVErAdg==}
+  type-fest@4.37.0:
+    resolution: {integrity: sha512-S/5/0kFftkq27FPNye0XM1e2NsnoD/3FS+pBmbjmmtLT6I+i344KoOf7pvXreaFsDamWeaJX55nczA1m5PsBDg==}
     engines: {node: '>=16'}
 
   typesafe-path@0.2.2:
@@ -4488,7 +4485,7 @@ snapshots:
       chalk: 5.3.0
       cli-boxes: 3.0.0
       string-width: 7.2.0
-      type-fest: 4.26.1
+      type-fest: 4.37.0
       widest-line: 5.0.0
       wrap-ansi: 9.0.0
 
@@ -6288,7 +6285,7 @@ snapshots:
 
   tslib@2.7.0: {}
 
-  type-fest@4.26.1: {}
+  type-fest@4.37.0: {}
 
   typesafe-path@0.2.2: {}
 

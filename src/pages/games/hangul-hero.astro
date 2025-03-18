@@ -1160,12 +1160,30 @@ import Layout from "../../layouts/default.astro";
     private flashCount: number;
     private maxFlashCount: number;
     private lifeCharacters: LifeCharacter[];
-    private wasScoreZero: boolean; // Add this new property
+    private wasScoreZero: boolean;
+    public sounds: {
+      explosions: p5.SoundFile[];
+      buttonPressed: p5.SoundFile;
+      buttonReleased: p5.SoundFile;
+      gameOver: p5.SoundFile;
+    };
+    private audioContextInitialized: boolean;
 
-    constructor(p: p5, pixelFont: p5.Font, koreanPixelFont: p5.Font) {
+    constructor(
+      p: p5,
+      pixelFont: p5.Font,
+      koreanPixelFont: p5.Font,
+      sounds: {
+        explosions: p5.SoundFile[];
+        buttonPressed: p5.SoundFile;
+        buttonReleased: p5.SoundFile;
+        gameOver: p5.SoundFile;
+      }
+    ) {
       this.p = p;
       this.pixelFont = pixelFont;
       this.koreanPixelFont = koreanPixelFont;
+      this.sounds = sounds;
       this.isPlaying = false;
       this.isPaused = false;
       this.score = 0;
@@ -1192,17 +1210,57 @@ import Layout from "../../layouts/default.astro";
       this.pauseTextOpacity = 0.3;
       this.pauseTextFading = 1;
       this.scoreAnimations = [];
-      this.scoreColor = p.color("#00ff00"); // Start with green
+      this.scoreColor = p.color("#00ff00");
       this.scoreColorTransitionStart = 0;
       this.scoreColorTransitionDuration = 500;
       this.particles = [];
       this.flashStartTime = 0;
       this.isFlashing = false;
-      this.flashDuration = 1200; // Total duration of flash effect in ms
+      this.flashDuration = 1200;
       this.flashCount = 0;
-      this.maxFlashCount = 1; // Initialize to 1, will be updated based on mistakes
+      this.maxFlashCount = 1;
       this.lifeCharacters = [];
-      this.wasScoreZero = false; // Initialize the new property
+      this.wasScoreZero = false;
+      this.audioContextInitialized = false;
+    }
+
+    private async initializeAudioContext(): Promise<void> {
+      if (this.audioContextInitialized) return;
+
+      try {
+        await this.p.userStartAudio();
+        this.audioContextInitialized = true;
+      } catch (error) {
+        console.warn("Audio context initialization failed:", error);
+      }
+    }
+
+    public async playSound(
+      sound: p5.SoundFile,
+      options: {
+        rate?: number;
+        volume?: number;
+      } = {}
+    ): Promise<void> {
+      if (!this.audioContextInitialized) {
+        await this.initializeAudioContext();
+      }
+
+      if (sound && this.audioContextInitialized) {
+        try {
+          if (options.rate) {
+            sound.rate(options.rate);
+          }
+          if (options.volume) {
+            sound.setVolume(options.volume);
+          }
+          sound.play();
+        } catch (error) {
+          console.warn("Failed to play sound:", error);
+        }
+      } else {
+        console.warn("Sound not found or audio context not initialized");
+      }
     }
 
     setupInput(): void {
@@ -1313,6 +1371,11 @@ import Layout from "../../layouts/default.astro";
       this.isPlaying = false;
       this.isPaused = false;
 
+      // Play game over sound
+      if (this.sounds.gameOver) {
+        this.playSound(this.sounds.gameOver, { rate: 0.5, volume: 0.3 });
+      }
+
       // Create explosions for all remaining falling characters simultaneously
       this.fallingChars.forEach((char) => {
         this.createExplosion(char.x, char.y, char.char, false);
@@ -1364,6 +1427,21 @@ import Layout from "../../layouts/default.astro";
         this.particles.push(
           new Particle(x, y, char, this.koreanPixelFont, isSuccess)
         );
+      }
+      if (isSuccess) {
+        // Play success explosion sound
+        const successSound = this.sounds.explosions[0];
+        if (successSound) {
+          this.playSound(successSound, { rate: 1.2, volume: 0.5 });
+        }
+      } else {
+        // Play random failure explosion sound
+        const randomIndex =
+          Math.floor(Math.random() * (this.sounds.explosions.length - 1)) + 1;
+        const failureSound = this.sounds.explosions[randomIndex];
+        if (failureSound) {
+          this.playSound(failureSound, { rate: 1.3, volume: 0.05 });
+        }
       }
     }
 
@@ -2137,6 +2215,20 @@ import Layout from "../../layouts/default.astro";
       koreanPixelFont = p.loadFont("/fonts/UnifontExMono.ttf");
       buttonPressedSound = p.loadSound("/sounds/button-pressed.mp3");
       buttonReleasedSound = p.loadSound("/sounds/button-depressed.mp3");
+      const gameOverSound = p.loadSound("/sounds/game-over.mp3");
+
+      // Load explosion sounds
+      const explosion1 = p.loadSound("/sounds/explosion-1.mp3");
+      const explosion2 = p.loadSound("/sounds/explosion-2.mp3");
+      const explosion3 = p.loadSound("/sounds/explosion-3.mp3");
+
+      // Create game instance with sounds
+      game = new Game(p, pixelFont, koreanPixelFont, {
+        explosions: [explosion1, explosion2, explosion3],
+        buttonPressed: buttonPressedSound,
+        buttonReleased: buttonReleasedSound,
+        gameOver: gameOverSound,
+      });
     };
 
     p.setup = () => {
@@ -2145,12 +2237,9 @@ import Layout from "../../layouts/default.astro";
         container.clientWidth * 0.75
       );
       canvas.parent(container);
-      game = new Game(p, pixelFont, koreanPixelFont);
+      game = new Game(p, pixelFont, koreanPixelFont, game.sounds);
       game.numColumns = Math.floor(p.width / game.columnWidth);
       p.textFont(pixelFont);
-
-      // Initialize audio context
-      p.userStartAudio();
 
       // Setup input handling
       game.setupInput();
@@ -2158,17 +2247,15 @@ import Layout from "../../layouts/default.astro";
       // Setup start button
       const startButton = document.getElementById("start-button");
       if (startButton) {
-        startButton.addEventListener("mousedown", () => {
-          buttonPressedSound.rate(0.5);
-          buttonPressedSound.play();
+        startButton.addEventListener("mousedown", async () => {
+          await game.playSound(game.sounds.buttonPressed, { volume: 1.5 });
         });
 
-        startButton.addEventListener("mouseup", () => {
-          buttonReleasedSound.rate(0.5);
-          buttonReleasedSound.play();
+        startButton.addEventListener("mouseup", async () => {
+          await game.playSound(game.sounds.buttonReleased, { volume: 1.5 });
         });
 
-        startButton.addEventListener("click", () => {
+        startButton.addEventListener("click", async () => {
           if (!game.isPlaying) {
             game.start();
           } else {
