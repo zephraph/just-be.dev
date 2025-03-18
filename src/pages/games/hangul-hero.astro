@@ -1132,6 +1132,7 @@ import Layout from "../../layouts/default.astro";
     private flashCount: number;
     private maxFlashCount: number;
     private lifeCharacters: LifeCharacter[];
+    private wasScoreZero: boolean; // Add this new property
 
     constructor(p: p5, pixelFont: p5.Font, koreanPixelFont: p5.Font) {
       this.p = p;
@@ -1163,7 +1164,7 @@ import Layout from "../../layouts/default.astro";
       this.pauseTextOpacity = 0.3;
       this.pauseTextFading = 1;
       this.scoreAnimations = [];
-      this.scoreColor = p.color("#96CEB4");
+      this.scoreColor = p.color("#00ff00"); // Start with green
       this.scoreColorTransitionStart = 0;
       this.scoreColorTransitionDuration = 500;
       this.particles = [];
@@ -1173,6 +1174,7 @@ import Layout from "../../layouts/default.astro";
       this.flashCount = 0;
       this.maxFlashCount = 1; // Initialize to 1, will be updated based on mistakes
       this.lifeCharacters = [];
+      this.wasScoreZero = false; // Initialize the new property
     }
 
     setupInput(): void {
@@ -1242,6 +1244,8 @@ import Layout from "../../layouts/default.astro";
       );
       this.gameStartTime = this.p.millis();
       this.lastSpawnTime = this.gameStartTime;
+      this.scoreColor = this.p.color("#00ff00"); // Reset to green when starting
+      this.wasScoreZero = false; // Reset the flag when starting
 
       // Initialize life characters
       this.lifeCharacters = [];
@@ -1551,7 +1555,7 @@ import Layout from "../../layouts/default.astro";
 
           if (progress < 1) {
             // Interpolate between red and normal color
-            const normalColor = this.p.color("#96CEB4");
+            const normalColor = this.p.color("#00ff00"); // Use green as normal color
             const redColor = this.p.color("#FF0000");
             currentScoreColor = this.p.lerpColor(
               redColor,
@@ -1560,7 +1564,7 @@ import Layout from "../../layouts/default.astro";
             );
           } else {
             this.scoreColorTransitionStart = 0;
-            currentScoreColor = this.p.color("#96CEB4");
+            currentScoreColor = this.p.color("#00ff00");
           }
         }
 
@@ -2006,6 +2010,11 @@ import Layout from "../../layouts/default.astro";
         const matchedChar = this.fallingChars[charIndex];
         matchedChar.startGrowth(); // Start the growth animation
         this.score += 10;
+        // If score was zero and we're adding points, transition back to green
+        if (this.wasScoreZero) {
+          this.scoreColor = this.p.color("#00ff00");
+          this.wasScoreZero = false;
+        }
       } else {
         // No match found - use hot pink for errors and reduce score
         this.lastTypedCharColor = "#ff0066";
@@ -2022,8 +2031,17 @@ import Layout from "../../layouts/default.astro";
           this.scoreAnimations.push(
             new ScoreAnimation(centerOfNumber, this.p.height - 40, "-1")
           );
-          // Start score color transition
-          this.scoreColorTransitionStart = this.p.millis();
+
+          // If score reaches zero, set it to red immediately and mark that it was due to point loss
+          if (this.score === 0) {
+            this.scoreColor = this.p.color("#FF0000");
+            this.wasScoreZero = true;
+            // Reset any ongoing color transition
+            this.scoreColorTransitionStart = 0;
+          } else {
+            // Only start the color transition if we're not at zero
+            this.scoreColorTransitionStart = this.p.millis();
+          }
         }
       }
     }
