@@ -1390,6 +1390,7 @@ import Layout from "../../layouts/default.astro";
       buttonReleased: p5.SoundFile;
       gameOver: p5.SoundFile;
       intro: p5.SoundFile;
+      success: p5.SoundFile[]; // Add success sounds array
     };
     private audioContextInitialized: boolean;
     // Add new power state properties
@@ -1410,6 +1411,7 @@ import Layout from "../../layouts/default.astro";
         buttonReleased: p5.SoundFile;
         gameOver: p5.SoundFile;
         intro: p5.SoundFile;
+        success: p5.SoundFile[]; // Add success sounds array
       }
     ) {
       this.p = p;
@@ -1673,10 +1675,13 @@ import Layout from "../../layouts/default.astro";
         );
       }
       if (isSuccess) {
-        // Play success explosion sound
-        const successSound = this.sounds.explosions[0];
+        // Play random success sound
+        const randomIndex = Math.floor(
+          Math.random() * this.sounds.success.length
+        );
+        const successSound = this.sounds.success[randomIndex];
         if (successSound) {
-          this.playSound(successSound, { rate: 1.2, volume: 0.1 });
+          this.playSound(successSound, { rate: 1.2, volume: 0.2 });
         }
       } else {
         // Play random failure explosion sound
@@ -2427,6 +2432,7 @@ import Layout from "../../layouts/default.astro";
           this.scoreColor = this.p.color("#00ff00");
           this.wasScoreZero = false;
         }
+
         // Create success explosion
         setTimeout(() => {
           this.createExplosion(
@@ -2620,6 +2626,22 @@ import Layout from "../../layouts/default.astro";
         p.loadSound("/sounds/explosion-2.mp3"),
         p.loadSound("/sounds/explosion-3.mp3"),
       ];
+
+      // Load success sounds
+      const successSounds = [
+        p.loadSound("/sounds/success-1.mp3"),
+        p.loadSound("/sounds/success-2.mp3"),
+        p.loadSound("/sounds/success-3.mp3"),
+      ];
+
+      game = new Game(p, pixelFont, koreanPixelFont, {
+        explosions: explosions,
+        buttonPressed: buttonPressedSound,
+        buttonReleased: buttonReleasedSound,
+        gameOver: gameOverSound,
+        intro: introMusic,
+        success: successSounds, // Add success sounds to game initialization
+      });
     };
 
     p.setup = () => {
@@ -2628,13 +2650,6 @@ import Layout from "../../layouts/default.astro";
         container.clientWidth * 0.75
       );
       canvas.parent(container);
-      game = new Game(p, pixelFont, koreanPixelFont, {
-        explosions: explosions,
-        buttonPressed: buttonPressedSound,
-        buttonReleased: buttonReleasedSound,
-        gameOver: gameOverSound,
-        intro: introMusic,
-      });
       game.numColumns = Math.floor(p.width / game.columnWidth);
       p.textFont(pixelFont);
 
