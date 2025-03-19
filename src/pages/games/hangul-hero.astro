@@ -1362,6 +1362,7 @@ import Layout from "../../layouts/default.astro";
       buttonPressed: p5.SoundFile;
       buttonReleased: p5.SoundFile;
       gameOver: p5.SoundFile;
+      intro: p5.SoundFile;
     };
     private audioContextInitialized: boolean;
     // Add new power state properties
@@ -1529,6 +1530,11 @@ import Layout from "../../layouts/default.astro";
 
     start(): void {
       if (this.isPlaying) return;
+
+      // Stop intro music when game starts
+      if (this.sounds.intro) {
+        this.sounds.intro.stop();
+      }
 
       this.isPlaying = true;
       this.isPaused = false;
@@ -2468,7 +2474,13 @@ import Layout from "../../layouts/default.astro";
       this.screenPowerTransitionStart = this.p.millis();
       // Play power on sound
       if (this.sounds.buttonPressed) {
-        this.playSound(this.sounds.buttonPressed, { volume: 0.5 });
+        this.playSound(this.sounds.buttonPressed, { volume: 1.5, rate: 0.8 });
+      }
+      // Play intro music in a loop
+      if (this.sounds.intro) {
+        this.playSound(this.sounds.intro, { volume: 0.1 });
+        // Set the intro music to loop
+        this.sounds.intro.loop();
       }
       // Add powered class to LED housing and remove off class from button
       const ledHousing = document.querySelector(".led-housing");
@@ -2486,6 +2498,11 @@ import Layout from "../../layouts/default.astro";
       this.isPlaying = false;
       this.isPaused = false;
       this.screenPowerTransitionStart = this.p.millis();
+
+      // Stop intro music if it's playing
+      if (this.sounds.intro) {
+        this.sounds.intro.stop();
+      }
 
       // Reset game state
       this.score = 0;
@@ -2520,7 +2537,7 @@ import Layout from "../../layouts/default.astro";
 
       // Play power off sound
       if (this.sounds.buttonReleased) {
-        this.playSound(this.sounds.buttonReleased, { volume: 0.5 });
+        this.playSound(this.sounds.buttonReleased, { volume: 1.5, rate: 0.8 });
       }
       // Remove powered class from LED housing and add off class to button
       const ledHousing = document.querySelector(".led-housing");
@@ -2602,14 +2619,20 @@ import Layout from "../../layouts/default.astro";
       if (startButton) {
         startButton.addEventListener("mousedown", async () => {
           game.buttonPressStartTime = Date.now();
-          await game.playSound(game.sounds.buttonPressed, { volume: 1.5 });
+          await game.playSound(game.sounds.buttonPressed, {
+            volume: 1.5,
+            rate: 0.8,
+          });
         });
 
         startButton.addEventListener("mouseup", async () => {
           const pressDuration = Date.now() - game.buttonPressStartTime;
           game.isLongPress = pressDuration >= game.longPressThreshold;
           game.handlePowerToggle();
-          await game.playSound(game.sounds.buttonReleased, { volume: 1.5 });
+          await game.playSound(game.sounds.buttonReleased, {
+            volume: 1.5,
+            rate: 0.8,
+          });
         });
 
         // Handle long press
