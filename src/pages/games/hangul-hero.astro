@@ -101,8 +101,15 @@ import Layout from "../../layouts/default.astro";
             <div class="speaker-grill">
               <div class="speaker-pattern"></div>
             </div>
+            <div class="led-container">
+              <div class="led-housing">
+                <div class="led-glow"></div>
+                <div class="led-core"></div>
+                <div class="led-highlight"></div>
+              </div>
+            </div>
             <div class="button-mount">
-              <button id="start-button" class="arcade-start-button">
+              <button id="start-button" class="arcade-start-button off">
                 <div class="button-trim">
                   <div class="button-surface">
                     <div class="button-text">시작</div>
@@ -125,6 +132,8 @@ import Layout from "../../layouts/default.astro";
     --button-glow: rgba(74, 222, 128, 0.5);
     --button-color-active: #fbbf24; /* Amber/yellow */
     --button-glow-active: rgba(251, 191, 36, 0.5);
+    --button-color-off: #ef4444; /* Red */
+    --button-glow-off: rgba(239, 68, 68, 0.5);
   }
 
   .arcade-cabinet {
@@ -713,6 +722,193 @@ import Layout from "../../layouts/default.astro";
       inset 0 0 10px rgba(0, 0, 0, 0.5),
       0 2px 4px rgba(0, 0, 0, 0.2);
   }
+
+  .led-container {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    margin-right: 20px;
+    z-index: 10;
+  }
+
+  .led-housing {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 11;
+  }
+
+  .led-housing::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.1),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 12;
+  }
+
+  .led-housing::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: linear-gradient(135deg, #333333, #2a2a2a);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 13;
+  }
+
+  .led-glow {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 0, 0, 0.8) 0%,
+      rgba(255, 0, 0, 0.4) 50%,
+      rgba(255, 0, 0, 0) 100%
+    );
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    filter: blur(1px);
+    z-index: 14;
+  }
+
+  .led-core {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ff0000 0%,
+      #cc0000 50%,
+      #990000 100%
+    );
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.3),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 15;
+  }
+
+  .led-highlight {
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    filter: blur(0.5px);
+    z-index: 16;
+  }
+
+  .led-housing.powered .led-glow,
+  .led-housing.powered .led-core,
+  .led-housing.powered .led-highlight {
+    opacity: 1;
+  }
+
+  @keyframes ledPulse {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .arcade-start-button.off .button-surface {
+    background: radial-gradient(
+      circle at 30% 30%,
+      color-mix(in srgb, var(--button-color-off) 85%, white),
+      var(--button-color-off) 60%,
+      color-mix(in srgb, var(--button-color-off) 85%, black)
+    );
+    box-shadow:
+      0 0 30px var(--button-glow-off),
+      0 0 60px var(--button-glow-off),
+      0 0 90px var(--button-glow-off),
+      inset 0 0 15px rgba(255, 255, 255, 0.8),
+      inset 2px 2px 2px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .arcade-start-button.off:active .button-surface {
+    box-shadow:
+      0 0 15px var(--button-glow-off),
+      0 0 30px var(--button-glow-off),
+      0 0 45px var(--button-glow-off),
+      inset 0 0 8px rgba(255, 255, 255, 0.5);
+  }
+
+  .arcade-start-button.off .button-base {
+    background: color-mix(in srgb, var(--button-color-off) 85%, black);
+  }
+
+  @keyframes ledPulse {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .arcade-start-button.off .button-surface {
+    background: radial-gradient(
+      circle at 30% 30%,
+      color-mix(in srgb, var(--button-color-off) 85%, white),
+      var(--button-color-off) 60%,
+      color-mix(in srgb, var(--button-color-off) 85%, black)
+    );
+    box-shadow:
+      0 0 30px var(--button-glow-off),
+      0 0 60px var(--button-glow-off),
+      0 0 90px var(--button-glow-off),
+      inset 0 0 15px rgba(255, 255, 255, 0.8),
+      inset 2px 2px 2px rgba(255, 255, 255, 0.5),
+      inset -2px -2px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .arcade-start-button.off:active .button-surface {
+    box-shadow:
+      0 0 15px var(--button-glow-off),
+      0 0 30px var(--button-glow-off),
+      0 0 45px var(--button-glow-off),
+      inset 0 0 8px rgba(255, 255, 255, 0.5);
+  }
+
+  .arcade-start-button.off .button-base {
+    background: color-mix(in srgb, var(--button-color-off) 85%, black);
+  }
 </style>
 
 <script>
@@ -1168,6 +1364,13 @@ import Layout from "../../layouts/default.astro";
       gameOver: p5.SoundFile;
     };
     private audioContextInitialized: boolean;
+    // Add new power state properties
+    public isPowered: boolean;
+    private screenPowerTransitionStart: number;
+    private screenPowerTransitionDuration: number;
+    public buttonPressStartTime: number;
+    public longPressThreshold: number;
+    public isLongPress: boolean;
 
     constructor(
       p: p5,
@@ -1178,6 +1381,7 @@ import Layout from "../../layouts/default.astro";
         buttonPressed: p5.SoundFile;
         buttonReleased: p5.SoundFile;
         gameOver: p5.SoundFile;
+        intro: p5.SoundFile;
       }
     ) {
       this.p = p;
@@ -1222,6 +1426,13 @@ import Layout from "../../layouts/default.astro";
       this.lifeCharacters = [];
       this.wasScoreZero = false;
       this.audioContextInitialized = false;
+      // Initialize power state properties
+      this.isPowered = false;
+      this.screenPowerTransitionStart = 0;
+      this.screenPowerTransitionDuration = 1000;
+      this.buttonPressStartTime = 0;
+      this.longPressThreshold = 5000; // 5 seconds
+      this.isLongPress = false;
     }
 
     private async initializeAudioContext(): Promise<void> {
@@ -1285,7 +1496,7 @@ import Layout from "../../layouts/default.astro";
 
       // Handle input events
       input.addEventListener("input", (e) => {
-        if (!this.isPlaying || this.isPaused) return; // Don't process input when paused
+        if (!this.isPlaying || this.isPaused || !this.isPowered) return; // Don't process input when powered off or paused
 
         const char = (e.target as HTMLInputElement).value;
         if (char) {
@@ -1297,7 +1508,7 @@ import Layout from "../../layouts/default.astro";
 
       // Keep input focused when typing
       input.addEventListener("blur", () => {
-        if (this.isPlaying && !this.isPaused) {
+        if (this.isPlaying && !this.isPaused && this.isPowered) {
           input.focus({ preventScroll: true });
         }
       });
@@ -1446,6 +1657,9 @@ import Layout from "../../layouts/default.astro";
     }
 
     update(): void {
+      // Update power state
+      this.updatePowerState();
+
       // Update start text opacity for pulsing effect
       this.startTextOpacity += 0.05 * this.startTextFading;
       if (this.startTextOpacity >= 1) {
@@ -1453,6 +1667,11 @@ import Layout from "../../layouts/default.astro";
       } else if (this.startTextOpacity <= 0.3) {
         this.startTextFading = 1;
       }
+
+      // Don't update game state if powered off
+      if (!this.isPowered) return;
+
+      // Rest of the update logic...
 
       // Update pause text opacity for flashing effect
       if (this.isPaused) {
@@ -1586,6 +1805,32 @@ import Layout from "../../layouts/default.astro";
 
     draw(): void {
       this.p.background(0);
+
+      // Handle screen power transition
+      if (this.screenPowerTransitionStart > 0) {
+        const elapsed = this.p.millis() - this.screenPowerTransitionStart;
+        const progress = Math.min(
+          1,
+          elapsed / this.screenPowerTransitionDuration
+        );
+
+        if (this.isPowered) {
+          // Power on transition
+          const brightness = this.p.map(progress, 0, 1, 0, 255);
+          this.p.fill(0, 0, 0, 255 - brightness);
+          this.p.rect(0, 0, this.p.width, this.p.height);
+        } else {
+          // Power off transition
+          const brightness = this.p.map(progress, 0, 1, 255, 0);
+          this.p.fill(0, 0, 0, brightness);
+          this.p.rect(0, 0, this.p.width, this.p.height);
+        }
+      }
+
+      // Don't draw game content if powered off
+      if (!this.isPowered) return;
+
+      // Rest of the draw logic...
 
       // Create CRT-style radial background with flash effect
       const centerX = this.p.width / 2;
@@ -2198,6 +2443,110 @@ import Layout from "../../layouts/default.astro";
       // Adjust flash duration based on number of flashes to keep consistent timing per flash
       this.flashDuration = this.maxFlashCount * 600; // 600ms per flash
     }
+
+    // Add new power state methods
+    public handlePowerToggle(): void {
+      if (!this.isLongPress) {
+        // Normal press - turn on if off, start game if on
+        if (!this.isPowered) {
+          this.turnOn();
+        } else if (!this.isPlaying) {
+          this.start();
+        } else {
+          this.togglePause();
+        }
+      } else {
+        // Long press - turn off if on
+        if (this.isPowered) {
+          this.turnOff();
+        }
+      }
+    }
+
+    private turnOn(): void {
+      this.isPowered = true;
+      this.screenPowerTransitionStart = this.p.millis();
+      // Play power on sound
+      if (this.sounds.buttonPressed) {
+        this.playSound(this.sounds.buttonPressed, { volume: 0.5 });
+      }
+      // Add powered class to LED housing and remove off class from button
+      const ledHousing = document.querySelector(".led-housing");
+      const startButton = document.getElementById("start-button");
+      if (ledHousing) {
+        ledHousing.classList.add("powered");
+      }
+      if (startButton) {
+        startButton.classList.remove("off");
+      }
+    }
+
+    private turnOff(): void {
+      this.isPowered = false;
+      this.isPlaying = false;
+      this.isPaused = false;
+      this.screenPowerTransitionStart = this.p.millis();
+
+      // Reset game state
+      this.score = 0;
+      this.lives = Game.MAX_LIVES;
+      this.fallingChars = [];
+      this.backgroundChars = [];
+      this.particles = [];
+      this.scoreAnimations = [];
+      this.speed = this.initialSpeed;
+      this.lastTypedChar = null;
+      this.lastTypedCharColor = "#FFFFFF";
+      this.lastTypedCharTime = 0;
+      this.startTextOpacity = 0;
+      this.startTextFading = 1;
+      this.pauseTextOpacity = 0.3;
+      this.pauseTextFading = 1;
+      this.scoreColor = this.p.color("#00ff00");
+      this.scoreColorTransitionStart = 0;
+      this.wasScoreZero = false;
+      this.flashStartTime = 0;
+      this.isFlashing = false;
+      this.flashCount = 0;
+      this.maxFlashCount = 1;
+      this.lifeCharacters = [];
+      this.columnLastY = new Array(this.numColumns).fill(
+        -this.minBackgroundSpacing
+      );
+      this.gameStartTime = 0;
+      this.lastSpawnTime = 0;
+      this.initialSpawnInterval = 3000;
+      this.maxActiveChars = 1;
+
+      // Play power off sound
+      if (this.sounds.buttonReleased) {
+        this.playSound(this.sounds.buttonReleased, { volume: 0.5 });
+      }
+      // Remove powered class from LED housing and add off class to button
+      const ledHousing = document.querySelector(".led-housing");
+      const startButton = document.getElementById("start-button");
+      if (ledHousing) {
+        ledHousing.classList.remove("powered");
+      }
+      if (startButton) {
+        startButton.classList.add("off");
+      }
+    }
+
+    private updatePowerState(): void {
+      // Update screen power transition
+      if (this.screenPowerTransitionStart > 0) {
+        const elapsed = this.p.millis() - this.screenPowerTransitionStart;
+        const progress = Math.min(
+          1,
+          elapsed / this.screenPowerTransitionDuration
+        );
+
+        if (progress >= 1) {
+          this.screenPowerTransitionStart = 0;
+        }
+      }
+    }
   }
 
   // Initialize p5.js
@@ -2207,6 +2556,9 @@ import Layout from "../../layouts/default.astro";
     let koreanPixelFont: p5.Font;
     let buttonPressedSound: p5.SoundFile;
     let buttonReleasedSound: p5.SoundFile;
+    let introMusic: p5.SoundFile;
+    let gameOverSound: p5.SoundFile;
+    let explosions: p5.SoundFile[];
     const container = document.getElementById("game-container");
     if (!container) return;
 
@@ -2215,20 +2567,15 @@ import Layout from "../../layouts/default.astro";
       koreanPixelFont = p.loadFont("/fonts/UnifontExMono.ttf");
       buttonPressedSound = p.loadSound("/sounds/button-pressed.mp3");
       buttonReleasedSound = p.loadSound("/sounds/button-depressed.mp3");
-      const gameOverSound = p.loadSound("/sounds/game-over.mp3");
+      introMusic = p.loadSound("/sounds/hangul-hero-intro.mp3");
+      gameOverSound = p.loadSound("/sounds/game-over.mp3");
 
       // Load explosion sounds
-      const explosion1 = p.loadSound("/sounds/explosion-1.mp3");
-      const explosion2 = p.loadSound("/sounds/explosion-2.mp3");
-      const explosion3 = p.loadSound("/sounds/explosion-3.mp3");
-
-      // Create game instance with sounds
-      game = new Game(p, pixelFont, koreanPixelFont, {
-        explosions: [explosion1, explosion2, explosion3],
-        buttonPressed: buttonPressedSound,
-        buttonReleased: buttonReleasedSound,
-        gameOver: gameOverSound,
-      });
+      explosions = [
+        p.loadSound("/sounds/explosion-1.mp3"),
+        p.loadSound("/sounds/explosion-2.mp3"),
+        p.loadSound("/sounds/explosion-3.mp3"),
+      ];
     };
 
     p.setup = () => {
@@ -2237,37 +2584,45 @@ import Layout from "../../layouts/default.astro";
         container.clientWidth * 0.75
       );
       canvas.parent(container);
-      game = new Game(p, pixelFont, koreanPixelFont, game.sounds);
+      game = new Game(p, pixelFont, koreanPixelFont, {
+        explosions: explosions,
+        buttonPressed: buttonPressedSound,
+        buttonReleased: buttonReleasedSound,
+        gameOver: gameOverSound,
+        intro: introMusic,
+      });
       game.numColumns = Math.floor(p.width / game.columnWidth);
       p.textFont(pixelFont);
 
       // Setup input handling
       game.setupInput();
 
-      // Setup start button
+      // Setup start button with power state handling
       const startButton = document.getElementById("start-button");
       if (startButton) {
         startButton.addEventListener("mousedown", async () => {
+          game.buttonPressStartTime = Date.now();
           await game.playSound(game.sounds.buttonPressed, { volume: 1.5 });
         });
 
         startButton.addEventListener("mouseup", async () => {
+          const pressDuration = Date.now() - game.buttonPressStartTime;
+          game.isLongPress = pressDuration >= game.longPressThreshold;
+          game.handlePowerToggle();
           await game.playSound(game.sounds.buttonReleased, { volume: 1.5 });
         });
 
-        startButton.addEventListener("click", async () => {
-          if (!game.isPlaying) {
-            game.start();
-          } else {
-            game.togglePause();
-          }
-          // Focus the input after starting
-          const input = document.getElementById(
-            "korean-input"
-          ) as HTMLInputElement;
-          if (input && !game.isPaused) {
-            input.focus({ preventScroll: true });
-          }
+        // Handle long press
+        let longPressTimer: NodeJS.Timeout;
+        startButton.addEventListener("mousedown", () => {
+          longPressTimer = setTimeout(() => {
+            game.isLongPress = true;
+            game.handlePowerToggle();
+          }, game.longPressThreshold);
+        });
+
+        startButton.addEventListener("mouseup", () => {
+          clearTimeout(longPressTimer);
         });
       }
     };
