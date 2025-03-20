@@ -122,6 +122,13 @@ import Layout from "../../layouts/default.astro";
         </div>
       </div>
     </div>
+    <div class="text-center mt-4 text-sm text-gray-400">
+      <a
+        href="mailto:hangul-hero@just-be.dev"
+        class="bg-gradient-to-r from-[#ff3366] to-[#ff6633] bg-clip-text text-transparent hover:from-[#ff6633] hover:to-[#ff3366] transition-all duration-300 animate-gradient bg-[length:200%_auto]"
+        >Email me</a
+      > to leave feedback or report bugs
+    </div>
   </main>
 </Layout>
 
@@ -936,6 +943,22 @@ import Layout from "../../layouts/default.astro";
   .arcade-start-button.off .button-base {
     background: color-mix(in srgb, var(--button-color-off) 85%, black);
   }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient {
+    animation: gradient 3s ease infinite;
+  }
 </style>
 
 <script>
@@ -1390,7 +1413,9 @@ import Layout from "../../layouts/default.astro";
       buttonReleased: p5.SoundFile;
       gameOver: p5.SoundFile;
       intro: p5.SoundFile;
-      success: p5.SoundFile[]; // Add success sounds array
+      success: p5.SoundFile[];
+      gameMusic: p5.SoundFile[]; // Changed to array
+      gameOverSong: p5.SoundFile;
     };
     private audioContextInitialized: boolean;
     // Add new power state properties
@@ -1400,6 +1425,7 @@ import Layout from "../../layouts/default.astro";
     public buttonPressStartTime: number;
     public longPressThreshold: number;
     public isLongPress: boolean;
+    private currentGameMusicIndex: number = 0; // Add index tracking
 
     constructor(
       p: p5,
@@ -1411,7 +1437,9 @@ import Layout from "../../layouts/default.astro";
         buttonReleased: p5.SoundFile;
         gameOver: p5.SoundFile;
         intro: p5.SoundFile;
-        success: p5.SoundFile[]; // Add success sounds array
+        success: p5.SoundFile[];
+        gameMusic: p5.SoundFile[]; // Changed to array
+        gameOverSong: p5.SoundFile;
       }
     ) {
       this.p = p;
@@ -1481,11 +1509,15 @@ import Layout from "../../layouts/default.astro";
       options: {
         rate?: number;
         volume?: number;
+        loop?: boolean;
+        /** Delay in seconds */
+        delay?: number;
       } = {}
     ): Promise<void> {
       if (!this.audioContextInitialized) {
         await this.initializeAudioContext();
       }
+      const startTime = options.delay ?? 0;
 
       if (sound && this.audioContextInitialized) {
         try {
@@ -1495,7 +1527,12 @@ import Layout from "../../layouts/default.astro";
           if (options.volume) {
             sound.setVolume(options.volume);
           }
-          sound.play();
+
+          if (options.loop) {
+            sound.loop(startTime);
+          } else {
+            sound.play(startTime);
+          }
         } catch (error) {
           console.warn("Failed to play sound:", error);
         }
@@ -1551,9 +1588,23 @@ import Layout from "../../layouts/default.astro";
       if (this.isPaused) {
         input?.blur(); // Remove focus from input when paused
         startButton?.classList.remove("active");
+        // Pause current game music track
+        if (
+          this.sounds.gameMusic &&
+          this.sounds.gameMusic[this.currentGameMusicIndex]
+        ) {
+          this.sounds.gameMusic[this.currentGameMusicIndex].pause();
+        }
       } else {
         input?.focus({ preventScroll: true }); // Restore focus when unpaused
         startButton?.classList.add("active");
+        // Resume current game music track
+        if (
+          this.sounds.gameMusic &&
+          this.sounds.gameMusic[this.currentGameMusicIndex]
+        ) {
+          this.sounds.gameMusic[this.currentGameMusicIndex].play();
+        }
       }
     }
 
@@ -1563,6 +1614,17 @@ import Layout from "../../layouts/default.astro";
       // Stop intro music when game starts
       if (this.sounds.intro) {
         this.sounds.intro.stop();
+      }
+
+      // Stop game over song if it's playing
+      if (this.sounds.gameOverSong) {
+        this.sounds.gameOverSong.stop();
+      }
+
+      // Reset music index and start first track
+      this.currentGameMusicIndex = 0;
+      if (this.sounds.gameMusic && this.sounds.gameMusic.length > 0) {
+        this.playNextGameMusicTrack();
       }
 
       this.isPlaying = true;
@@ -1613,13 +1675,55 @@ import Layout from "../../layouts/default.astro";
       }
     }
 
+    private playNextGameMusicTrack(): void {
+      if (!this.sounds.gameMusic || this.sounds.gameMusic.length === 0) return;
+
+      // Stop current track if it's playing
+      if (this.sounds.gameMusic[this.currentGameMusicIndex]) {
+        this.sounds.gameMusic[this.currentGameMusicIndex].stop();
+      }
+
+      // Play next track
+      this.playSound(this.sounds.gameMusic[this.currentGameMusicIndex], {
+        volume: 0.08,
+      });
+
+      // Set up event listener for when this track ends
+      this.sounds.gameMusic[this.currentGameMusicIndex].onended = () => {
+        // Move to next track
+        this.currentGameMusicIndex =
+          (this.currentGameMusicIndex + 1) % this.sounds.gameMusic.length;
+        // Play the next track
+        this.playNextGameMusicTrack();
+      };
+    }
+
     gameOver(): void {
       this.isPlaying = false;
       this.isPaused = false;
 
+      // Stop current game music track
+      if (
+        this.sounds.gameMusic &&
+        this.sounds.gameMusic[this.currentGameMusicIndex]
+      ) {
+        this.sounds.gameMusic[this.currentGameMusicIndex].stop();
+      }
+
       // Play game over sound
       if (this.sounds.gameOver) {
-        this.playSound(this.sounds.gameOver, { rate: 0.5, volume: 0.3 });
+        this.playSound(this.sounds.gameOver, { rate: 0.5, volume: 0.1 }).then(
+          () => {
+            // After game over sound finishes, play the game over song
+            if (this.sounds.gameOverSong) {
+              this.playSound(this.sounds.gameOverSong, {
+                volume: 0.1,
+                loop: true,
+                delay: 1,
+              });
+            }
+          }
+        );
       }
 
       // Create explosions for all remaining falling characters simultaneously
@@ -1681,7 +1785,7 @@ import Layout from "../../layouts/default.astro";
         );
         const successSound = this.sounds.success[randomIndex];
         if (successSound) {
-          this.playSound(successSound, { rate: 1.2, volume: 0.2 });
+          this.playSound(successSound, { rate: 1.2, volume: 0.1 });
         }
       } else {
         // Play random failure explosion sound
@@ -2511,9 +2615,7 @@ import Layout from "../../layouts/default.astro";
       }
       // Play intro music in a loop
       if (this.sounds.intro) {
-        this.playSound(this.sounds.intro, { volume: 0.1 });
-        // Set the intro music to loop
-        this.sounds.intro.loop();
+        this.playSound(this.sounds.intro, { volume: 0.1, loop: true });
       }
       // Add powered class to LED housing and remove off class from button
       const ledHousing = document.querySelector(".led-housing");
@@ -2535,6 +2637,19 @@ import Layout from "../../layouts/default.astro";
       // Stop intro music if it's playing
       if (this.sounds.intro) {
         this.sounds.intro.stop();
+      }
+
+      // Stop current game music track
+      if (
+        this.sounds.gameMusic &&
+        this.sounds.gameMusic[this.currentGameMusicIndex]
+      ) {
+        this.sounds.gameMusic[this.currentGameMusicIndex].stop();
+      }
+
+      // Stop game over song if it's playing
+      if (this.sounds.gameOverSong) {
+        this.sounds.gameOverSong.stop();
       }
 
       // Reset game state
@@ -2567,6 +2682,7 @@ import Layout from "../../layouts/default.astro";
       this.lastSpawnTime = 0;
       this.initialSpawnInterval = 3000;
       this.maxActiveChars = 1;
+      this.currentGameMusicIndex = 0; // Reset music index
 
       // Play power off sound
       if (this.sounds.buttonReleased) {
@@ -2609,6 +2725,9 @@ import Layout from "../../layouts/default.astro";
     let introMusic: p5.SoundFile;
     let gameOverSound: p5.SoundFile;
     let explosions: p5.SoundFile[];
+    let gameMusic: p5.SoundFile[]; // Changed to array
+    let gameOverSong: p5.SoundFile;
+    let currentGameMusicIndex: number = 0; // Add index tracking
     const container = document.getElementById("game-container");
     if (!container) return;
 
@@ -2619,6 +2738,15 @@ import Layout from "../../layouts/default.astro";
       buttonReleasedSound = p.loadSound("/sounds/button-depressed.mp3");
       introMusic = p.loadSound("/sounds/hangul-hero-intro.mp3");
       gameOverSound = p.loadSound("/sounds/game-over.mp3");
+      gameOverSong = p.loadSound("/sounds/game-over-song.mp3");
+
+      // Load all game music tracks
+      gameMusic = [
+        p.loadSound("/sounds/game-music-1.mp3"),
+        p.loadSound("/sounds/game-music-2.mp3"),
+        p.loadSound("/sounds/game-music-3.mp3"),
+        p.loadSound("/sounds/game-music-4.mp3"),
+      ];
 
       // Load explosion sounds
       explosions = [
@@ -2640,7 +2768,9 @@ import Layout from "../../layouts/default.astro";
         buttonReleased: buttonReleasedSound,
         gameOver: gameOverSound,
         intro: introMusic,
-        success: successSounds, // Add success sounds to game initialization
+        success: successSounds,
+        gameMusic: gameMusic,
+        gameOverSong: gameOverSong,
       });
     };
 
