@@ -9,6 +9,10 @@ import BaseLayout from "../../layouts/base.astro";
   </header>
   <main class="container mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
+      <div class="mobile-message">
+        <h2>MOBILE NOT SUPPORTED</h2>
+        <p>SORRY, THIS GAME IS ONLY SUPPORTED ON DESKTOP (FOR NOW).</p>
+      </div>
       <div class="arcade-cabinet">
         <div class="cabinet-top">
           <div class="marquee">
@@ -962,6 +966,65 @@ import BaseLayout from "../../layouts/base.astro";
 
   .animate-gradient {
     animation: gradient 3s ease infinite;
+  }
+
+  /* Mobile message styles */
+  .mobile-message {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    background: #000;
+    border: 4px solid #333;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 90%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mobile-message::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 8px 8px;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  .mobile-message h2 {
+    font-family: "Press Start 2P", cursive;
+    color: #ff3366;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .mobile-message p {
+    font-family: "Press Start 2P", cursive;
+    color: #fff;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  /* Hide game on mobile */
+  @media (max-width: 768px) {
+    .arcade-cabinet {
+      display: none;
+    }
+
+    .mobile-message {
+      display: block;
+    }
+
+    .text-center.mt-4 {
+      display: none;
+    }
   }
 </style>
 
