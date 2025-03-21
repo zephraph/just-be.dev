@@ -1762,9 +1762,16 @@ import BaseLayout from "../../layouts/base.astro";
       input.addEventListener("input", (e) => {
         if (!this.isPlaying || this.isPaused || !this.isPowered) return; // Don't process input when powered off or paused
 
-        const char = (e.target as HTMLInputElement).value;
-        if (char) {
-          this.handleKeyPress(char);
+        const inputValue = (e.target as HTMLInputElement).value;
+        if (inputValue) {
+          // Decompose the input value into its constituent parts
+          inputValue
+            .split("")
+            .filter(Boolean)
+            .flatMap((char) => char.normalize("NFD").split(""))
+            .forEach((char) => {
+              this.handleKeyPress(char);
+            });
           // Clear the input for the next character
           (e.target as HTMLInputElement).value = "";
         }
