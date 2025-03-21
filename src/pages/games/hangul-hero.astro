@@ -2508,6 +2508,30 @@ import BaseLayout from "../../layouts/base.astro";
           this.p.fill(255, 255, 255, this.startTextOpacity * 255);
           this.p.textSize(40);
           this.p.text(titleText, this.p.width / 2, this.p.height / 2 - 20);
+
+          // Draw final score
+          this.p.textSize(24);
+          this.p.textAlign(this.p.CENTER, this.p.CENTER);
+
+          // Score glow effect
+          const scoreGlowColor = this.p.color("#00ff00");
+          scoreGlowColor.setAlpha(this.startTextOpacity * 100);
+          this.p.fill(scoreGlowColor);
+          this.p.textSize(26);
+          this.p.text(
+            `FINAL SCORE: ${this.score}`,
+            this.p.width / 2,
+            this.p.height / 2 + 40
+          );
+
+          // Main score text
+          this.p.fill(255, 255, 255, this.startTextOpacity * 255);
+          this.p.textSize(24);
+          this.p.text(
+            `FINAL SCORE: ${this.score}`,
+            this.p.width / 2,
+            this.p.height / 2 + 40
+          );
         } else {
           // 한글 HERO title with wave animation
           this.p.textSize(60);
