@@ -1,9 +1,14 @@
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  // @ts-ignore This is failing for astro check, but not otherwise causing issues.
-  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      "~/": new URL("./src/", import.meta.url).pathname,
+      "@components/": new URL("./src/components/", import.meta.url).pathname,
+      "@layouts/": new URL("./src/layouts/", import.meta.url).pathname,
+      "@just-be/": new URL("./packages/", import.meta.url).pathname,
+    },
+  },
   test: {
     // Add any additional test configurations here if needed
   },

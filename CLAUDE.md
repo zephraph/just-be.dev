@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is Justin's personal website (just-be.dev) built with Astro 4, TypeScript, and Tailwind CSS. It features a blog/note-taking system, interactive games (including Hangul Hero for learning Korean), and is deployed on Cloudflare Pages.
+This is Justin's personal website (just-be.dev) built with Astro 5, TypeScript, and Tailwind CSS. It features a blog/note-taking system, interactive games (including Hangul Hero for learning Korean), and is deployed on Cloudflare Pages.
 
 ## Commands
 
@@ -31,7 +31,7 @@ pnpm logs:preview # View preview environment logs
 ## Architecture
 
 ### Tech Stack
-- **Framework**: Astro 4 (SSR mode)
+- **Framework**: Astro 5 (SSR mode)
 - **Language**: TypeScript with path aliases
 - **Styling**: Tailwind CSS + Typography plugin
 - **Deployment**: Cloudflare Pages/Workers
