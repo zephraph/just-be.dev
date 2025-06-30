@@ -10,7 +10,20 @@ _.file = ".env"
 experimental = true
 
 [hooks]
-postinstall = "pnpm install ${CI:+--frozen-lockfile}"
+postinstall = [
+    "pnpm install ${CI:+--frozen-lockfile}",
+    "mise run sync-versions",
+]
+
+[tasks.sync-versions]
+run = """
+NODE_VERSION="v$(grep '^node = ' mise.toml | cut -d'"' -f2)"
+PNPM_VERSION="v$(grep '^pnpm = ' mise.toml | cut -d'"' -f2)"
+sed -i.bak -e "s/^NODE_VERSION = .*/NODE_VERSION = \\"$NODE_VERSION\\"/" \
+           -e "s/^PNPM_VERSION = .*/PNPM_VERSION = \\"$PNPM_VERSION\\"/" wrangler.toml
+rm -f wrangler.toml.bak
+echo "Updated wrangler.toml: NODE_VERSION=$NODE_VERSION, PNPM_VERSION=$PNPM_VERSION"
+"""
 
 [tasks.dev]
 run = "astro dev"
