@@ -1,3 +1,6 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
 /* @license see https://just-be.dev/fonts/bastia/LICENSE */
 @font-face {
   font-family: "Bastia-bold";

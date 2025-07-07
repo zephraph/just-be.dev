@@ -1,7 +1,7 @@
 /// <reference types="./astro.config.d.ts" />
 
 import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import cloudflare from "@astrojs/cloudflare";
 import { myRemark } from "./packages/my-remark";
 import mdRenderer from "./packages/astro-md";
@@ -25,7 +25,6 @@ export default defineConfig({
   },
   integrations: [
     mdRenderer(),
-    tailwind(),
     astroCloudflareSentry({
       org: "just-be",
       project: "just-be-dev",
@@ -39,10 +38,12 @@ export default defineConfig({
     },
   }),
   vite: {
-    plugins: [fullReload(["notes/**/*.md"]),
-    inject({
-      p5: 'p5',
-    }),
-  ],
+    plugins: [
+      tailwindcss(),
+      fullReload(["notes/**/*.md"]),
+      inject({
+        p5: 'p5',
+      }),
+    ],
   },
 });
