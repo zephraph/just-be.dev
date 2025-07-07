@@ -41,6 +41,8 @@ const { objects: pages } = await Astro.locals.runtime.env.R2_BUCKET.list({
 </Layout>
 
 <style>
+  @reference "tailwindcss";
+
   th,
   td {
     @apply px-3;
